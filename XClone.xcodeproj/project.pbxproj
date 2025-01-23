@@ -35,16 +35,6 @@
 			path = XClone;
 			sourceTree = "<group>";
 		};
-		2B0E2DAB2D4296BF001C636E /* XCloneTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = XCloneTests;
-			sourceTree = "<group>";
-		};
-		2B0E2DB52D4296BF001C636E /* XCloneUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = XCloneUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,8 +66,6 @@
 			isa = PBXGroup;
 			children = (
 				2B0E2D9A2D4296BD001C636E /* XClone */,
-				2B0E2DAB2D4296BF001C636E /* XCloneTests */,
-				2B0E2DB52D4296BF001C636E /* XCloneUITests */,
 				2B0E2D992D4296BD001C636E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -102,6 +90,7 @@
 				2B0E2D942D4296BD001C636E /* Sources */,
 				2B0E2D952D4296BD001C636E /* Frameworks */,
 				2B0E2D962D4296BD001C636E /* Resources */,
+				2B0E2E082D42AD10001C636E /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -130,9 +119,6 @@
 			dependencies = (
 				2B0E2DAA2D4296BF001C636E /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				2B0E2DAB2D4296BF001C636E /* XCloneTests */,
-			);
 			name = XCloneTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +138,6 @@
 			);
 			dependencies = (
 				2B0E2DB42D4296BF001C636E /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				2B0E2DB52D4296BF001C636E /* XCloneUITests */,
 			);
 			name = XCloneUITests;
 			packageProductDependencies = (
@@ -230,6 +213,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2B0E2E082D42AD10001C636E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [[ -z \"$CI\" ]]; then\n    if [[ \"$(uname -m)\" == arm64 ]]; then\n        export PATH=\"/opt/homebrew/bin:$PATH\"\n    fi\n    # Check if running in a SwiftUI preview\n    if [ \"$XCODE_RUNNING_FOR_PREVIEWS\" != \"1\" ]; then\n        if which swiftlint > /dev/null; then\n            swiftlint --fix && swiftlint\n        else\n            echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\n        fi\n    fi\nelse \n    # Running Xcode Cloud\n    echo \"Running in Xcode Cloud. Skipping SwiftLint.\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2B0E2D942D4296BD001C636E /* Sources */ = {
@@ -395,9 +400,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"XClone/Preview Content\"";
 				DEVELOPMENT_TEAM = LF78THV97C;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -412,7 +417,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.stephandowless.XClone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -424,9 +429,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"XClone/Preview Content\"";
 				DEVELOPMENT_TEAM = LF78THV97C;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -441,7 +446,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.stephandowless.XClone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
