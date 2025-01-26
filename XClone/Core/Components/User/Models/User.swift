@@ -16,6 +16,8 @@ struct User: Identifiable, Hashable, Codable {
     let email: String
     var isPrivate: Bool
     var stats: UserStats?
+    var createdAt: Date
+    var lastActiveAt: Date?
     
     var userRelationState: UserRelationState = .unknown
     
