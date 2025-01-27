@@ -9,8 +9,7 @@ import Kingfisher
 import SwiftUI
 
 struct PostDetailView: View {
-    @Environment(FeedViewModel.self) private var viewModel
-    
+    @State private var viewModel = PostDetailViewModel(service: PostDetailService())
     @State private var showReplySortMenu = false
     @State private var selectedReplySortOption: ReplySortModel = .mostRecent
     
@@ -19,28 +18,31 @@ struct PostDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    AvatarView(user: post.author, size: .medium)
-                    
-                    VStack(alignment: .leading) {
-                        Text(post.author?.fullname ?? "")
-                            .fontWeight(.semibold)
+                VStack {
+                    HStack {
+                        AvatarView(user: post.author, size: .medium)
                         
-                        Text("@\(post.author?.username ?? "")")
-                            .foregroundColor(.gray)
+                        VStack(alignment: .leading) {
+                            Text(post.author?.fullname ?? "")
+                                .fontWeight(.semibold)
+                            
+                            Text("@\(post.author?.username ?? "")")
+                                .foregroundColor(.gray)
+                        }
+                        .font(.subheadline)
                     }
-                    .font(.subheadline)
+                    
+                    Text(post.caption)
+                        .font(.title3)
+                    
+                    Text(post.timestamp.detailedTimestampString())
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    
+                    PostEngagementView(post: post)
+                        .environment(viewModel)
                 }
-                
-                Text(post.caption)
-                    .font(.system(size: 22))
-                
-                Text(post.timestamp.detailedTimestampString())
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-                
-                PostEngagementView(post: post)
-                    .environment(viewModel)
+                .padding()
                 
                 Button { showReplySortMenu.toggle() } label: {
                     HStack(spacing: 2) {
@@ -51,6 +53,7 @@ struct PostDetailView: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                 }
+                .padding(.horizontal)
                 
                 Spacer()
             }
@@ -58,8 +61,23 @@ struct PostDetailView: View {
             Divider()
             
             LazyVStack {
-                
+                switch viewModel.loadingState {
+                case .loading:
+                    ProgressView()
+                case .empty:
+                    EmptyView()
+                case .error(let error):
+                    Text("An error ocurred: \(error.localizedDescription)")
+                case .complete:
+                    ForEach(viewModel.replies) { reply in
+                        PostCell(post: reply)
+                    }
+                }
             }
+            .padding()
+        }
+        .task(id: selectedReplySortOption) {
+            await viewModel.fetchReplies(for: post, sortOption: selectedReplySortOption)
         }
         .sheet(isPresented: $showReplySortMenu) {
             ReplySortSelectionView(selectedReplySortOption: $selectedReplySortOption)
@@ -67,7 +85,6 @@ struct PostDetailView: View {
                 .presentationCornerRadius(20)
                 .presentationDetents([.height(180)])
         }
-        .padding()
     }
 }
 

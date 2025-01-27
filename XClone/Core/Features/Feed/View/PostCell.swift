@@ -7,9 +7,7 @@
 
 import SwiftUI
 
-struct FeedCell: View {
-    @Environment(FeedViewModel.self) private var viewModel
-    
+struct PostCell: View {    
     let post: Post
     
     var body: some View {
@@ -55,6 +53,6 @@ struct FeedCell: View {
 }
 
 #Preview {
-    FeedCell(post: MockData.post)
+    PostCell(post: MockData.post)
         .environment(FeedViewModel(service: MockFeedService()))
 }
