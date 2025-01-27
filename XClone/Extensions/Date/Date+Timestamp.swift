@@ -15,4 +15,10 @@ extension Date {
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: self, to: Date()) ?? ""
     }
+    
+    func detailedTimestampString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a · MM/dd/yyyy"
+        return formatter.string(from: self)
+    }
 }

@@ -19,6 +19,8 @@ struct Post: Identifiable, Codable, Hashable {
     var didSave: Bool = false
     var didRepost: Bool = false
     
+    var author: User?
+    
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(String.self, forKey: .id)
@@ -42,7 +44,8 @@ struct Post: Identifiable, Codable, Hashable {
         engagement: PostEngagement,
         didLike: Bool = false,
         didSave: Bool = false,
-        didRepost: Bool = false
+        didRepost: Bool = false,
+        author: User? = nil
     ) {
         self.id = id
         self.authorID = authorID
@@ -53,5 +56,6 @@ struct Post: Identifiable, Codable, Hashable {
         self.didLike = didLike
         self.didSave = didSave
         self.didRepost = didRepost
+        self.author = author
     }
 }

@@ -10,6 +10,6 @@ import Foundation
 struct PostEngagement: Codable, Hashable {
     var likesCount: Int
     var impressionsCount: Int
-    var savesCount: Int
+    var commentsCount: Int
     var repostsCount: Int
 }

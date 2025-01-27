@@ -8,8 +8,34 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @State private var selection = 0
     var body: some View {
-        Text("Hello, TabBar!")
+        TabView(selection: $selection) {
+            FeedView()
+                .tabItem {
+                    Image(systemName: "house")
+                        .environment(\.symbolVariants, selection == 0 ? .fill : .none)
+                }
+                .tag(0)
+            
+            ExploreView()
+                .tabItem { Image(systemName: "magnifyingglass") }
+                .tag(1)
+            
+            NotificationsView()
+                .tabItem {
+                    Image(systemName: "bell")
+                        .environment(\.symbolVariants, selection == 2 ? .fill : .none)
+                }
+                .tag(2)
+            
+            InboxView()
+                .tabItem {
+                    Image(systemName: "envelope")
+                        .environment(\.symbolVariants, selection == 3 ? .fill : .none)
+                }
+                .tag(3)
+        }
     }
 }
 

@@ -12,7 +12,7 @@ import SwiftUI
 struct XCloneApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
     }
 }
