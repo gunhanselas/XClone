@@ -18,31 +18,28 @@ struct PostDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                VStack {
-                    HStack {
-                        AvatarView(user: post.author, size: .medium)
+                HStack {
+                    AvatarView(user: post.author, size: .medium)
+                    
+                    VStack(alignment: .leading) {
+                        Text(post.author?.fullname ?? "")
+                            .fontWeight(.semibold)
                         
-                        VStack(alignment: .leading) {
-                            Text(post.author?.fullname ?? "")
-                                .fontWeight(.semibold)
-                            
-                            Text("@\(post.author?.username ?? "")")
-                                .foregroundColor(.gray)
-                        }
-                        .font(.subheadline)
+                        Text("@\(post.author?.username ?? "")")
+                            .foregroundColor(.gray)
                     }
-                    
-                    Text(post.caption)
-                        .font(.title3)
-                    
-                    Text(post.timestamp.detailedTimestampString())
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    PostEngagementView(post: post)
-                        .environment(viewModel)
+                    .font(.subheadline)
                 }
-                .padding()
+                
+                Text(post.caption)
+                    .font(.title3)
+                
+                Text(post.timestamp.detailedTimestampString())
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                
+                PostEngagementView(post: post)
+                    .environment(viewModel)
                 
                 Button { showReplySortMenu.toggle() } label: {
                     HStack(spacing: 2) {
@@ -53,11 +50,11 @@ struct PostDetailView: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                 }
-                .padding(.horizontal)
                 
                 Spacer()
             }
-            
+            .padding([.horizontal, .top])
+
             Divider()
             
             LazyVStack {

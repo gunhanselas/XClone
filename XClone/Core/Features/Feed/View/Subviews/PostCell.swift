@@ -48,7 +48,7 @@ struct PostCell: View {
             
             Divider()
         }
-        .foregroundStyle(.black)
+        .foregroundStyle(Color(.primaryText))
     }
 }
 

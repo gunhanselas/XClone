@@ -32,6 +32,7 @@ struct FeedView: View {
                     }
                 }
             }
+            .padding(.vertical)
             .task { await viewModel.fetchPosts() }
             .navigationDestination(for: Post.self) { post in
                 PostDetailView(post: post)
