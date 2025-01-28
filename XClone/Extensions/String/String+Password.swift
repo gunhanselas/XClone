@@ -9,6 +9,6 @@ import Foundation
 
 extension String {
     func isValidPassword() -> Bool {
-        return self.count > 5
+        return self.count >= Constants.minimumPasswordCount
     }
 }

@@ -10,20 +10,20 @@ import FirebaseAuth
 import Firebase
 
 protocol AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String) async throws -> String
+    func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState
     func deleteAccount() async throws
-    func getUserSession() -> String?
-    func login(withEmail email: String, password: String) async throws -> String
+    func getAuthState() -> AuthenticationState
+    func login(withEmail email: String, password: String) async throws -> AuthenticationState
     func sendResetPasswordLink(toEmail email: String) async throws
     func signout()
 }
 
 struct AuthService: AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String) async throws -> String {
+    func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             await uploadUserData(uid: result.user.uid, username: username, email: email)
-            return result.user.uid
+            return .authenticated
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
             throw AuthenticationError(rawValue: authErrorCode)
@@ -34,14 +34,14 @@ struct AuthService: AuthServiceProtocol {
         
     }
     
-    func getUserSession() -> String? {
-        return Auth.auth().currentUser?.uid
+    func getAuthState() -> AuthenticationState {
+        return Auth.auth().currentUser?.uid == nil ? .unauthenticated : .authenticated
     }
     
-    func login(withEmail email: String, password: String) async throws -> String {
+    func login(withEmail email: String, password: String) async throws -> AuthenticationState {
         do {
-            let result = try await Auth.auth().signIn(withEmail: email, password: password)
-            return result.user.uid
+            _ = try await Auth.auth().signIn(withEmail: email, password: password)
+            return .authenticated
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
             throw AuthenticationError(rawValue: authErrorCode)

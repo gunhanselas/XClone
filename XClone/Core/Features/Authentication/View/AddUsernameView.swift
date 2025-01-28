@@ -1,0 +1,71 @@
+//
+//  AddUsernameView.swift
+//  XClone
+//
+//  Created by Stephan Dowless on 1/28/25.
+//
+
+import SwiftUI
+
+struct AddUsernameView: View {
+    @State private var usernameValidationState: InputValidationState = .idle
+    @State private var username = ""
+    @State private var validationManager = RegistrationValidationManager(service: RegistrationValidationService())
+    
+    var body: some View {
+        VStack(spacing: 24) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("To get started, pick a username")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
+                Text("Your @username is unique, you can always change it later.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            FormInputField(
+                "Enter username",
+                validationState: usernameValidationState,
+                errorMessage: "This username is unavailable, please try again",
+                text: $username
+            )
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            
+            Spacer()
+            
+            XButton("Next") {
+                validateUsername()
+            }
+            .buttonStyle(.standard)
+            .disabled(!formIsValid || usernameValidationState == .validating)
+            .opacity(formIsValid ? 1.0 : 0.5)
+        }
+        .padding()
+    }
+}
+
+private extension AddUsernameView {
+    var formIsValid: Bool {
+        return username.isValidUsername()
+    }
+    
+    func validateUsername() {
+        Task {
+            usernameValidationState = .validating
+            let isValid = await validationManager.validateUsername(username)
+            
+            if isValid {
+                usernameValidationState = .validated
+                
+                // upload username and navigate to feed view
+            }
+        }
+    }
+}
+
+#Preview {
+    AddUsernameView()
+}

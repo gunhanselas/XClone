@@ -6,6 +6,8 @@ file_length:
   warning: 750  # Set a warning when a file exceeds 750 lines
 disabled_rules:
   - trailing_whitespace
+cyclomatic_complexity:
+  ignores_case_statements: true
   
 excluded:
   - .git

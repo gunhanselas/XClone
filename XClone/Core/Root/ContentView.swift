@@ -5,17 +5,25 @@
 //  Created by Stephan Dowless on 1/23/25.
 //
 
+import GoogleSignIn
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AuthManager.self) private var authManager
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            switch authManager.authState {
+            case .notDetermined:
+                ProgressView()
+            case .unauthenticated:
+                AuthenticationRootView()
+            case .authenticated:
+                MainTabView()
+            }
         }
-        .padding()
+        .onAppear { authManager.configureAuthState() }
+        
     }
 }
 

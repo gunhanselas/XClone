@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B6A11372D47F065007FA696 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2B6A11362D47F065007FA696 /* GoogleSignInSwift */; };
+		2B6A11392D47F06C007FA696 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 2B6A11382D47F06C007FA696 /* GoogleSignIn */; };
 		2BA02ECE2D443E8300DE1A87 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2BA02ECD2D443E8300DE1A87 /* Kingfisher */; };
 		2BA02ED02D443EA100DE1A87 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 2BA02ECF2D443EA100DE1A87 /* FirebaseAnalytics */; };
 		2BA02ED22D443EA100DE1A87 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 2BA02ED12D443EA100DE1A87 /* FirebaseAuth */; };
@@ -42,9 +44,22 @@
 		2B0E2DB22D4296BF001C636E /* XCloneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XCloneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2B6A113B2D47F18D007FA696 /* Exceptions for "XClone" folder in "XClone" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/PropertyLists/Info.plist,
+			);
+			target = 2B0E2D972D4296BD001C636E /* XClone */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2B0E2D9A2D4296BD001C636E /* XClone */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2B6A113B2D47F18D007FA696 /* Exceptions for "XClone" folder in "XClone" target */,
+			);
 			path = XClone;
 			sourceTree = "<group>";
 		};
@@ -60,11 +75,13 @@
 				2BA02ED02D443EA100DE1A87 /* FirebaseAnalytics in Frameworks */,
 				2BA02EE02D443EA100DE1A87 /* FirebaseStorage in Frameworks */,
 				2BA02EDA2D443EA100DE1A87 /* FirebaseMessaging in Frameworks */,
+				2B6A11392D47F06C007FA696 /* GoogleSignIn in Frameworks */,
 				2BA02ED22D443EA100DE1A87 /* FirebaseAuth in Frameworks */,
 				2BA02ED42D443EA100DE1A87 /* FirebaseCore in Frameworks */,
 				2BA02ECE2D443E8300DE1A87 /* Kingfisher in Frameworks */,
 				2BA02EDC2D443EA100DE1A87 /* FirebasePerformance in Frameworks */,
 				2BA02ED82D443EA100DE1A87 /* FirebaseFirestore in Frameworks */,
+				2B6A11372D47F065007FA696 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +159,8 @@
 				2BA02EDB2D443EA100DE1A87 /* FirebasePerformance */,
 				2BA02EDD2D443EA100DE1A87 /* FirebaseRemoteConfig */,
 				2BA02EDF2D443EA100DE1A87 /* FirebaseStorage */,
+				2B6A11362D47F065007FA696 /* GoogleSignInSwift */,
+				2B6A11382D47F06C007FA696 /* GoogleSignIn */,
 			);
 			productName = XClone;
 			productReference = 2B0E2D982D4296BD001C636E /* XClone.app */;
@@ -222,6 +241,7 @@
 			packageReferences = (
 				2BA02ECA2D443DF100DE1A87 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				2BA02ECB2D443E7700DE1A87 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				2B6A11352D47EF4B007FA696 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2B0E2D992D4296BD001C636E /* Products */;
@@ -449,6 +469,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XClone/Resources/PropertyLists/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -478,6 +499,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XClone/Resources/PropertyLists/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -610,6 +632,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2B6A11352D47EF4B007FA696 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		2BA02ECA2D443DF100DE1A87 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -629,6 +659,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2B6A11362D47F065007FA696 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2B6A11352D47EF4B007FA696 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		2B6A11382D47F06C007FA696 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2B6A11352D47EF4B007FA696 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
 		2BA02ECD2D443E8300DE1A87 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2BA02ECA2D443DF100DE1A87 /* XCRemoteSwiftPackageReference "Kingfisher" */;

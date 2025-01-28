@@ -12,6 +12,8 @@ enum AvatarSize {
     case small
     case medium
     case large
+    case xLarge
+    case custom(CGFloat)
     
     var dimension: CGFloat {
         switch self {
@@ -23,6 +25,10 @@ enum AvatarSize {
             return 64
         case .large:
             return 80
+        case .xLarge:
+            return 100
+        case .custom(let size):
+            return size
         }
     }
 }

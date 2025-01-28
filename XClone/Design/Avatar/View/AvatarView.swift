@@ -9,12 +9,33 @@ import Kingfisher
 import SwiftUI
 
 struct AvatarView: View {
-    let user: User?
-    let size: AvatarSize
+    private let user: User?
+    private let image: Image?
+    private let size: AvatarSize
+    
+    init(user: User?, size: AvatarSize) {
+        self.user = user
+        self.size = size
+        
+        self.image = nil
+    }
+    
+    init(image: Image, size: AvatarSize) {
+        self.image = image
+        self.size = size
+        
+        self.user = nil
+    }
     
     var body: some View {
         if let imageUrl = user?.profileImageUrl {
             KFImage(URL(string: imageUrl))
+                .resizable()
+                .scaledToFill()
+                .frame(width: size.dimension, height: size.dimension)
+                .clipShape(Circle())
+        } else if let image = image {
+            image
                 .resizable()
                 .scaledToFill()
                 .frame(width: size.dimension, height: size.dimension)
@@ -24,7 +45,7 @@ struct AvatarView: View {
                 .resizable()
                 .frame(width: size.dimension, height: size.dimension)
                 .clipShape(Circle())
-                .foregroundColor(Color(.systemGray4))
+                .foregroundStyle(Color(.systemGray5), .gray)
         }
     }
 }

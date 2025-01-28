@@ -6,21 +6,27 @@
 //
 
 import FirebaseCore
+import GoogleSignIn
 import SwiftUI
 
-@main
-struct XCloneApp: App {
-    var body: some Scene {
-        WindowGroup {
-            MainTabView()
-        }
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-    return true
-  }
+@main
+struct XCloneApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    @State private var authManager = AuthManager(service: AuthService(), googleAuthService: GoogleAuthService())
+    
+    var body: some Scene {
+        WindowGroup {
+            LoginView()
+                .environment(authManager)
+        }
+    }
 }

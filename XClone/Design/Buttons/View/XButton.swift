@@ -1,0 +1,48 @@
+//
+//  XButton.swift
+//  XClone
+//
+//  Created by Stephan Dowless on 1/27/25.
+//
+
+import SwiftUI
+
+struct XButton: View {
+    @Environment(\.isLoading) var isLoading
+
+    private let title: String
+    private let imageResource: ImageResource?
+    private let action: () -> Void
+    
+    init(_ title: String, imageResource: ImageResource? = nil, action: @escaping () -> Void) {
+        self.title = title
+        self.imageResource = imageResource
+        self.action = action
+    }
+    
+    var body: some View {
+        Button { action() } label: {
+            HStack(spacing: 6) {
+                Group {
+                    if isLoading.wrappedValue {
+                        ProgressView()
+                            .tint(.black)
+                    } else {
+                        if let imageResource {
+                            Image(imageResource)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 20, height: 20)
+                        }
+                        
+                        Text(title)
+                    }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    XButton("Next", action: {})
+}
