@@ -16,7 +16,6 @@ protocol AuthServiceProtocol {
     func login(withEmail email: String, password: String) async throws -> AuthenticationState
     func sendResetPasswordLink(toEmail email: String) async throws
     func signout()
-    func uploadUsername(_ username: String) async throws
 }
 
 struct AuthService: AuthServiceProtocol {
@@ -56,11 +55,6 @@ struct AuthService: AuthServiceProtocol {
         try? Auth.auth().signOut()
     }
     
-    func uploadUsername(_ username: String) async throws {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        try await FirestoreConstants.UserCollection.document(uid).updateData(["username": username])
-    }
-    
     private func uploadUserData(uid: String, username: String, email: String, fullname: String) async throws {
         let user = User(
             id: uid,
@@ -69,7 +63,18 @@ struct AuthService: AuthServiceProtocol {
             isPrivate: false,
             createdAt: Date()
         )
+        
         let encodedUser = try Firestore.Encoder().encode(user)
         try await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
+    }
+}
+
+extension AuthService {
+    func uploadUserProfilePhoto() async throws {
+        
+    }
+    
+    func uploadUserProfileHeaderPhoto() async throws {
+        
     }
 }

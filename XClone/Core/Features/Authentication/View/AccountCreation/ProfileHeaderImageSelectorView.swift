@@ -9,10 +9,16 @@ import PhotosUI
 import SwiftUI
 
 struct ProfileHeaderImageSelectorView: View {
-    @State private var selectedPickerItem: PhotosPickerItem?
-    @State private var headerImage: Image?
-    @State private var showPhotosPicker = false
+    @Environment(AuthenticationRouter.self) private var router
+    @Environment(UserManager.self) private var userManager
+    @EnvironmentObject private var store: AuthDataStore
     
+    @State private var headerImage: Image?
+    @State private var isUploadingPhoto = false
+    @State private var selectedPickerItem: PhotosPickerItem?
+    @State private var showPhotosPicker = false
+    @State private var uiImage: UIImage?
+
     var body: some View {
         VStack(spacing: 36) {
             VStack(alignment: .leading, spacing: 16) {
@@ -56,13 +62,13 @@ struct ProfileHeaderImageSelectorView: View {
                 }
                 
                 VStack(alignment: .leading) {
-                    AvatarView(user: nil, size: .medium)
+                    AvatarView(image: store.profileImage, size: .medium)
                         .shadow(color: .primary.opacity(0.25), radius: 8)
                     
-                    Text("Bruce Wayne")
+                    Text(store.name)
                         .font(.headline)
                     
-                    Text("@batman")
+                    Text("@\(store.username)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -80,14 +86,14 @@ struct ProfileHeaderImageSelectorView: View {
             
             VStack(spacing: 24) {
                 XButton("Next") {
-                    
+                    uploadProfilePhoto()
                 }
-                .buttonStyle(.standard)
+                .buttonStyle(.standard, isLoading: $isUploadingPhoto)
                 .disabled(headerImage == nil)
                 .opacity(headerImage == nil ? 0.5 : 1.0)
                 
                 Button("Skip for now") {
-                    
+                    router.pushNextAccountCreationStep()
                 }
                 .foregroundStyle(Color(.primaryText))
                 .fontWeight(.semibold)
@@ -106,9 +112,26 @@ private extension ProfileHeaderImageSelectorView {
         do {
             guard let data = try await selectedPickerItem.loadTransferable(type: Data.self) else { return }
             guard let uiImage = UIImage(data: data) else { return }
+            
+            self.uiImage = uiImage
             self.headerImage = Image(uiImage: uiImage)
         } catch {
             print("DEBUG: Failed to select profile photo with error: \(error.localizedDescription)")
+        }
+    }
+    
+    func uploadProfilePhoto() {
+        Task {
+            isUploadingPhoto = true
+            defer { isUploadingPhoto = false }
+            
+            do {
+                guard let imageData = uiImage?.jpegData(compressionQuality: 0.5) else { return }
+                try await userManager.uploadProfileHeaderPhoto(with: imageData)
+                router.pushNextAccountCreationStep()
+            } catch {
+                print("DEBUG: Failed to upload image with error: \(error)")
+            }
         }
     }
 }

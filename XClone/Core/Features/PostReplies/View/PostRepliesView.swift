@@ -25,6 +25,7 @@ struct PostRepliesView: View {
                     VStack(alignment: .leading) {
                         HStack(spacing: 2) {
                             Text(post.author?.username ?? "")
+                                .foregroundStyle(.primaryText)
                                 .fontWeight(.semibold)
                             
                             Text("•")
@@ -37,6 +38,8 @@ struct PostRepliesView: View {
                         }
                         
                         Text(post.caption)
+                            .foregroundStyle(.primaryText)
+                            .multilineTextAlignment(.leading)
                     }
                 }
                 .font(.subheadline)
@@ -55,6 +58,7 @@ struct PostRepliesView: View {
                         
                         TextField("Post your reply...", text: $replyText, axis: .vertical)
                             .offset(y: AvatarSize.xSmall.dimension / 4)
+                            .multilineTextAlignment(.leading)
                     }
                 }
                 .font(.subheadline)

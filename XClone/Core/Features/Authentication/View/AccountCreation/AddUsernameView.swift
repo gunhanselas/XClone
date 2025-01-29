@@ -9,10 +9,12 @@ import SwiftUI
 
 struct AddUsernameView: View {
     @Environment(AuthManager.self) private var authManager
-
+    @Environment(UserManager.self) private var userManager
+    
     @State private var usernameValidationState: InputValidationState = .idle
     @State private var validationManager = RegistrationValidationManager(service: RegistrationValidationService())
     @State private var username = ""
+    
     var body: some View {
         VStack(spacing: 24) {
             VStack(alignment: .leading, spacing: 16) {
@@ -61,7 +63,7 @@ private extension AddUsernameView {
             
             if isValid {
                 usernameValidationState = .validated
-                try await authManager.uploadUsername(username)
+                try await userManager.uploadUsername(username)
                 authManager.updateAuthState(.authenticated)
             } else {
                 usernameValidationState = .invalid

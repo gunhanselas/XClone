@@ -24,6 +24,7 @@ enum AccountCreationRoutes: Int, Hashable {
     case passwordView
     case profilePhotoSelectionView
     case profileHeaderPhotoSelectionView
+    case completionView
     
     @ViewBuilder
     var destination: some View {
@@ -36,6 +37,8 @@ enum AccountCreationRoutes: Int, Hashable {
             ProfileImageSelectorView()
         case .profileHeaderPhotoSelectionView:
             ProfileHeaderImageSelectorView()
+        case .completionView:
+            AccountCreationCompletionView()
         }
     }
 }

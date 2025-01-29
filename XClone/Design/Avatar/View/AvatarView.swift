@@ -20,7 +20,7 @@ struct AvatarView: View {
         self.image = nil
     }
     
-    init(image: Image, size: AvatarSize) {
+    init(image: Image?, size: AvatarSize) {
         self.image = image
         self.size = size
         

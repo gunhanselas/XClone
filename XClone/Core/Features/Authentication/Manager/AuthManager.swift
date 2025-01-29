@@ -36,6 +36,7 @@ class AuthManager {
             self.authState = try await service.login(withEmail: email, password: password)
         } catch {
             self.error = .unknown
+            print("DEBUG: Failed to login with error: \(error)")
         }
     }
     
@@ -61,9 +62,5 @@ class AuthManager {
     func signOut() {
         service.signout()
         authState = .unauthenticated
-    }
-    
-    func uploadUsername(_ username: String) async throws {
-        try await service.uploadUsername(username)
     }
 }

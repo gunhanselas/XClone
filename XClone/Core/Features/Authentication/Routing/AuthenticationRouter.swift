@@ -40,7 +40,9 @@ class AuthenticationRouter {
         case .profilePhotoSelectionView:
             path.append(.accountCreation(.profileHeaderPhotoSelectionView))
         case .profileHeaderPhotoSelectionView:
-            print("DEBUG: Complete flow..")
+            path.append(.accountCreation(.completionView))
+        case .completionView:
+            path.removeAll()
         }
     }
 }

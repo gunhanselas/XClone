@@ -21,9 +21,23 @@ class UserManager {
         do {
             self.currentUser = try await service.fetchCurrentUser()
             self.currentUser?.userRelationState = .isCurrentUser
-            print("DEBUG: Current user is \(self.currentUser)")
         } catch {
             print("DEBUG: Error fetching current user: \(error)")
         }
+    }
+    
+    func uploadUsername(_ username: String) async throws {
+        try await service.uploadUsername(username)
+        self.currentUser?.username = username
+    }
+    
+    func uploadProfilePhoto(with imageData: Data) async throws {
+        let imageUrl = try await service.uploadProfilePhoto(imageData)
+        self.currentUser?.profileImageUrl = imageUrl
+    }
+    
+    func uploadProfileHeaderPhoto(with imageData: Data) async throws {
+        let imageUrl = try await service.uploadProfileHeaderPhoto(imageData)
+        self.currentUser?.profileHeaderImageUrl = imageUrl
     }
 }
