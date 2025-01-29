@@ -5,6 +5,7 @@
 //  Created by Stephan Dowless on 1/27/25.
 //
 
+import AuthenticationServices
 import GoogleSignIn
 import SwiftUI
 
@@ -38,7 +39,7 @@ struct AuthenticationRootView: View {
                     .buttonStyle(.standard)
                     
                     XButton("Continue with Apple", imageResource: .appleIcon) {
-                        
+                        signInwithApple()
                     }
                     .buttonStyle(.standard)
                     
@@ -104,6 +105,10 @@ struct AuthenticationRootView: View {
 private extension AuthenticationRootView {
     func signInWithGoogle() {
         Task { await authManager.signInWithGoogle() }
+    }
+    
+    func signInwithApple() {
+        authManager.requestAppleAuthorization()
     }
 }
 

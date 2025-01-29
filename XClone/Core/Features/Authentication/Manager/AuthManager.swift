@@ -5,11 +5,12 @@
 //  Created by Stephan Dowless on 1/27/25.
 //
 
+import AuthenticationServices
 import Foundation
 import GoogleSignIn
 
 @Observable
-class AuthManager {
+class AuthManager: NSObject {
     var authState: AuthenticationState = .notDetermined
     var error: AuthenticationError?
     var googleAuthUser: XGoogleAuthUser?
@@ -17,10 +18,18 @@ class AuthManager {
     
     private let service: AuthServiceProtocol
     private let googleAuthService: GoogleAuthServiceProtocol
+    private let appleAuthService: AppleAuthService
     
-    init(service: AuthServiceProtocol, googleAuthService: GoogleAuthServiceProtocol) {
+    private var currentNOnce: String?
+    
+    init(
+        service: AuthServiceProtocol = AuthService(),
+        googleAuthService: GoogleAuthServiceProtocol = GoogleAuthService(),
+        appleAuthService: AppleAuthService = AppleAuthService()
+    ) {
         self.service = service
         self.googleAuthService = googleAuthService
+        self.appleAuthService = appleAuthService
     }
     
     func configureAuthState() {
@@ -62,5 +71,33 @@ class AuthManager {
     func signOut() {
         service.signout()
         authState = .unauthenticated
+    }
+}
+
+extension AuthManager: ASAuthorizationControllerDelegate {
+    func requestAppleAuthorization() {
+        let nonce = appleAuthService.randomNonceString()
+        self.currentNOnce = nonce
+        
+        let appleIdProvider = ASAuthorizationAppleIDProvider()
+        let request = appleIdProvider.createRequest()
+        request.requestedScopes = [.email, .fullName]
+        request.nonce = appleAuthService.sha256(nonce)
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.performRequests()
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        print("DEBUG: Entered callback method..")
+        Task {
+            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+            let result = try await appleAuthService.signInWithApple(appleIDCredential, nonce: currentNOnce)
+        }
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        print("DEBUG: Failed with error: \(error)")
     }
 }
