@@ -10,7 +10,8 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthManager.self) private var authManager
-
+    @Environment(UserManager.self) private var userManager
+    
     var body: some View {
         Group {
             switch authManager.authState {
@@ -23,7 +24,10 @@ struct ContentView: View {
             }
         }
         .onAppear { authManager.configureAuthState() }
-        
+        .onChange(of: authManager.authState) { _, newValue in
+            guard newValue == .authenticated else { return }
+            Task { await userManager.fetchCurrentUser() }
+        }
     }
 }
 

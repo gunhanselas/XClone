@@ -10,12 +10,6 @@ import Firebase
 import FirebaseAuth
 import GoogleSignIn
 
-enum GoogleAuthError: Error {
-    case invalidClientID
-    case noRootViewController
-    case invalidToken
-}
-
 protocol GoogleAuthServiceProtocol {
     func signIn() async throws -> XGoogleAuthUser
 }
@@ -47,7 +41,26 @@ struct GoogleAuthService: GoogleAuthServiceProtocol {
         let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false
         
         print("DEBUG: New google user sign in \(isNewUser)")
-
+        if isNewUser {
+            try await uploadUserData(googleUser, uid: firebaseAuthResult.user.uid)
+        }
+        
         return XGoogleAuthUser(isNewUser: isNewUser, user: googleUser)
+    }
+    
+    private func uploadUserData(_ googleUser: GIDGoogleUser, uid: String) async throws {
+        guard let profileData = googleUser.profile else { throw GoogleAuthError.invalidProfileData }
+        
+        let user = User(
+            id: uid,
+            username: "",
+            fullname: profileData.name,
+            email: profileData.email,
+            isPrivate: false,
+            createdAt: Date()
+        )
+        
+        let encodedUser = try Firestore.Encoder().encode(user)
+        try await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
     }
 }

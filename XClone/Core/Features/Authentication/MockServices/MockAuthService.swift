@@ -9,9 +9,12 @@ import Foundation
 import GoogleSignIn
 
 struct MockAuthService: AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState {
+    func uploadUsername(_ username: String) async throws {
+        
+    }
+    
+    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws {
         try await Task.sleep(for: .seconds(1))
-        return .authenticated
     }
     
     func deleteAccount() async throws {

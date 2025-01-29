@@ -10,9 +10,10 @@ import SwiftUI
 struct CreatePasswordView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(AuthenticationRouter.self) private var authRouter
-    
+    @EnvironmentObject private var store: AuthDataStore
+
     @State private var isLoading = false
-    @State private var password = ""
+    @State private var error: Error?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -28,9 +29,9 @@ struct CreatePasswordView: View {
                 FormInputField(
                     "Password",
                     isSecureField: true,
-                    text: $password
+                    text: $store.password
                 )
-                    .textContentType(.password)
+                .textContentType(.password)
             }
                         
             VStack(spacing: 20) {
@@ -57,10 +58,25 @@ private extension CreatePasswordView {
     func onSignUp() {
         Task {
             isLoading = true
-            await authManager.signUp(withEmail: "", password: "", username: "")
-            isLoading = false
-            authRouter.pushNextAccountCreationStep()
+            defer { isLoading = false }
+            
+            do {
+                try await authManager.signUp(
+                    withEmail: store.email,
+                    password: store.password,
+                    username: store.username,
+                    fullname: store.name
+                )
+                
+                authRouter.pushNextAccountCreationStep()
+            } catch {
+                self.error = error
+            }
         }
+    }
+    
+    var password: String {
+        return store.password
     }
 }
 

@@ -12,7 +12,6 @@ import GoogleSignIn
 class AuthManager {
     var authState: AuthenticationState = .notDetermined
     var error: AuthenticationError?
-    
     var googleAuthUser: XGoogleAuthUser?
     var googleAuthError: GoogleAuthError?
     
@@ -40,12 +39,8 @@ class AuthManager {
         }
     }
     
-    func signUp(withEmail email: String, password: String, username: String) async {
-        do {
-            self.authState = try await service.createUser(withEmail: email, password: password, username: username)
-        } catch {
-            self.error = .unknown
-        }
+    func signUp(withEmail email: String, password: String, username: String, fullname: String) async throws {
+        try await service.createUser(withEmail: email, password: password, username: username, fullname: fullname)
     }
     
     func signInWithGoogle() async {
@@ -66,5 +61,9 @@ class AuthManager {
     func signOut() {
         service.signout()
         authState = .unauthenticated
+    }
+    
+    func uploadUsername(_ username: String) async throws {
+        try await service.uploadUsername(username)
     }
 }

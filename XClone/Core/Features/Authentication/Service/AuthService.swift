@@ -10,20 +10,20 @@ import FirebaseAuth
 import Firebase
 
 protocol AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState
+    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws
     func deleteAccount() async throws
     func getAuthState() -> AuthenticationState
     func login(withEmail email: String, password: String) async throws -> AuthenticationState
     func sendResetPasswordLink(toEmail email: String) async throws
     func signout()
+    func uploadUsername(_ username: String) async throws
 }
 
 struct AuthService: AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState {
+    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
-            await uploadUserData(uid: result.user.uid, username: username, email: email)
-            return .authenticated
+            try await uploadUserData(uid: result.user.uid, username: username, email: email, fullname: fullname)
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
             throw AuthenticationError(rawValue: authErrorCode)
@@ -40,7 +40,7 @@ struct AuthService: AuthServiceProtocol {
     
     func login(withEmail email: String, password: String) async throws -> AuthenticationState {
         do {
-            _ = try await Auth.auth().signIn(withEmail: email, password: password)
+            try await Auth.auth().signIn(withEmail: email, password: password)
             return .authenticated
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
@@ -56,9 +56,20 @@ struct AuthService: AuthServiceProtocol {
         try? Auth.auth().signOut()
     }
     
-    private func uploadUserData(uid: String, username: String, email: String) async {
-//        let user = User(id: uid, username: username, email: email, isPrivate: false)
-//        guard let encodedUser = try? Firestore.Encoder().encode(user) else { return }
-//        try? await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
+    func uploadUsername(_ username: String) async throws {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        try await FirestoreConstants.UserCollection.document(uid).updateData(["username": username])
+    }
+    
+    private func uploadUserData(uid: String, username: String, email: String, fullname: String) async throws {
+        let user = User(
+            id: uid,
+            username: username,
+            fullname: fullname, email: email,
+            isPrivate: false,
+            createdAt: Date()
+        )
+        let encodedUser = try Firestore.Encoder().encode(user)
+        try await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
     }
 }

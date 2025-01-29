@@ -12,6 +12,7 @@ struct AuthenticationRootView: View {
     @Environment(AuthManager.self) private var authManager
     
     @State private var router = AuthenticationRouter()
+    @StateObject private var dataStore = AuthDataStore()
     
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -94,6 +95,7 @@ struct AuthenticationRootView: View {
                     }
                 }
                 .environment(router)
+                .environmentObject(dataStore)
             }
         }
     }

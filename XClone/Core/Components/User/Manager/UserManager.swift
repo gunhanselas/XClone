@@ -21,6 +21,7 @@ class UserManager {
         do {
             self.currentUser = try await service.fetchCurrentUser()
             self.currentUser?.userRelationState = .isCurrentUser
+            print("DEBUG: Current user is \(self.currentUser)")
         } catch {
             print("DEBUG: Error fetching current user: \(error)")
         }

@@ -22,14 +22,16 @@ struct XCloneApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     @State private var authManager = AuthManager(
-        service: MockAuthService(),
-        googleAuthService: MockGoogleAuthService()
+        service: AuthService(),
+        googleAuthService: GoogleAuthService()
     )
+    @State private var userManager = UserManager(service: UserService())
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(authManager)
+                .environment(userManager)
         }
     }
 }

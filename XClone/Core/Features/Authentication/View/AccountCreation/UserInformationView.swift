@@ -9,10 +9,7 @@ import SwiftUI
 
 struct UserInformationView: View {
     @Environment(AuthenticationRouter.self) private var router
-    
-    @State private var name = ""
-    @State private var email = ""
-    @State private var username = ""
+    @EnvironmentObject private var store: AuthDataStore
     
     @State private var validationManager = RegistrationValidationManager(service: RegistrationValidationService())
     @State private var emailValidation: InputValidationState = .idle
@@ -27,14 +24,14 @@ struct UserInformationView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 VStack(spacing: 20) {
-                    FormInputField("Name", text: $name)
+                    FormInputField("Name", text: $store.name)
                         .textContentType(.name)
                     
                     FormInputField(
                         "Email address",
                         validationState: emailValidation,
                         errorMessage: "This email is not valid. Please try again.",
-                        text: $email
+                        text: $store.email
                     )
                     .keyboardType(.emailAddress)
                     .textContentType(.emailAddress)
@@ -44,7 +41,7 @@ struct UserInformationView: View {
                         "Username",
                         validationState: usernameValidation,
                         errorMessage: "This username is not valid. Please try again.",
-                        text: $username
+                        text: $store.username
                     )
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -62,10 +59,10 @@ struct UserInformationView: View {
 //            .disabled(!formIsValid)
 //            .opacity(formIsValid ? 1.0 : 0.5)
         }
-        .onChange(of: username) { _, newValue in
+        .onChange(of: store.username) { _, newValue in
             validateUsername(newValue)
         }
-        .onChange(of: email) { _, newValue in
+        .onChange(of: store.email) { _, newValue in
             validateEmail(newValue)
         }
         .padding()
@@ -74,7 +71,7 @@ struct UserInformationView: View {
 
 private extension UserInformationView {
     var formIsValid: Bool {
-        return name.isValidName() &&
+        return store.name.isValidName() &&
         emailValidation == .validated &&
         usernameValidation == .validated
     }
