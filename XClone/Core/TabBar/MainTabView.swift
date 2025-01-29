@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selection = 0
+    
     var body: some View {
         TabView(selection: $selection) {
             FeedView()
@@ -19,7 +20,9 @@ struct MainTabView: View {
                 .tag(0)
             
             ExploreView()
-                .tabItem { Image(systemName: "magnifyingglass") }
+                .tabItem {
+                    Image(systemName: "magnifyingglass")
+                }
                 .tag(1)
             
             NotificationsView()
@@ -35,6 +38,13 @@ struct MainTabView: View {
                         .environment(\.symbolVariants, selection == 3 ? .fill : .none)
                 }
                 .tag(3)
+            
+            CurrentUserProfileView()
+                .tabItem {
+                    Image(systemName: "person")
+                        .environment(\.symbolVariants, selection == 4 ? .fill : .none)
+                }
+                .tag(4)
         }
     }
 }

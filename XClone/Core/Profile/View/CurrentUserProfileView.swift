@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct CurrentUserProfileView: View {
+    @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
+    
     var body: some View {
-        Text("Current User Profile")
+        VStack {
+            Button("Sign Out") {
+                authManager.signOut()
+            }
+        }
     }
 }
 
