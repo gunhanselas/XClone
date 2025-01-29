@@ -81,11 +81,19 @@ struct FormInputField: View {
 }
 
 #Preview {
-    VStack {
+    VStack(spacing: 20) {
         FormInputField("Name", text: .constant(""))
-        
         FormInputField("Name", validationState: .validating, text: .constant(""))
         FormInputField("Name", validationState: .invalid, text: .constant(""))
         FormInputField("Name", validationState: .validated, text: .constant(""))
+        
+        FormInputField(
+            "Name",
+            validationState: .invalid,
+            errorMessage: "An error ocurred. Please try again.",
+            text: .constant("")
+        )
+
     }
+    .padding()
 }

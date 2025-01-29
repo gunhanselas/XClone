@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GoogleSignIn
 
 struct MockAuthService: AuthServiceProtocol {
     func createUser(withEmail email: String, password: String, username: String) async throws -> AuthenticationState {
@@ -18,7 +19,7 @@ struct MockAuthService: AuthServiceProtocol {
     }
     
     func getAuthState() -> AuthenticationState {
-        return .authenticated
+        return .unauthenticated
     }
     
     func login(withEmail email: String, password: String) async throws -> AuthenticationState {
@@ -36,8 +37,8 @@ struct MockAuthService: AuthServiceProtocol {
 }
 
 struct MockGoogleAuthService: GoogleAuthServiceProtocol {
-    func signIn() async throws -> AuthenticationState {
+    func signIn() async throws -> XGoogleAuthUser {
         try await Task.sleep(for: .seconds(1))
-        return .authenticated
+        return XGoogleAuthUser(isNewUser: true, user: GIDGoogleUser())
     }
 }

@@ -17,11 +17,11 @@ enum GoogleAuthError: Error {
 }
 
 protocol GoogleAuthServiceProtocol {
-    func signIn() async throws -> AuthenticationState
+    func signIn() async throws -> XGoogleAuthUser
 }
 
 struct GoogleAuthService: GoogleAuthServiceProtocol {
-    func signIn() async throws -> AuthenticationState {
+    func signIn() async throws -> XGoogleAuthUser {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
             throw GoogleAuthError.invalidClientID
         }
@@ -35,16 +35,19 @@ struct GoogleAuthService: GoogleAuthServiceProtocol {
         }
         
         let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-        let user = result.user
-        
-        guard let idToken = user.idToken?.tokenString else {
+        let googleUser = result.user
+    
+        guard let idToken = googleUser.idToken?.tokenString else {
             throw GoogleAuthError.invalidToken
         }
         
-        let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
+        let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: googleUser.accessToken.tokenString)
         
-        try await Auth.auth().signIn(with: credential)
+        let firebaseAuthResult = try await Auth.auth().signIn(with: credential)
+        let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false
         
-        return .authenticated
+        print("DEBUG: New google user sign in \(isNewUser)")
+
+        return XGoogleAuthUser(isNewUser: isNewUser, user: googleUser)
     }
 }

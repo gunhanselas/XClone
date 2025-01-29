@@ -11,64 +11,89 @@ import SwiftUI
 struct AuthenticationRootView: View {
     @Environment(AuthManager.self) private var authManager
     
-    var body: some View {
-        VStack {
-            Spacer()
-            
-            Text("See what's happening in the world right now.")
-                .font(.title)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.leading)
-            
-            Spacer()
-            
-            VStack(spacing: 12) {
+    @State private var router = AuthenticationRouter()
     
-                XButton("Continue with Google", imageResource: .googleIcon) {
-                    signInWithGoogle()
-                }
-                .buttonStyle(.standard)
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            VStack {
+                XLogoImageView()
+                    .padding()
                 
-                XButton("Continue with Apple", imageResource: .appleIcon) {
-                    
-                }
-                .buttonStyle(.standard)
+                Spacer()
                 
-                HStack {
-                    Rectangle()
-                        .frame(height: 1)
-                    
-                    Text("or")
-                        .font(.subheadline)
-                    
-                    Rectangle()
-                        .frame(height: 1)
-                }
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
+                Text("See what's happening in the world right now.")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.leading)
+                    .padding(.horizontal)
                 
-                XButton("Create Account") {
-                    authManager.authState = .authenticated
-                }
-                .buttonStyle(.standard)
+                Spacer()
                 
-                VStack(alignment: .leading, spacing: 24) {
-                    Text("By signing up, you agree to our Terms of Service and Privacy Policy.")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+                VStack(spacing: 12) {
                     
-                    Button { } label: {
-                        Text("Have an account already? ")
-                            .foregroundStyle(.gray)
-                        +
-                        
-                        Text("Log in")
-                            .foregroundStyle(.primary)
+                    XButton("Continue with Google", imageResource: .googleIcon) {
+                        signInWithGoogle()
                     }
-                    .font(.caption)
+                    .buttonStyle(.standard)
+                    
+                    XButton("Continue with Apple", imageResource: .appleIcon) {
+                        
+                    }
+                    .buttonStyle(.standard)
+                    
+                    HStack {
+                        Rectangle()
+                            .frame(height: 1)
+                        
+                        Text("or")
+                            .font(.subheadline)
+                        
+                        Rectangle()
+                            .frame(height: 1)
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+                    
+                    XButton("Create Account") {
+                        router.startAccountCreationFlow()
+                    }
+                    .buttonStyle(.standard)
+                    
+                    VStack(alignment: .leading, spacing: 24) {
+                        Text("By signing up, you agree to our Terms of Service.")
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                        
+                        Button { router.showLogin() } label: {
+                            Text("Have an account already? ")
+                                .foregroundStyle(.gray)
+                            +
+                            
+                            Text("Log in")
+                                .foregroundStyle(.primary)
+                        }
+                        .font(.caption)
+                    }
+                    .padding(.vertical)
+                    .padding(.horizontal, 8)
                 }
-                .padding(.vertical)
-                .padding(.horizontal, 12)
+            }
+            .onChange(of: authManager.googleAuthUser) { _, newValue in
+                guard let newValue, newValue.isNewUser else { return }
+                router.showUsernameViewAfterGoogleAuth()
+            }
+            .navigationDestination(for: AuthenticationRoutes.self) { route in
+                Group {
+                    switch route {
+                    case .login(let loginRoute):
+                        loginRoute.destination
+                    case .accountCreation(let accountCreationRoute):
+                        accountCreationRoute.destination
+                    case .googleAuthentication(let googleAuthRoute):
+                        googleAuthRoute.destination
+                    }
+                }
+                .environment(router)
             }
         }
     }

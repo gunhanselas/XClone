@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AddUsernameView: View {
+    @Environment(AuthManager.self) private var authManager
+    
     @State private var usernameValidationState: InputValidationState = .idle
     @State private var username = ""
     @State private var validationManager = RegistrationValidationManager(service: RegistrationValidationService())
@@ -40,9 +42,10 @@ struct AddUsernameView: View {
                 validateUsername()
             }
             .buttonStyle(.standard)
-            .disabled(!formIsValid || usernameValidationState == .validating)
+            .disabled(!formIsValid || usernameValidationState == .validating || usernameValidationState == .invalid)
             .opacity(formIsValid ? 1.0 : 0.5)
         }
+        .navigationBarBackButtonHidden()
         .padding()
     }
 }
@@ -59,8 +62,9 @@ private extension AddUsernameView {
             
             if isValid {
                 usernameValidationState = .validated
-                
-                // upload username and navigate to feed view
+                authManager.updateAuthState(.authenticated)
+            } else {
+                usernameValidationState = .invalid
             }
         }
     }

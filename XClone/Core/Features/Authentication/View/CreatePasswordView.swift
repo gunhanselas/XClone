@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct CreatePasswordView: View {
-    @State private var password = ""
+    @Environment(AuthManager.self) private var authManager
+    @Environment(AuthenticationRouter.self) private var authRouter
+    
     @State private var isLoading = false
+    @State private var password = ""
     
     var body: some View {
         VStack(spacing: 20) {
@@ -37,7 +40,7 @@ struct CreatePasswordView: View {
                     .multilineTextAlignment(.leading)
                 
                 XButton("Sign up") {
-                    isLoading.toggle()
+                    onSignUp()
                 }
                 .buttonStyle(.standard, isLoading: $isLoading)
                 .disabled(!password.isValidPassword())
@@ -47,6 +50,17 @@ struct CreatePasswordView: View {
             Spacer()
         }
         .padding()
+    }
+}
+
+private extension CreatePasswordView {
+    func onSignUp() {
+        Task {
+            isLoading = true
+            await authManager.signUp(withEmail: "", password: "", username: "")
+            isLoading = false
+            authRouter.pushNextAccountCreationStep()
+        }
     }
 }
 

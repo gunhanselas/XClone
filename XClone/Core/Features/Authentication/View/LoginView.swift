@@ -15,9 +15,7 @@ struct LoginView: View {
     @State private var isAuthenticating = false
     
     var body: some View {
-        VStack {
-            Spacer()
-            
+        VStack {            
             XLogoImageView()
             
             VStack(spacing: 20) {

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct UserInformationView: View {
+    @Environment(AuthenticationRouter.self) private var router
+    
     @State private var name = ""
     @State private var email = ""
     @State private var username = ""
@@ -54,11 +56,11 @@ struct UserInformationView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             
             XButton("Next") {
-                
+                router.pushNextAccountCreationStep()
             }
             .buttonStyle(.standard(size: .compact))
-            .disabled(!formIsValid)
-            .opacity(formIsValid ? 1.0 : 0.5)
+//            .disabled(!formIsValid)
+//            .opacity(formIsValid ? 1.0 : 0.5)
         }
         .onChange(of: username) { _, newValue in
             validateUsername(newValue)

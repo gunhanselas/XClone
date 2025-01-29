@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import GoogleSignIn
 
 @Observable
 class AuthManager {
     var authState: AuthenticationState = .notDetermined
     var error: AuthenticationError?
+    
+    var googleAuthUser: XGoogleAuthUser?
     var googleAuthError: GoogleAuthError?
     
     private let service: AuthServiceProtocol
@@ -23,7 +26,10 @@ class AuthManager {
     
     func configureAuthState() {
         self.authState = service.getAuthState()
-        print("DEBUG: Auth state \(authState)")
+    }
+    
+    func updateAuthState(_ state: AuthenticationState) {
+        self.authState = state
     }
     
     func login(withEmail email: String, password: String) async {
@@ -34,9 +40,22 @@ class AuthManager {
         }
     }
     
+    func signUp(withEmail email: String, password: String, username: String) async {
+        do {
+            self.authState = try await service.createUser(withEmail: email, password: password, username: username)
+        } catch {
+            self.error = .unknown
+        }
+    }
+    
     func signInWithGoogle() async {
         do {
-            self.authState = try await googleAuthService.signIn()
+            self.googleAuthUser = try await googleAuthService.signIn()
+            
+            if let googleAuthUser, !googleAuthUser.isNewUser {
+                updateAuthState(.authenticated)
+            }
+            
         } catch let error as GoogleAuthError {
             self.googleAuthError = error
         } catch {
