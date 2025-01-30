@@ -60,7 +60,7 @@ struct MockData {
             authorID: users[1].id,
             timestamp: Date().addingTimeInterval(-7200),
             caption: "Why so serious? Let’s put a smile on that face! 😈",
-            imageURL: "https://example.com/images/joker.jpg",
+            imageURL: nil,
             engagement: PostEngagement(likesCount: 1200, impressionsCount: 15000, commentsCount: 300, repostsCount: 120),
             didLike: false,
             didSave: true,

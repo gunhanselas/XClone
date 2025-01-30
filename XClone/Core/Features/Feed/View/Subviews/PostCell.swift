@@ -5,6 +5,7 @@
 //  Created by Stephan Dowless on 1/26/25.
 //
 
+import Kingfisher
 import SwiftUI
 
 struct PostCell: View {    
@@ -38,6 +39,16 @@ struct PostCell: View {
                     
                     Text(post.caption)
                         .multilineTextAlignment(.leading)
+                    
+                    if let imageUrl = post.imageURL {
+                        KFImage(URL(string: imageUrl))
+                            .placeholder { ProgressView() }
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxHeight: 200)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(.rect(cornerRadius: 10))
+                    }
                 }
                 .font(.subheadline)
             }
