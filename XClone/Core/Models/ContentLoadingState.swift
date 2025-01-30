@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ContentLoadingState {
+enum ContentLoadingState {    
     case loading
     case empty
     case error(Error)

@@ -7,12 +7,19 @@
 
 import Foundation
 
-struct User: Identifiable, Hashable, Codable {
+protocol BaseUser: Identifiable, Hashable {
+    var id: String { get }
+    var email: String { get }
+    var fullname: String? { get }
+    var username: String { get }
+}
+
+struct User: BaseUser, Codable {
     let id: String
     var username: String
     var profileImageUrl: String?
     var profileHeaderImageUrl: String?
-    var fullname: String
+    var fullname: String?
     var bio: String?
     let email: String
     var isPrivate: Bool

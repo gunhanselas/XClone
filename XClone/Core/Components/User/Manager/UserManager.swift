@@ -27,17 +27,25 @@ class UserManager {
     }
     
     func uploadUsername(_ username: String) async throws {
-        try await service.uploadUsername(username)
+        try await service.updateUsername(username)
         self.currentUser?.username = username
     }
     
     func uploadProfilePhoto(with imageData: Data) async throws {
-        let imageUrl = try await service.uploadProfilePhoto(imageData)
+        let imageUrl = try await service.updateProfilePhoto(imageData)
         self.currentUser?.profileImageUrl = imageUrl
     }
     
     func uploadProfileHeaderPhoto(with imageData: Data) async throws {
-        let imageUrl = try await service.uploadProfileHeaderPhoto(imageData)
+        let imageUrl = try await service.updateProfileHeaderPhoto(imageData)
         self.currentUser?.profileHeaderImageUrl = imageUrl
+    }
+    
+    func saveUserDataAfterAuthentication(_ user: any BaseUser) async {
+        do {
+            try await service.saveUserDataAfterAuthentication(user)
+        } catch {
+            print("DEBUG: Failed to save user data to firestore with error: \(error)")
+        }
     }
 }

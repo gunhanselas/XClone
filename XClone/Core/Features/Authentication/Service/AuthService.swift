@@ -10,7 +10,7 @@ import FirebaseAuth
 import Firebase
 
 protocol AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws
+    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws -> User
     func deleteAccount() async throws
     func getAuthState() -> AuthenticationState
     func login(withEmail email: String, password: String) async throws -> AuthenticationState
@@ -19,10 +19,10 @@ protocol AuthServiceProtocol {
 }
 
 struct AuthService: AuthServiceProtocol {
-    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws {
+    func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws -> User {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
-            try await uploadUserData(uid: result.user.uid, username: username, email: email, fullname: fullname)
+            return User(id: result.user.uid, username: username, email: email, isPrivate: false, createdAt: Date())
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
             throw AuthenticationError(rawValue: authErrorCode)
@@ -53,28 +53,5 @@ struct AuthService: AuthServiceProtocol {
     
     func signout() {
         try? Auth.auth().signOut()
-    }
-    
-    private func uploadUserData(uid: String, username: String, email: String, fullname: String) async throws {
-        let user = User(
-            id: uid,
-            username: username,
-            fullname: fullname, email: email,
-            isPrivate: false,
-            createdAt: Date()
-        )
-        
-        let encodedUser = try Firestore.Encoder().encode(user)
-        try await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
-    }
-}
-
-extension AuthService {
-    func uploadUserProfilePhoto() async throws {
-        
-    }
-    
-    func uploadUserProfileHeaderPhoto() async throws {
-        
     }
 }

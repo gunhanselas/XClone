@@ -43,7 +43,7 @@ enum AccountCreationRoutes: Int, Hashable {
     }
 }
 
-enum GoogleAuthenticationRoutes: Int, Hashable {
+enum OAuthRoutes: Int, Hashable {
     case usernameView
     
     @ViewBuilder
@@ -58,5 +58,5 @@ enum GoogleAuthenticationRoutes: Int, Hashable {
 enum AuthenticationRoutes: Hashable {
     case login(LoginRoutes)
     case accountCreation(AccountCreationRoutes)
-    case googleAuthentication(GoogleAuthenticationRoutes)
+    case oAuth(OAuthRoutes)
 }

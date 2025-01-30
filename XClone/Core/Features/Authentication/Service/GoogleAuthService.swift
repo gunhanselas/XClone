@@ -40,27 +40,10 @@ struct GoogleAuthService: GoogleAuthServiceProtocol {
         let firebaseAuthResult = try await Auth.auth().signIn(with: credential)
         let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false
         
-        print("DEBUG: New google user sign in \(isNewUser)")
-        if isNewUser {
-            try await uploadUserData(googleUser, uid: firebaseAuthResult.user.uid)
-        }
-        
-        return XGoogleAuthUser(isNewUser: isNewUser, user: googleUser)
-    }
-    
-    private func uploadUserData(_ googleUser: GIDGoogleUser, uid: String) async throws {
-        guard let profileData = googleUser.profile else { throw GoogleAuthError.invalidProfileData }
-        
-        let user = User(
-            id: uid,
-            username: "",
-            fullname: profileData.name,
-            email: profileData.email,
-            isPrivate: false,
-            createdAt: Date()
+        return XGoogleAuthUser(
+            id: firebaseAuthResult.user.uid,
+            isNewUser: isNewUser,
+            userProfileData: googleUser.profile ?? GIDProfileData()
         )
-        
-        let encodedUser = try Firestore.Encoder().encode(user)
-        try await FirestoreConstants.UserCollection.document(user.id).setData(encodedUser)
     }
 }

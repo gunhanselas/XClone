@@ -13,6 +13,8 @@ import GoogleSignIn
 class AuthManager: NSObject {
     var authState: AuthenticationState = .notDetermined
     var error: AuthenticationError?
+    
+    var appleAuthUser: XAppleAuthUser?
     var googleAuthUser: XGoogleAuthUser?
     var googleAuthError: GoogleAuthError?
     
@@ -49,8 +51,14 @@ class AuthManager: NSObject {
         }
     }
     
-    func signUp(withEmail email: String, password: String, username: String, fullname: String) async throws {
-        try await service.createUser(withEmail: email, password: password, username: username, fullname: fullname)
+    func signUp(withEmail email: String, password: String, username: String, fullname: String) async throws -> User {
+        return try await service
+            .createUser(
+                withEmail: email,
+                password: password,
+                username: username,
+                fullname: fullname
+            )
     }
     
     func signInWithGoogle() async {
@@ -60,7 +68,6 @@ class AuthManager: NSObject {
             if let googleAuthUser, !googleAuthUser.isNewUser {
                 updateAuthState(.authenticated)
             }
-            
         } catch let error as GoogleAuthError {
             self.googleAuthError = error
         } catch {
@@ -90,10 +97,17 @@ extension AuthManager: ASAuthorizationControllerDelegate {
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        print("DEBUG: Entered callback method..")
         Task {
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
-            let result = try await appleAuthService.signInWithApple(appleIDCredential, nonce: currentNOnce)
+            guard let appleAuthUser = try await appleAuthService.signInWithApple(appleIDCredential, nonce: currentNOnce) else { return }
+            
+            if appleAuthUser.isNewUser {
+                print("DEBUG: Is new user")
+                self.appleAuthUser = appleAuthUser
+            } else {
+                print("DEBUG: Is not new user")
+                updateAuthState(.authenticated)
+            }
         }
     }
     

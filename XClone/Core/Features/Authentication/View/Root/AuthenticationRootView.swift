@@ -11,6 +11,7 @@ import SwiftUI
 
 struct AuthenticationRootView: View {
     @Environment(AuthManager.self) private var authManager
+    @Environment(UserManager.self) private var userManager
     
     @State private var router = AuthenticationRouter()
     @StateObject private var dataStore = AuthDataStore()
@@ -82,7 +83,11 @@ struct AuthenticationRootView: View {
             }
             .onChange(of: authManager.googleAuthUser) { _, newValue in
                 guard let newValue, newValue.isNewUser else { return }
-                router.showUsernameViewAfterGoogleAuth()
+                saveUserDataAndShowCreateUsernameView(newValue)
+            }
+            .onChange(of: authManager.appleAuthUser) { _, newValue in
+                guard let newValue, newValue.isNewUser else { return }
+                saveUserDataAndShowCreateUsernameView(newValue)
             }
             .navigationDestination(for: AuthenticationRoutes.self) { route in
                 Group {
@@ -91,8 +96,8 @@ struct AuthenticationRootView: View {
                         loginRoute.destination
                     case .accountCreation(let accountCreationRoute):
                         accountCreationRoute.destination
-                    case .googleAuthentication(let googleAuthRoute):
-                        googleAuthRoute.destination
+                    case .oAuth(let oAuthRoute):
+                        oAuthRoute.destination
                     }
                 }
                 .environment(router)
@@ -109,6 +114,13 @@ private extension AuthenticationRootView {
     
     func signInwithApple() {
         authManager.requestAppleAuthorization()
+    }
+    
+    func saveUserDataAndShowCreateUsernameView(_ user: any BaseUser) {
+        Task {
+            await userManager.saveUserDataAfterAuthentication(user)
+            router.showUsernameViewAfterOAuth()
+        }
     }
 }
 

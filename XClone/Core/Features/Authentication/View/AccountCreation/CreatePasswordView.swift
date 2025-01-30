@@ -10,6 +10,7 @@ import SwiftUI
 struct CreatePasswordView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(AuthenticationRouter.self) private var authRouter
+    @Environment(UserManager.self) private var userManager
     @EnvironmentObject private var store: AuthDataStore
 
     @State private var isLoading = false
@@ -61,12 +62,14 @@ private extension CreatePasswordView {
             defer { isLoading = false }
             
             do {
-                try await authManager.signUp(
+                let user = try await authManager.signUp(
                     withEmail: store.email,
                     password: store.password,
                     username: store.username,
                     fullname: store.name
                 )
+                
+                await userManager.saveUserDataAfterAuthentication(user)
                 
                 authRouter.pushNextAccountCreationStep()
             } catch {

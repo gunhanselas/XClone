@@ -8,9 +8,12 @@
 import Foundation
 import GoogleSignIn
 
-struct XGoogleAuthUser: Identifiable, Hashable {
+struct XGoogleAuthUser: BaseUser {
+    let id: String
     let isNewUser: Bool
-    let user: GIDGoogleUser
+    let userProfileData: GIDProfileData
     
-    var id: String { user.accessToken.tokenString }
+    var username: String { "" }
+    var email: String { userProfileData.email }
+    var fullname: String? { userProfileData.name }
 }

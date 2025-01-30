@@ -10,7 +10,7 @@ import CryptoKit
 import FirebaseAuth
 
 struct AppleAuthService {
-    func signInWithApple(_ appleIDCredential: ASAuthorizationAppleIDCredential, nonce: String?) async throws -> AuthDataResult? {
+    func signInWithApple(_ appleIDCredential: ASAuthorizationAppleIDCredential, nonce: String?) async throws -> XAppleAuthUser? {
         guard let appleIDToken = appleIDCredential.identityToken else {
             print("DEBUG: No Apple ID Token found..")
             return nil
@@ -27,7 +27,27 @@ struct AppleAuthService {
             fullName: appleIDCredential.fullName
         )
         
-        return try await Auth.auth().signIn(with: credential)
+        print("DEBUG: Full name \(appleIDCredential.fullName?.givenName)")
+        print("DEBUG: Full name \(appleIDCredential.email)")
+
+        let firebaseAuthResult = try await Auth.auth().signIn(with: credential)
+        let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false
+        
+        guard let email = appleIDCredential.email else { return nil }
+        var name: String?
+        
+        if let nameComponents = appleIDCredential.fullName {
+            let formatter = PersonNameComponentsFormatter()
+            formatter.style = .medium
+            name = formatter.string(from: nameComponents)
+        }
+        
+        return XAppleAuthUser(
+            id: firebaseAuthResult.user.uid,
+            email: email,
+            fullName: name,
+            isNewUser: isNewUser
+        )
     }
     
     func randomNonceString(length: Int = 32) -> String {

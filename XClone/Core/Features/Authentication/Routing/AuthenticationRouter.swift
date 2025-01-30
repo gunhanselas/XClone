@@ -21,8 +21,8 @@ class AuthenticationRouter {
         path.append(.login(.loginView))
     }
     
-    func showUsernameViewAfterGoogleAuth() {
-        path.append(.googleAuthentication(.usernameView))
+    func showUsernameViewAfterOAuth() {
+        path.append(.oAuth(.usernameView))
     }
     
     func pushNextAccountCreationStep() {
