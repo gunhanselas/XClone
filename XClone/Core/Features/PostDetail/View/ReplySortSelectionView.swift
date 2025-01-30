@@ -41,5 +41,8 @@ struct ReplySortSelectionView: View {
 }
 
 #Preview {
-    ReplySortSelectionView(selectedReplySortOption: .constant(.mostLiked))
+    @Previewable
+    @State var selected: ReplySortModel = .mostLiked
+    
+    ReplySortSelectionView(selectedReplySortOption: $selected)
 }

@@ -10,6 +10,5 @@ enum UserRelationState: Codable {
     case isCurrentUser
     case notFollowed
     case followed
-    case requestedToFollow
     case blocked
 }

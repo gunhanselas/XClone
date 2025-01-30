@@ -73,6 +73,8 @@ struct PostDetailView: View {
             }
             .padding()
         }
+        .navigationTitle("Post")
+        .navigationBarTitleDisplayMode(.inline)
         .task(id: selectedReplySortOption) {
             await viewModel.fetchReplies(for: post, sortOption: selectedReplySortOption)
         }
