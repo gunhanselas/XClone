@@ -74,15 +74,10 @@ struct PostRepliesView: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { } label: {
-                        Text("Post")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
-                            .frame(width: 64, height: 36)
-                            .background(.blue)
-                            .clipShape(.capsule)
+                    XButton("Post") {
+                        
                     }
+                    .buttonStyle(.standard(size: .compact, variant: .primary))
                     .disabled(replyText.isEmpty)
                     .opacity(replyText.isEmpty ? 0.5 : 1.0)
                 }

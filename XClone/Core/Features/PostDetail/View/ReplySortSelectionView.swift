@@ -27,7 +27,7 @@ struct ReplySortSelectionView: View {
                         
                         Image(systemName: model == selectedReplySortOption ? "checkmark.circle.fill" : "circle")
                             .imageScale(.large)
-                            .foregroundStyle(model == selectedReplySortOption ? .blue : .gray)
+                            .foregroundStyle(model == selectedReplySortOption ? .primaryBlue : .gray)
                     }
                     .padding(.horizontal)
                     .onTapGesture {

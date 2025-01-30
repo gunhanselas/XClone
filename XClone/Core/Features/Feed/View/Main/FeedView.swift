@@ -45,7 +45,7 @@ struct FeedView: View {
                             .frame(width: 40, height: 40)
                             .background {
                                 Circle()
-                                    .fill(.blue)
+                                    .fill(.primaryBlue)
                                     .frame(width: 54, height: 54)
                                     .shadow(color: .primary.opacity(0.25), radius: 6)
                             }

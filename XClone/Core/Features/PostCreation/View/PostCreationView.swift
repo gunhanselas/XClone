@@ -63,6 +63,15 @@ struct PostCreationView: View {
                     }
                 }
             }
+            .alert("Cancel?", isPresented: $isShowingCancellationAlert, actions: {
+                Button("Discard", role: .destructive) {
+                    dismiss()
+                }
+                
+                Button("Continue", role: .cancel) {}
+            }, message: {
+                Text("Are you sure you want to discard this post?")
+            })
             .task(id: selectedPhotoItem) {
                 await loadPostImage()
             }
@@ -120,9 +129,9 @@ private extension PostCreationView {
             XButton("Post") {
                 
             }
-            .buttonStyle(.standard(size: .compact), isLoading: $isUploading)
-            .disabled(true)
-            .opacity(1.0)
+            .buttonStyle(.standard(size: .compact, variant: .primary), isLoading: $isUploading)
+            .disabled(caption.isEmpty)
+            .opacity(caption.isEmpty ? 0.5 : 1.0)
         }
     }
 }

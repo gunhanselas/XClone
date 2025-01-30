@@ -42,7 +42,7 @@ struct ProfileImageSelectorView: View {
                         Image(systemName: "plus.circle.fill")
                             .resizable()
                             .frame(width: 50, height: 50)
-                            .foregroundStyle(Color(.primaryTextInverse), .blue)
+                            .foregroundStyle(Color(.primaryTextInverse), .primaryBlue)
                             .offset(x: -4, y: -4)
                     }
                 }

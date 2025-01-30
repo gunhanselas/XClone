@@ -12,7 +12,7 @@ struct Post: Identifiable, Codable, Hashable {
     let authorID: String
     let timestamp: Date
     let caption: String
-    let imageURL: String?
+    var imageURL: String?
     var engagement: PostEngagement
     
     var didLike: Bool = false

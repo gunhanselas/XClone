@@ -13,22 +13,24 @@ struct XStandardButtonStyle: ButtonStyle {
     private var rank: XButtonRank
     private var size: XButtonSize
     private var iconLayout: XButtonIconLayout
+    private var variant: XButtonVariant = .system
     
-    init(rank: XButtonRank, size: XButtonSize, iconLayout: XButtonIconLayout) {
+    init(rank: XButtonRank, size: XButtonSize, iconLayout: XButtonIconLayout, variant: XButtonVariant) {
         self.rank = rank
         self.size = size
         self.iconLayout = iconLayout
+        self.variant = variant
     }
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
-            .foregroundStyle(.black.opacity(configuration.isPressed ? 0.4 : 1.0))
+            .foregroundStyle(foregroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .frame(width: width, height: height)
-            .background(.white.opacity(configuration.isPressed ? 0.4 : 1.0))
+            .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
-                if colorScheme == .light {
+                if colorScheme == .light && variant == .system {
                     Capsule()
                         .stroke(.gray, lineWidth: 1.0)
                         .opacity(configuration.isPressed ? 0.4 : 1.0)
@@ -38,10 +40,28 @@ struct XStandardButtonStyle: ButtonStyle {
 }
 
 private extension XStandardButtonStyle {
+    var backgroundColor: Color {
+        switch variant {
+        case .primary:
+            .primaryBlue
+        case .system:
+            .white
+        }
+    }
+    
+    var foregroundColor: Color {
+        switch variant {
+        case .primary:
+            .white
+        case .system:
+            .black
+        }
+    }
+    
     var width: CGFloat {
         switch size {
         case .compact:
-            return 72
+            return 64
         case .standard:
             return 360
         }
@@ -50,7 +70,7 @@ private extension XStandardButtonStyle {
     var height: CGFloat {
         switch size {
         case .compact:
-            return 36
+            return 32
         case .standard:
             return 50
         }
@@ -59,14 +79,15 @@ private extension XStandardButtonStyle {
 
 extension ButtonStyle where Self == XStandardButtonStyle {
     static var standard: XStandardButtonStyle {
-        return XStandardButtonStyle(rank: .primary, size: .standard, iconLayout: .leading)
+        return XStandardButtonStyle(rank: .primary, size: .standard, iconLayout: .leading, variant: .system)
     }
     
     static func standard(
         rank: XButtonRank = .primary,
         size: XButtonSize = .standard,
-        iconLayout: XButtonIconLayout = .leading
+        iconLayout: XButtonIconLayout = .leading,
+        variant: XButtonVariant = .system
     ) -> Self {
-        .init(rank: rank, size: size, iconLayout: iconLayout)
+        .init(rank: rank, size: size, iconLayout: iconLayout, variant: variant)
     }
 }
