@@ -23,7 +23,7 @@ struct User: BaseUser, Codable {
     var bio: String?
     let email: String
     var isPrivate: Bool
-    var stats: UserStats?
+    var followStats: UserFollowStats
     var createdAt: Date
     var lastActiveAt: Date?
     
@@ -31,5 +31,33 @@ struct User: BaseUser, Codable {
     
     var isCurrentUser: Bool {
         userRelationState == .isCurrentUser
+    }
+    
+    init(
+        id: String,
+        username: String,
+        profileImageUrl: String? = nil,
+        profileHeaderImageUrl: String? = nil,
+        fullname: String? = nil,
+        bio: String? = nil,
+        email: String,
+        isPrivate: Bool,
+        followStats: UserFollowStats? = nil,
+        createdAt: Date,
+        lastActiveAt: Date? = nil,
+        userRelationState: UserRelationState? = .unknown
+    ) {
+        self.id = id
+        self.username = username
+        self.profileImageUrl = profileImageUrl
+        self.profileHeaderImageUrl = profileHeaderImageUrl
+        self.fullname = fullname
+        self.bio = bio
+        self.email = email
+        self.isPrivate = isPrivate
+        self.followStats = followStats ?? UserFollowStats(followingCount: 0, followersCount: 0)
+        self.createdAt = createdAt
+        self.lastActiveAt = lastActiveAt
+        self.userRelationState = userRelationState ?? .unknown
     }
 }

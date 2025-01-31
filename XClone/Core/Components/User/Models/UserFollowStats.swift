@@ -5,8 +5,7 @@
 //  Created by Stephan Dowless on 1/26/25.
 //
 
-struct UserStats: Codable, Hashable {
+struct UserFollowStats: Codable, Hashable {
     var followingCount: Int
     var followersCount: Int
-    var postsCount: Int
 }

@@ -65,5 +65,4 @@ struct PostCell: View {
 
 #Preview {
     PostCell(post: MockData.post)
-        .environment(FeedViewModel(service: MockFeedService()))
 }

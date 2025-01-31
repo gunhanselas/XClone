@@ -138,4 +138,7 @@ private extension ProfileHeaderImageSelectorView {
 
 #Preview {
     ProfileHeaderImageSelectorView()
+        .environment(AuthenticationRouter())
+        .environment(UserManager(service: MockUserService()))
+        .environmentObject(AuthDataStore())
 }

@@ -20,10 +20,10 @@ protocol UserServiceProtocol {
 
 struct UserService: UserServiceProtocol {
     private let imageUploader = ImageUploader()
-        
+    
     func fetchCurrentUser() async throws -> User? {
         guard let uid = Auth.auth().currentUser?.uid else { return nil }
-        
+                
         return try await FirestoreConstants
             .UserCollection
             .document(uid)

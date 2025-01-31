@@ -20,7 +20,7 @@ struct MockData {
             bio: "Gotham's Dark Knight",
             email: "batman@gmail.com",
             isPrivate: false,
-            stats: .init(followingCount: 20, followersCount: 1000, postsCount: 32),
+            followStats: .init(followingCount: 20, followersCount: 1000),
             createdAt: Date(timeIntervalSinceNow: -1_000_000),
             lastActiveAt: Date(),
             userRelationState: .unknown
@@ -33,7 +33,7 @@ struct MockData {
             bio: "The Joker",
             email: "joker@gmail.com",
             isPrivate: false,
-            stats: .init(followingCount: 20, followersCount: 6000, postsCount: 23),
+            followStats: .init(followingCount: 20, followersCount: 6000),
             createdAt: Date(timeIntervalSinceNow: -3_000_000),
             lastActiveAt: Date(),
             userRelationState: .unknown
