@@ -11,8 +11,8 @@ struct CurrentUserProfileView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     
-    @State private var selectedTab = 0
-    @State private var viewModel = ProfileViewModel()
+    @State private var selectedFilter: ProfileContentFilterModel = .posts
+    @State private var viewModel = ProfileViewModel(service: MockProfileService())
     
     var body: some View {
         ScrollView {
@@ -20,29 +20,37 @@ struct CurrentUserProfileView: View {
                 if let user = userManager.currentUser {
                     ProfileHeaderView(user: user)
                     
-                    VStack(spacing: 0) {
-                        ProfileContentFilterView(selectedTab: $selectedTab)
+                    VStack(spacing: 4) {
+                        ProfileContentFilterView(selectedFilter: $selectedFilter)
                         
-                        TabView(selection: $selectedTab) {
-                            ForEach(ProfileContentFilterModel.allCases) { filter in
-                                LazyVStack {
-                                    ForEach(viewModel.posts(for: filter, uid: user.id)) { post in
-    //                                    PostCell(post: post)
-                                        Text(post.caption)
-                                    }
+                        switch viewModel.loadingState {
+                        case .loading:
+                            ProgressView()
+                                .padding()
+                        case .empty:
+                            Text("Configure empty state..")
+                        case .error(let error):
+                            Text("An error ocurred: \(error.localizedDescription)")
+                        case .complete:
+                            LazyVStack {
+                                ForEach(viewModel.currentDataSource) { post in
+                                    PostCell(post: post)
                                 }
                             }
+                            .padding(.vertical, 8)
                         }
-                        .containerRelativeFrame(.vertical, { height, _ in
-                            height / 1.75
-                        })
-                        .tabViewStyle(.page(indexDisplayMode: .never))
-                        .padding(.vertical)
                     }
                 }
             }
         }
-        .ignoresSafeArea()
+        .task {
+            guard let currentUser = userManager.currentUser else { return }
+            await viewModel.fetchContent(for: currentUser.id)
+        }
+        .onChange(of: selectedFilter) { _, newValue in
+            viewModel.setCurrentDataSource(for: newValue)
+        }
+        .ignoresSafeArea(edges: .top)
     }
 }
 

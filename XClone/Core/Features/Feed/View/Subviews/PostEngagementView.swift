@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PostEngagementView: View {
-    @Environment(FeedViewModel.self) private var viewModel
+//    @Environment(FeedViewModel.self) private var viewModel
     @State private var showRepliesView = false
     
     let post: Post

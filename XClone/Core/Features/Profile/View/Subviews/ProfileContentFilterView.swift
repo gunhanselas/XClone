@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileContentFilterView: View {
-    @Binding var selectedTab: Int
+    @Binding var selectedFilter: ProfileContentFilterModel
     @Namespace private var animation
 
     var body: some View {
@@ -17,11 +17,11 @@ struct ProfileContentFilterView: View {
                 VStack {
                     Text(filter.description)
                         .font(.subheadline)
-                        .fontWeight(selectedTab == filter.rawValue ? .semibold : .regular)
-                        .foregroundColor(selectedTab == filter.rawValue ? .black : .gray)
-                        .onTapGesture { selectedTab = filter.rawValue }
+                        .fontWeight(selectedFilter == filter ? .semibold : .regular)
+                        .foregroundColor(selectedFilter == filter ? .black : .gray)
+                        .onTapGesture { selectedFilter = filter }
                     
-                    if selectedTab == filter.rawValue {
+                    if selectedFilter == filter {
                         Rectangle()
                             .frame(height: 3)
                             .matchedGeometryEffect(id: "underline", in: animation)
@@ -35,13 +35,18 @@ struct ProfileContentFilterView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .animation(.smooth, value: selectedTab)
-        .padding(.top)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color(.separator))
+                .frame(height: 1)
+                .frame(maxWidth: .infinity)
+        }
+        .animation(.smooth, value: selectedFilter)
     }
 }
 
 #Preview {
-    @Previewable @State var selectedTab = 0
+    @Previewable @State var selectedFilter: ProfileContentFilterModel = .posts
     
-    ProfileContentFilterView(selectedTab: $selectedTab)
+    ProfileContentFilterView(selectedFilter: $selectedFilter)
 }

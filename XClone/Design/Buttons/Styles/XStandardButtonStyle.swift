@@ -27,6 +27,7 @@ struct XStandardButtonStyle: ButtonStyle {
             .font(.headline)
             .foregroundStyle(foregroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .frame(width: width, height: height)
+            .padding(.horizontal, size == .compact ? 14 : 0)
             .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
@@ -58,10 +59,10 @@ private extension XStandardButtonStyle {
         }
     }
     
-    var width: CGFloat {
+    var width: CGFloat? {
         switch size {
         case .compact:
-            return 64
+            return nil
         case .standard:
             return 360
         }

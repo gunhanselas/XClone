@@ -9,16 +9,64 @@ import Foundation
 
 @Observable
 class ProfileViewModel {
-
-    func posts(for filter: ProfileContentFilterModel, uid: String) -> [Post] {
+    var currentDataSource = [Post]()
+    var loadingState: ContentLoadingState = .loading
+    
+    private var posts = [Post]()
+    private var replies = [Post]()
+    private var likedPosts = [Post]()
+    
+    private let service: ProfileServiceProtocol
+    
+    init(service: ProfileServiceProtocol) {
+        self.service = service
+    }
+    
+    func setCurrentDataSource(for filter: ProfileContentFilterModel) {
+        loadingState = .loading
+        
         switch filter {
         case .posts:
-            return MockData.posts.filter({ $0.authorID == uid })
+            self.currentDataSource = posts
         case .replies:
-            return []
+            self.currentDataSource = replies
         case .likes:
-            return []
-
+            self.currentDataSource = likedPosts
+        }
+        
+        loadingState = currentDataSource.isEmpty ? .empty : .complete
+    }
+    
+    func fetchContent(for uid: String) async {
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask { await self.fetchPosts(for: uid) }
+            group.addTask { await self.fetchReplies(for: uid) }
+            group.addTask { await self.fetchedLikedPosts(for: uid) }
+        }
+    }
+    
+    private func fetchPosts(for uid: String) async {
+        do {
+            self.posts = try await service.fetchPosts(for: uid)
+            setCurrentDataSource(for: .posts)
+        } catch {
+            print("DEBUG: Error fetching posts: \(error)")
+        }
+    }
+    
+    private func fetchReplies(for uid: String) async {
+        do {
+            self.replies = try await service.fetchReplies(for: uid)
+        } catch {
+            print("DEBUG: Error fetching posts: \(error)")
+        }
+    }
+    
+    private func fetchedLikedPosts(for uid: String) async {
+        do {
+            self.likedPosts = try await service.fetchLikedPosts(for: uid)
+        } catch {
+            print("DEBUG: Error fetching posts: \(error)")
         }
     }
 }

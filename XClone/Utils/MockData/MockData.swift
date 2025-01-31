@@ -92,4 +92,6 @@ struct MockData {
             author: users[0]
         )
     ]
+    
+    static let likedPosts = [posts[0], posts[2]]
 }

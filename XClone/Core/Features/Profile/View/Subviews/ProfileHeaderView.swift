@@ -65,15 +65,15 @@ struct ProfileHeaderView: View {
                     }
                     .foregroundStyle(.secondary)
                     .font(.footnote)
-                    
                 }
                 .offset(y: -(AvatarSize.medium.dimension / 2))
                 
                 Spacer()
                 
-                Button("Set up profile") {
+                XButton("Edit Profile") {
                     
                 }
+                .buttonStyle(.standard(size: .compact))
             }
             .padding(.horizontal, 8)
         }
