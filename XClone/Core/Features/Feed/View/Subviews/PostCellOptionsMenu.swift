@@ -9,7 +9,18 @@ import SwiftUI
 
 struct PostCellOptionsMenu: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Menu {
+            Button("Report Post", action: {})
+            
+            Menu("@batman") {
+                Button("Unfollow", action: {})
+                Button("Block", action: {})
+            }
+            
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(.gray)
+        }
     }
 }
 

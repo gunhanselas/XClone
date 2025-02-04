@@ -14,12 +14,17 @@ struct Post: Identifiable, Codable, Hashable {
     let caption: String
     var imageURL: String?
     var engagement: PostEngagement
-    
+    var parentPostId: String?
+
     var didLike: Bool = false
     var didSave: Bool = false
     var didRepost: Bool = false
     
     var author: User?
+    
+    var isReply: Bool {
+        return parentPostId != nil
+    }
     
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -29,6 +34,7 @@ struct Post: Identifiable, Codable, Hashable {
         self.caption = try container.decode(String.self, forKey: .caption)
         self.imageURL = try container.decodeIfPresent(String.self, forKey: .imageURL)
         self.engagement = try container.decode(PostEngagement.self, forKey: .engagement)
+        self.parentPostId = try container.decodeIfPresent(String.self, forKey: .parentPostId)
         
         self.didLike = try container.decodeIfPresent(Bool.self, forKey: .didLike) ?? false
         self.didSave = try container.decodeIfPresent(Bool.self, forKey: .didSave) ?? false
@@ -42,6 +48,7 @@ struct Post: Identifiable, Codable, Hashable {
         caption: String,
         imageURL: String? = nil,
         engagement: PostEngagement,
+        parentPostId: String? = nil,
         didLike: Bool = false,
         didSave: Bool = false,
         didRepost: Bool = false,
@@ -53,6 +60,7 @@ struct Post: Identifiable, Codable, Hashable {
         self.caption = caption
         self.imageURL = imageURL
         self.engagement = engagement
+        self.parentPostId = parentPostId 
         self.didLike = didLike
         self.didSave = didSave
         self.didRepost = didRepost

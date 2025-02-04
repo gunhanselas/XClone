@@ -80,7 +80,12 @@ private extension XStandardButtonStyle {
 
 extension ButtonStyle where Self == XStandardButtonStyle {
     static var standard: XStandardButtonStyle {
-        return XStandardButtonStyle(rank: .primary, size: .standard, iconLayout: .leading, variant: .system)
+        return XStandardButtonStyle(
+            rank: .primary,
+            size: .standard,
+            iconLayout: .leading,
+            variant: .system
+        )
     }
     
     static func standard(

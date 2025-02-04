@@ -31,10 +31,7 @@ struct PostCell: View {
                         
                         Spacer()
                         
-                        Button { } label: {
-                            Image(systemName: "ellipsis")
-                                .foregroundStyle(.gray)
-                        }
+                        PostCellOptionsMenu()
                     }
                     
                     Text(post.caption)
