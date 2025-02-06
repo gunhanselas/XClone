@@ -9,9 +9,23 @@ import SwiftUI
 
 struct PostRepliesView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var replyText: String = ""
     
-    let post: Post
+    @State private var showUploadFailureAlert = false
+    @State private var isUploadingReply = false
+    @State private var replyText: String = ""
+    @State private var viewModel: PostReplyViewModel
+    
+    private let post: Post
+    
+    init(post: Post) {
+        self.post = post
+        
+        _viewModel = State(
+            initialValue: PostReplyViewModel(
+                service: PostReplyService(postId: post.id)
+            )
+        )
+    }
     
     var body: some View {
         NavigationStack {
@@ -66,6 +80,11 @@ struct PostRepliesView: View {
                 
                 Spacer()
             }
+            .alert("Error", isPresented: $showUploadFailureAlert, actions: {
+                Button("Ok", role: .cancel) {}
+            }, message: {
+                Text("There was an error sending your reply. Please try again later.")
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
@@ -74,13 +93,31 @@ struct PostRepliesView: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    XButton("Post") {
-                        
-                    }
-                    .buttonStyle(.standard(size: .compact, variant: .primary))
-                    .disabled(replyText.isEmpty)
-                    .opacity(replyText.isEmpty ? 0.5 : 1.0)
+                    XButton("Post", action: uploadReply)
+                        .buttonStyle(
+                            .standard(size: .compact, variant: .primary),
+                            isLoading: $isUploadingReply
+                        )
+                        .disabled(replyText.isEmpty)
+                        .opacity(replyText.isEmpty ? 0.5 : 1.0)
                 }
+            }
+        }
+    }
+}
+
+private extension PostRepliesView {
+    func uploadReply() {
+        Task {
+            isUploadingReply = true
+            defer { isUploadingReply = false }
+            
+            do {
+                try await viewModel.uploadReply(caption: replyText)
+                dismiss()
+            } catch {
+                print("DEBUG: Error uploading reply \(error)")
+                showUploadFailureAlert.toggle()
             }
         }
     }

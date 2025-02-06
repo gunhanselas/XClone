@@ -19,6 +19,10 @@ struct FirestoreConstants {
         return PostsCollection.document(postId).collection("post-likes")
     }
     
+    static func postRepliesCollection(postId: String) -> CollectionReference {
+        return PostsCollection.document(postId).collection("post-replies")
+    }
+    
     static func userFeedCollection(uid: String) -> CollectionReference {
         return UserCollection.document(uid).collection("user-feed")
     }
@@ -33,5 +37,9 @@ struct FirestoreConstants {
     
     static func userLikesCollection(uid: String) -> CollectionReference {
         return UserCollection.document(uid).collection("user-likes")
+    }
+    
+    static func userRepliesCollection(uid: String) -> CollectionReference {
+        return UserCollection.document(uid).collection("user-replies")
     }
 }
