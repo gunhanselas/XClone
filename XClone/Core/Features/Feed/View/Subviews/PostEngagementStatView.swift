@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct PostEngagementStatView: View {
-    let imageName: String
-    let count: Int
+    private let imageName: String
+    private let imageForegroundColor: Color
+    private let count: Int
+    
+    init(imageName: String, imageForegroundColor: Color = .secondary, count: Int) {
+        self.imageName = imageName
+        self.imageForegroundColor = imageForegroundColor
+        self.count = count
+    }
     
     var body: some View {
         HStack(spacing: 4) {
@@ -21,7 +28,7 @@ struct PostEngagementStatView: View {
             }
         }
         .font(.subheadline)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(imageForegroundColor)
     }
 }
 

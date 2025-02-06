@@ -7,11 +7,16 @@
 
 import SwiftUI
 
-struct PostEngagementView: View {
-//    @Environment(FeedViewModel.self) private var viewModel
+struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
+    @ObservedObject private var viewModel: ViewModel
     @State private var showRepliesView = false
     
-    let post: Post
+    private let post: Post
+    
+    init(post: Post, viewModel: ViewModel) {
+        self.viewModel = viewModel
+        self.post = post
+    }
     
     var body: some View {
         HStack {
@@ -27,8 +32,12 @@ struct PostEngagementView: View {
             
             Spacer()
             
-            Button {} label: {
-                PostEngagementStatView(imageName: "heart", count: post.engagement.likesCount)
+            Button { handleLikeTapped() } label: {
+                PostEngagementStatView(
+                    imageName: isPostLiked ? "heart.fill" : "heart",
+                    imageForegroundColor: isPostLiked ? Color(.red) : .secondary,
+                    count: likesCount
+                )
             }
             
             Spacer()
@@ -43,7 +52,37 @@ struct PostEngagementView: View {
     }
 }
 
+private extension PostEngagementView {
+    func handleLikeTapped() {
+        guard let postIndex else { return }
+        
+        Task {
+            if viewModel.posts[postIndex].didLike {
+                await viewModel.unlikePost(post)
+            } else {
+                await viewModel.likePost(post)
+            }
+        }
+    }
+    
+    var isPostLiked: Bool {
+        guard let postIndex else { return false }
+        return viewModel.posts[postIndex].didLike
+    }
+    
+    var likesCount: Int {
+        guard let postIndex else { return 0 }
+        return viewModel.posts[postIndex].engagement.likesCount
+    }
+    
+    var postIndex: Int? {
+        return viewModel.posts.firstIndex(where: { $0.id == post.id })
+    }
+}
+
 #Preview {
-    PostEngagementView(post: MockData.post)
-        .environment(FeedViewModel(service: MockFeedService()))
+    PostEngagementView<FeedViewModel>(post: MockData.post, viewModel: FeedViewModel(
+        feedService: MockFeedService(),
+        likeService: MockLikePostService()
+    ))
 }

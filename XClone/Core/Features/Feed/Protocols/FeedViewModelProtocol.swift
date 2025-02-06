@@ -1,43 +1,24 @@
 //
-//  FeedViewModel.swift
+//  FeedViewModelProtocol.swift
 //  XClone
 //
-//  Created by Stephan Dowless on 1/26/25.
+//  Created by Stephan Dowless on 2/6/25.
 //
 
 import Foundation
 
-@Observable
-class FeedViewModel: FeedViewModelProtocol {
-    var loadingState: ContentLoadingState = .loading
-    var posts = [Post]()
-    
-    private let feedService: FeedServiceProtocol
-    let likeService: LikePostServiceProtocol
-    
-    init(
-        feedService: FeedServiceProtocol = FeedService(),
-        likeService: LikePostServiceProtocol = LikePostService()
-    ) {
-        self.feedService = feedService
-        self.likeService = likeService
-    }
-    
-    func fetchPosts() async {
-        do {
-            self.posts = try await feedService.fetchPosts()
-            loadingState = posts.isEmpty ? .empty : .complete
-        } catch {
-            print("DEBUG: Failed to fetch posts with error: \(error)")
-            loadingState = .error(error)
-        }
-    }
-    
+@MainActor
+protocol FeedViewModelProtocol: ObservableObject {
+    var posts: [Post] { get set }
+    var likeService: LikePostServiceProtocol { get }
+}
+
+extension FeedViewModelProtocol {
     func likePost(_ post: Post) async {
         guard let index = posts.firstIndex(where: { $0.id == post.id }) else { return }
         
         do {
-            posts[index].didLike = true
+            self.posts[index].didLike = true
             posts[index].engagement.likesCount += 1
             try await likeService.likePost(post)
         } catch {

@@ -10,7 +10,10 @@ import SwiftUI
 struct FeedView: View {
     @Environment(UserManager.self) private var userManager
     
-    @State private var viewModel = FeedViewModel(service: MockFeedService())
+    @State private var viewModel = FeedViewModel(
+        feedService: MockFeedService(),
+        likeService: MockLikePostService()
+    )
     @State private var isShowingPostCreationView = false
     
     var body: some View {
@@ -29,8 +32,7 @@ struct FeedView: View {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.posts) { post in
                                 NavigationLink(value: post) {
-                                    PostCell(post: post)
-                                        .environment(viewModel)
+                                    PostCell(post: post, viewModel: viewModel)
                                 }
                             }
                         }

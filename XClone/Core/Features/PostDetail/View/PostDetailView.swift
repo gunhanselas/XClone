@@ -38,9 +38,8 @@ struct PostDetailView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
-                PostEngagementView(post: post)
-                    .environment(viewModel)
-                
+                PostEngagementView(post: post, viewModel: viewModel)
+
                 Button { showReplySortMenu.toggle() } label: {
                     HStack(spacing: 2) {
                         Text(selectedReplySortOption.description)
@@ -66,8 +65,8 @@ struct PostDetailView: View {
                 case .error(let error):
                     Text("An error ocurred: \(error.localizedDescription)")
                 case .complete:
-                    ForEach(viewModel.replies) { reply in
-                        PostCell(post: reply)
+                    ForEach(viewModel.posts) { reply in
+                        PostCell(post: reply, viewModel: viewModel)
                     }
                 }
             }
@@ -89,5 +88,10 @@ struct PostDetailView: View {
 
 #Preview {
     PostDetailView(post: MockData.post)
-        .environment(FeedViewModel(service: MockFeedService()))
+        .environment(
+            FeedViewModel(
+                feedService: MockFeedService(),
+                likeService: MockLikePostService()
+            )
+        )
 }

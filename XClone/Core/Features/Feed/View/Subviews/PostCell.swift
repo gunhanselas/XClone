@@ -8,8 +8,14 @@
 import Kingfisher
 import SwiftUI
 
-struct PostCell: View {    
-    let post: Post
+struct PostCell<ViewModel: FeedViewModelProtocol>: View {
+    @ObservedObject private var viewModel: ViewModel
+    private let post: Post
+    
+    init(post: Post, viewModel: ViewModel) {
+        self.post = post
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         VStack {
@@ -52,7 +58,7 @@ struct PostCell: View {
             }
             .padding(.horizontal, 8)
             
-            PostEngagementView(post: post)
+            PostEngagementView(post: post, viewModel: viewModel)
                 .padding(.horizontal)
             
             Divider()
@@ -62,5 +68,11 @@ struct PostCell: View {
 }
 
 #Preview {
-    PostCell(post: MockData.post)
+    PostCell(
+        post: MockData.post,
+        viewModel: FeedViewModel(
+            feedService: MockFeedService(),
+            likeService: MockLikePostService()
+        )
+    )
 }

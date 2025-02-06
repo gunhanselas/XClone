@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ExploreView: View {
     var body: some View {
-        Text("Hello, Explore!")
+        NavigationStack {
+            UserListView(config: .explore)
+        }
     }
 }
 

@@ -8,18 +8,21 @@
 import Foundation
 
 @Observable
-class ProfileViewModel {
+class ProfileViewModel: FeedViewModelProtocol {
+    
     var currentDataSource = [Post]()
     var loadingState: ContentLoadingState = .loading
-    
-    private var posts = [Post]()
+
+    var posts = [Post]()
     private var replies = [Post]()
     private var likedPosts = [Post]()
     
-    private let service: ProfileServiceProtocol
-    
-    init(service: ProfileServiceProtocol) {
-        self.service = service
+    private let profileService: ProfileServiceProtocol
+    private(set) var likeService: LikePostServiceProtocol
+
+    init(profileService: ProfileServiceProtocol, likeService: LikePostServiceProtocol = LikePostService()) {
+        self.profileService = profileService
+        self.likeService = likeService
     }
     
     func setCurrentDataSource(for filter: ProfileContentFilterModel) {
@@ -47,7 +50,7 @@ class ProfileViewModel {
     
     private func fetchPosts(for uid: String) async {
         do {
-            self.posts = try await service.fetchPosts(for: uid)
+            self.posts = try await profileService.fetchPosts(for: uid)
             setCurrentDataSource(for: .posts)
         } catch {
             print("DEBUG: Error fetching posts: \(error)")
@@ -56,7 +59,7 @@ class ProfileViewModel {
     
     private func fetchReplies(for uid: String) async {
         do {
-            self.replies = try await service.fetchReplies(for: uid)
+            self.replies = try await profileService.fetchReplies(for: uid)
         } catch {
             print("DEBUG: Error fetching posts: \(error)")
         }
@@ -64,7 +67,7 @@ class ProfileViewModel {
     
     private func fetchedLikedPosts(for uid: String) async {
         do {
-            self.likedPosts = try await service.fetchLikedPosts(for: uid)
+            self.likedPosts = try await profileService.fetchLikedPosts(for: uid)
         } catch {
             print("DEBUG: Error fetching posts: \(error)")
         }

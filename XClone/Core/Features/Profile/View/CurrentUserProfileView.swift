@@ -12,7 +12,10 @@ struct CurrentUserProfileView: View {
     @Environment(UserManager.self) private var userManager
     
     @State private var selectedFilter: ProfileContentFilterModel = .posts
-    @State private var viewModel = ProfileViewModel(service: MockProfileService())
+    @State private var viewModel = ProfileViewModel(
+        profileService: MockProfileService(),
+        likeService: MockLikePostService()
+    )
     
     var body: some View {
         ScrollView {
@@ -34,7 +37,7 @@ struct CurrentUserProfileView: View {
                         case .complete:
                             LazyVStack {
                                 ForEach(viewModel.currentDataSource) { post in
-                                    PostCell(post: post)
+                                    PostCell(post: post, viewModel: viewModel)
                                 }
                             }
                             .padding(.vertical, 8)

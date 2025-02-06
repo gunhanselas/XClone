@@ -8,22 +8,24 @@
 import Observation
 
 @Observable
-class PostDetailViewModel {
+class PostDetailViewModel: FeedViewModelProtocol {
     var loadingState: ContentLoadingState = .loading
-    var replies = [Post]()
+    var posts = [Post]()
     
     private let service: PostDetailServiceProtocol
+    private(set) var likeService: LikePostServiceProtocol
     
-    init(service: PostDetailServiceProtocol) {
+    init(service: PostDetailServiceProtocol, likePostService: LikePostServiceProtocol = LikePostService()) {
         self.service = service
+        self.likeService = likePostService
     }
     
     func fetchReplies(for post: Post, sortOption: ReplySortModel) async {
         loadingState = .loading
         
         do {
-            self.replies = try await service.fetchReplies(for: post, sortOption: sortOption)
-            loadingState = replies.isEmpty ? .empty : .complete
+            self.posts = try await service.fetchReplies(for: post, sortOption: sortOption)
+            loadingState = posts.isEmpty ? .empty : .complete
         } catch {
             loadingState = .error(error)
         }
