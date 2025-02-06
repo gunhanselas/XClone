@@ -23,6 +23,7 @@ struct PostReplyService: PostReplyServiceProtocol {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         let postRef = FirestoreConstants.PostsCollection.document(postId)
         let replyRef = FirestoreConstants.postRepliesCollection(postId: postId).document()
+        let userReplyRef = FirestoreConstants.userRepliesCollection(uid: currentUid).document(postId)
         let batch = Firestore.firestore().batch()
 
         let reply = Post(
@@ -34,13 +35,18 @@ struct PostReplyService: PostReplyServiceProtocol {
             parentPostId: postId
         )
         
-        let data = try Firestore.Encoder().encode(reply)
+        let replyData = try Firestore.Encoder().encode(reply)
         
-        batch.setData(data, forDocument: replyRef)
+        batch.setData(replyData, forDocument: replyRef)
         batch.updateData(
             ["engagement.replyCount": FieldValue.increment(Int64(1))],
             forDocument: postRef
         )
+        
+        let userReply = UserPostReply(uid: currentUid, postId: postId, timestamp: Date())
+        let userReplyData = try Firestore.Encoder().encode(userReply)
+        
+        batch.setData(userReplyData, forDocument: userReplyRef)
         
         try await batch.commit()
     }
