@@ -8,14 +8,24 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    @State private var viewModel = NotificationsViewModel(service: XNotificationService())
+    @State private var viewModel = NotificationsViewModel()
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack {
-                    ForEach(viewModel.notifications) { notification in
-                        Text(notification.id)
+            switch viewModel.loadingState {
+            case .loading:
+                ProgressView()
+                    .containerRelativeFrame(.vertical)
+            case .empty:
+                Text("Empty state..")
+            case .error(let error):
+                Text("Error: \(error.localizedDescription)")
+            case .complete:
+                ScrollView {
+                    LazyVStack {
+                        ForEach(viewModel.notifications) { notification in
+                            NotificationRowView(notification: notification)
+                        }
                     }
                 }
             }

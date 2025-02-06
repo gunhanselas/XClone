@@ -15,6 +15,7 @@ struct XNotification: Identifiable, Codable {
     var postId: String?
     
     var sender: User?
+    var post: Post? 
 }
 
 enum XNotificationType: Int, Codable {

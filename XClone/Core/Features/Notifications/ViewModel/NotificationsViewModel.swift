@@ -14,13 +14,14 @@ class NotificationsViewModel {
     
     private let service: XNotificationServiceProtocol
     
-    init(service: XNotificationServiceProtocol) {
+    init(service: XNotificationServiceProtocol = MockXNotificationService()) {
         self.service = service
     }
     
     func fetchNotifications() async {
         do {
-            self.notifications = try await service.fetchNotifications()
+            notifications = try await service.fetchNotifications()
+            loadingState = notifications.isEmpty ? .empty : .complete
         } catch {
             loadingState = .error(error)
             print("DEBUG: Failed to fetch notifications with error: \(error)")

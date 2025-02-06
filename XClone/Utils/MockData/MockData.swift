@@ -10,37 +10,37 @@ import Foundation
 struct MockData {
     
     static let currentUser = users[0]
+    static let post = posts[0]
+    static let likedPosts = [posts[0], posts[2]]
+    static let notification = notifications[0]
     
-    static let users: [User] = [
+    static let notifications: [XNotification] = [
         .init(
             id: UUID().uuidString,
-            username: "batman",
-            profileImageUrl: "https://firebasestorage.googleapis.com:443/v0/b/instagramswiftui-22394.appspot.com/o/profile_images%2F35004D5A-6360-4F72-B010-880254BDD973?alt=media&token=e67e2092-22f2-4b61-b6ca-67151e808efe",
-            fullname: "Bruce Wayne",
-            bio: "Gotham's Dark Knight",
-            email: "batman@gmail.com",
-            isPrivate: false,
-            followStats: .init(followingCount: 20, followersCount: 1000),
-            createdAt: Date(timeIntervalSinceNow: -1_000_000),
-            lastActiveAt: Date(),
-            userRelationState: .unknown
+            type: .like,
+            senderId: users[1].id,
+            timestamp: Date(),
+            postId: posts[0].id,
+            sender: users[1],
+            post: posts[0]
         ),
         .init(
             id: UUID().uuidString,
-            username: "joker",
-            profileImageUrl: "https://firebasestorage.googleapis.com:443/v0/b/instagramswiftui-22394.appspot.com/o/profile_images%2F43B191E7-9E37-4394-ACDB-F253F9C837AC?alt=media&token=353f617b-fdae-44eb-bf71-0c63ecbabcb3",
-            fullname: "Heath Ledger",
-            bio: "The Joker",
-            email: "joker@gmail.com",
-            isPrivate: false,
-            followStats: .init(followingCount: 20, followersCount: 6000),
-            createdAt: Date(timeIntervalSinceNow: -3_000_000),
-            lastActiveAt: Date(),
-            userRelationState: .unknown
+            type: .follow,
+            senderId: users[1].id,
+            timestamp: Date(),
+            sender: users[1]
+        ),
+        .init(
+            id: UUID().uuidString,
+            type: .reply,
+            senderId: users[1].id,
+            timestamp: Date(),
+            postId: posts[0].id,
+            sender: users[1],
+            post: posts[0]
         )
     ]
-    
-    static let post = posts[0]
     
     static let posts: [Post] = [
         Post(
@@ -93,5 +93,32 @@ struct MockData {
         )
     ]
     
-    static let likedPosts = [posts[0], posts[2]]
+    static let users: [User] = [
+        .init(
+            id: UUID().uuidString,
+            username: "batman",
+            profileImageUrl: "https://firebasestorage.googleapis.com:443/v0/b/instagramswiftui-22394.appspot.com/o/profile_images%2F35004D5A-6360-4F72-B010-880254BDD973?alt=media&token=e67e2092-22f2-4b61-b6ca-67151e808efe",
+            fullname: "Bruce Wayne",
+            bio: "Gotham's Dark Knight",
+            email: "batman@gmail.com",
+            isPrivate: false,
+            followStats: .init(followingCount: 20, followersCount: 1000),
+            createdAt: Date(timeIntervalSinceNow: -1_000_000),
+            lastActiveAt: Date(),
+            userRelationState: .unknown
+        ),
+        .init(
+            id: UUID().uuidString,
+            username: "joker",
+            profileImageUrl: "https://firebasestorage.googleapis.com:443/v0/b/instagramswiftui-22394.appspot.com/o/profile_images%2F43B191E7-9E37-4394-ACDB-F253F9C837AC?alt=media&token=353f617b-fdae-44eb-bf71-0c63ecbabcb3",
+            fullname: "Heath Ledger",
+            bio: "The Joker",
+            email: "joker@gmail.com",
+            isPrivate: false,
+            followStats: .init(followingCount: 20, followersCount: 6000),
+            createdAt: Date(timeIntervalSinceNow: -3_000_000),
+            lastActiveAt: Date(),
+            userRelationState: .unknown
+        )
+    ]
 }
