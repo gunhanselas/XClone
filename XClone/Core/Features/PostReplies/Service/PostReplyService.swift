@@ -21,7 +21,7 @@ struct PostReplyService: PostReplyServiceProtocol {
     
     func uploadReply(caption: String) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        let replyRef = FirestoreConstants.PostsCollection.document()
+        let replyRef = FirestoreConstants.postRepliesCollection(postId: postId).document()
         
         let reply = Post(
             id: replyRef.documentID,
