@@ -21,7 +21,7 @@ struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
     var body: some View {
         HStack {
             Button { showRepliesView.toggle() } label: {
-                PostEngagementStatView(imageName: "bubble", count: post.engagement.commentsCount)
+                PostEngagementStatView(imageName: "bubble", count: post.engagement.replyCount)
             }
             
             Spacer()
