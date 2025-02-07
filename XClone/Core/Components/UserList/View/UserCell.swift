@@ -26,7 +26,7 @@ struct UserCell: View {
             
             Spacer()
         }
-        .foregroundColor(.black)
+        .foregroundStyle(.primaryText)
         .padding(.horizontal)
     }
 }

@@ -18,7 +18,7 @@ struct ProfileContentFilterView: View {
                     Text(filter.description)
                         .font(.subheadline)
                         .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                        .foregroundColor(selectedFilter == filter ? .black : .gray)
+                        .foregroundColor(selectedFilter == filter ? .primaryText : .gray)
                         .onTapGesture { selectedFilter = filter }
                     
                     if selectedFilter == filter {

@@ -9,24 +9,36 @@ import Kingfisher
 import SwiftUI
 
 struct ProfileHeaderView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     let user: User
     
     var body: some View {
         VStack {
-            if let headerImageUrl = user.profileHeaderImageUrl {
-                KFImage(URL(string: headerImageUrl))
-                    .resizable()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 140)
-                    .clipped()
-                    .contentShape(.rect)
-            } else {
-                Rectangle()
-                    .fill(.primaryBlue)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 140)
-                    .clipped()
-                    .contentShape(.rect)
+            ZStack(alignment: .leading) {
+                if let headerImageUrl = user.profileHeaderImageUrl {
+                    KFImage(URL(string: headerImageUrl))
+                        .resizable()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 140)
+                        .clipped()
+                        .contentShape(.rect)
+                } else {
+                    Rectangle()
+                        .fill(.primaryBlue)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 140)
+                        .clipped()
+                        .contentShape(.rect)
+                }
+                
+                Button { dismiss() } label: {
+                    Image(systemName: "arrow.left.circle.fill")
+                        .resizable()
+                        .frame(width: 28, height: 28)
+                        .foregroundStyle(.white, .black.opacity(0.4))
+                        .padding(.leading)
+                }
             }
             
             HStack(alignment: .top) {
@@ -70,12 +82,38 @@ struct ProfileHeaderView: View {
                 
                 Spacer()
                 
-                XButton("Edit Profile") {
-                    
+                XButton(primaryButtonTitle) {
+
                 }
-                .buttonStyle(.standard(size: .compact))
+                .buttonStyle(.standard(rank: primaryButtonRank, size: .compact))
             }
             .padding(.horizontal, 8)
+        }
+    }
+}
+
+private extension ProfileHeaderView {
+    var primaryButtonTitle: String {
+        switch user.userRelationState {
+        case .unknown:
+            "Loading"
+        case .isCurrentUser:
+            "Edit Profile"
+        case .notFollowed:
+            "Follow"
+        case .followed:
+            "Following"
+        case .blocked:
+            "Unblock"
+        }
+    }
+    
+    var primaryButtonRank: XButtonRank {
+        switch user.userRelationState {
+        case .isCurrentUser, .followed, .blocked, .unknown:
+            .secondary
+        default:
+            .primary
         }
     }
 }

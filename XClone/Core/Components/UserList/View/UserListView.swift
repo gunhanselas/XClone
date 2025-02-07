@@ -51,8 +51,8 @@ struct UserListView: View {
         .onChange(of: activeScrollId) { _, newValue in
             loadMoreUsersIfNecessary(newValue)
         }
-        .navigationDestination(for: User.self) { _ in
-//            ProfileView(user: user)
+        .navigationDestination(for: User.self) { user in
+            UserProfileView(user: user)
         }
         .navigationTitle(config.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)

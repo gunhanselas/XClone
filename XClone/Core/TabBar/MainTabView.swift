@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @Environment(UserManager.self) private var userManager
+    
     @State private var selection = 0
     
     var body: some View {
@@ -39,12 +41,14 @@ struct MainTabView: View {
                 }
                 .tag(3)
             
-            CurrentUserProfileView()
-                .tabItem {
-                    Image(systemName: "person")
-                        .environment(\.symbolVariants, selection == 4 ? .fill : .none)
-                }
-                .tag(4)
+            if let currentUser = userManager.currentUser {
+                UserProfileView(user: currentUser)
+                    .tabItem {
+                        Image(systemName: "person")
+                            .environment(\.symbolVariants, selection == 4 ? .fill : .none)
+                    }
+                    .tag(4)
+            }
         }
     }
 }

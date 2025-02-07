@@ -27,11 +27,11 @@ struct XStandardButtonStyle: ButtonStyle {
             .font(.headline)
             .foregroundStyle(foregroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .frame(width: width, height: height)
-            .padding(.horizontal, size == .compact ? 14 : 0)
+            .padding(.horizontal, size == .compact ? 18 : 0)
             .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
-                if colorScheme == .light && variant == .system {
+                if (colorScheme == .light || rank == .secondary) && variant == .system {
                     Capsule()
                         .stroke(.gray, lineWidth: 1.0)
                         .opacity(configuration.isPressed ? 0.4 : 1.0)
@@ -46,7 +46,14 @@ private extension XStandardButtonStyle {
         case .primary:
             .primaryBlue
         case .system:
-            .white
+            switch rank {
+            case .primary:
+                .white
+            case .secondary:
+                Color(.systemBackground)
+            case .tertiary:
+                .clear
+            }
         }
     }
     
@@ -55,7 +62,11 @@ private extension XStandardButtonStyle {
         case .primary:
             .white
         case .system:
-            .black
+            if rank == .secondary {
+                Color(.primaryText)
+            } else {
+                .black
+            }
         }
     }
     
@@ -71,7 +82,7 @@ private extension XStandardButtonStyle {
     var height: CGFloat {
         switch size {
         case .compact:
-            return 32
+            return 34
         case .standard:
             return 50
         }
