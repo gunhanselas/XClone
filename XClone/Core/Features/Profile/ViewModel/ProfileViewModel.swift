@@ -19,18 +19,22 @@ class ProfileViewModel: FeedViewModelProtocol {
     
     private let profileService: ProfileServiceProtocol
     private let followService: FollowServiceProtocol
+    private let userService: UserServiceProtocol
+    
     private(set) var likeService: LikePostServiceProtocol
 
     init(
         user: User,
         profileService: ProfileServiceProtocol = MockProfileService(),
         likeService: LikePostServiceProtocol = LikePostService(),
-        followService: FollowServiceProtocol = FollowService()
+        followService: FollowServiceProtocol = FollowService(),
+        userService: UserServiceProtocol = UserService()
     ) {
         self.user = user
         self.profileService = profileService
         self.likeService = likeService
         self.followService = followService
+        self.userService = userService
     }
     
     func setCurrentDataSource(for filter: ProfileContentFilterModel) {
@@ -46,6 +50,21 @@ class ProfileViewModel: FeedViewModelProtocol {
         }
         
         loadingState = currentDataSource.isEmpty ? .empty : .complete
+    }
+    
+    func refresh() async {
+        do {
+            self.user = try await userService.fetchUser(withUid: user.id)
+            
+            await withThrowingTaskGroup(of: Void.self) { [weak self] group in
+                guard let self else { return }
+                
+                group.addTask { await self.fetchUserRelationState() }
+                group.addTask { await self.fetchUserContent() }
+            }
+        } catch {
+            print("DEBUG: Failed to refresh profile with error: \(error)")
+        }
     }
     
     func fetchUserContent() async {

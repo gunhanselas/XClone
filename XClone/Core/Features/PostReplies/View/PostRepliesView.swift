@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PostRepliesView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(UserManager.self) private var userManager
     
     @State private var showUploadFailureAlert = false
     @State private var isUploadingReply = false
@@ -68,7 +69,7 @@ struct PostRepliesView: View {
                         .foregroundStyle(.gray)
                     
                     HStack(alignment: .top) {
-                        AvatarView(user: post.author, size: .xSmall)
+                        AvatarView(user: userManager.currentUser, size: .xSmall)
                         
                         TextField("Post your reply...", text: $replyText, axis: .vertical)
                             .offset(y: AvatarSize.xSmall.dimension / 4)
@@ -125,4 +126,5 @@ private extension PostRepliesView {
 
 #Preview {
     PostRepliesView(post: MockData.post)
+        .environment(UserManager(service: MockUserService()))
 }

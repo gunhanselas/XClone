@@ -44,6 +44,7 @@ struct UserProfileView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .refreshable { await viewModel.refresh() }
         .task { await viewModel.fetchUserContent() }
         .task { await viewModel.fetchUserRelationState() }
         .onChange(of: selectedFilter) { _, newValue in
