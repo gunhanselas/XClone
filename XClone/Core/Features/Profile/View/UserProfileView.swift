@@ -9,21 +9,17 @@ import SwiftUI
 
 struct UserProfileView: View {
     @State private var selectedFilter: ProfileContentFilterModel = .posts
-    @State private var viewModel = ProfileViewModel(
-        profileService: MockProfileService(),
-        likeService: MockLikePostService()
-    )
-    
-    private let user: User
-    
+    @State private var viewModel: ProfileViewModel
+        
     init(user: User) {
-        self.user = user
+        _viewModel = State(initialValue: ProfileViewModel(user: user))
     }
     
     var body: some View {
         ScrollView {
             VStack {
-                ProfileHeaderView(user: user)
+                ProfileHeaderView(user: viewModel.user)
+                    .environment(viewModel)
                 
                 VStack(spacing: 4) {
                     ProfileContentFilterView(selectedFilter: $selectedFilter)
@@ -48,7 +44,8 @@ struct UserProfileView: View {
             }
         }
         .navigationBarBackButtonHidden()
-        .task { await viewModel.fetchContent(for: user.id) }
+        .task { await viewModel.fetchUserContent() }
+        .task { await viewModel.fetchUserRelationState() }
         .onChange(of: selectedFilter) { _, newValue in
             viewModel.setCurrentDataSource(for: newValue)
         }

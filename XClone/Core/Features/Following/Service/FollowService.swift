@@ -27,9 +27,14 @@ struct FollowService: FollowServiceProtocol {
             .userFollowerCollection(uid: uid)
             .document(currentUid)
         
+        let currentUserStatRef = FirestoreConstants.UserCollection.document(currentUid)
+        let followedUserStatRef = FirestoreConstants.UserCollection.document(uid)
+        
         batch.setData([:], forDocument: followingRef)
         batch.setData([:], forDocument: followerRef)
-        
+        batch.updateData(["followStats.followingCount": FieldValue.increment(Int64(1))], forDocument: currentUserStatRef)
+        batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(1))], forDocument: followedUserStatRef)
+
         try await batch.commit()
     }
     
@@ -45,14 +50,21 @@ struct FollowService: FollowServiceProtocol {
             .userFollowerCollection(uid: uid)
             .document(currentUid)
         
+        let currentUserStatRef = FirestoreConstants.UserCollection.document(currentUid)
+        let unfollowedUserStatRef = FirestoreConstants.UserCollection.document(uid)
+        
         batch.deleteDocument(followingRef)
         batch.deleteDocument(followerRef)
+        batch.updateData(["followStats.followingCount": FieldValue.increment(Int64(-1))], forDocument: currentUserStatRef)
+        batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(-1))], forDocument: unfollowedUserStatRef)
         
         try await batch.commit()
     }
     
     func fetchUserRelationState(uid: String) async throws -> UserRelationState {
         guard let currentUid = Auth.auth().currentUser?.uid else { return .unknown }
+        
+        if currentUid == uid { return .isCurrentUser }
         
         let isFollowed = try await FirestoreConstants
             .userFollowingCollection(uid: currentUid)

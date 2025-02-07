@@ -13,6 +13,7 @@ struct Post: Identifiable, Codable, Hashable {
     let timestamp: Date
     let caption: String
     var imageURL: String?
+    var videoURL: String?
     var engagement: PostEngagement
     var parentPostId: String?
 
@@ -33,6 +34,7 @@ struct Post: Identifiable, Codable, Hashable {
         self.timestamp = try container.decode(Date.self, forKey: .timestamp)
         self.caption = try container.decode(String.self, forKey: .caption)
         self.imageURL = try container.decodeIfPresent(String.self, forKey: .imageURL)
+        self.videoURL = try container.decodeIfPresent(String.self, forKey: .videoURL)
         self.engagement = try container.decode(PostEngagement.self, forKey: .engagement)
         self.parentPostId = try container.decodeIfPresent(String.self, forKey: .parentPostId)
         

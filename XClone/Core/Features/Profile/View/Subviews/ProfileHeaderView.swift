@@ -10,6 +10,9 @@ import SwiftUI
 
 struct ProfileHeaderView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(ProfileViewModel.self) private var viewModel
+    
+    @State private var isShowingEditProfile = false
     
     let user: User
     
@@ -83,16 +86,35 @@ struct ProfileHeaderView: View {
                 Spacer()
                 
                 XButton(primaryButtonTitle) {
-
+                    primaryButtonTapped()
                 }
                 .buttonStyle(.standard(rank: primaryButtonRank, size: .compact))
             }
             .padding(.horizontal, 8)
         }
+        .fullScreenCover(isPresented: $isShowingEditProfile) {
+            EditProfileView()
+        }
     }
 }
 
 private extension ProfileHeaderView {
+    
+    func primaryButtonTapped() {
+        switch user.userRelationState {
+        case .unknown:
+            break
+        case .isCurrentUser:
+            isShowingEditProfile.toggle()
+        case .notFollowed:
+            Task { await viewModel.follow() }
+        case .followed:
+            Task { await viewModel.unfollow() }
+        case .blocked:
+            print("DEBUG: Unblock user here..")
+        }
+    }
+    
     var primaryButtonTitle: String {
         switch user.userRelationState {
         case .unknown:

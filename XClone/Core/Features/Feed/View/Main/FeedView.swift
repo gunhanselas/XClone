@@ -55,19 +55,31 @@ struct FeedView: View {
                     }
                 }
             }
+            .padding(.vertical)
+            .navigationBarTitleDisplayMode(.inline)
+            .task { await viewModel.fetchPosts() }
             .fullScreenCover(isPresented: $isShowingPostCreationView) {
                 PostCreationView()
                     .environment(userManager)
             }
-            .padding(.vertical)
-            .task { await viewModel.fetchPosts() }
             .navigationDestination(for: Post.self) { post in
                 PostDetailView(post: post)
                     .environment(viewModel)
             }
-            .navigationTitle("Feed")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    AvatarView(user: userManager.currentUser, size: .xSmall)
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    XLogoImageView(size: .small)
+                }
+            }
         }
     }
+}
+
+private extension FeedView {
 }
 
 #Preview {

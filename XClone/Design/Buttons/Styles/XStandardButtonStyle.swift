@@ -24,7 +24,8 @@ struct XStandardButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.headline)
+            .font(size == .compact ? .subheadline : .headline)
+            .fontWeight(.semibold)
             .foregroundStyle(foregroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .frame(width: width, height: height)
             .padding(.horizontal, size == .compact ? 18 : 0)

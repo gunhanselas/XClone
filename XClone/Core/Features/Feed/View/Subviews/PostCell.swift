@@ -48,7 +48,6 @@ struct PostCell<ViewModel: FeedViewModelProtocol>: View {
                             .placeholder { ProgressView() }
                             .resizable()
                             .scaledToFill()
-                            .frame(maxHeight: 200)
                             .background(Color(.secondarySystemBackground))
                             .clipShape(.rect(cornerRadius: 10))
                             .contentShape(.rect)
