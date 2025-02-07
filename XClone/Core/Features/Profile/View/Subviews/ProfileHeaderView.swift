@@ -61,7 +61,7 @@ struct ProfileHeaderView: View {
                     HStack(spacing: 2) {
                         Image(systemName: "calendar")
                         
-                        Text("Joined January 2025")
+                        Text("Joined \(user.createdAt.monthAndYearString())")
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
