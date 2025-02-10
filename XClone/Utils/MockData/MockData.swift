@@ -18,7 +18,7 @@ struct MockData {
         .init(
             id: UUID().uuidString,
             type: .like,
-            senderId: users[1].id,
+            senderID: users[1].id,
             timestamp: Date(),
             postId: posts[0].id,
             sender: users[1],
@@ -27,14 +27,14 @@ struct MockData {
         .init(
             id: UUID().uuidString,
             type: .follow,
-            senderId: users[1].id,
+            senderID: users[1].id,
             timestamp: Date(),
             sender: users[1]
         ),
         .init(
             id: UUID().uuidString,
             type: .reply,
-            senderId: users[1].id,
+            senderID: users[1].id,
             timestamp: Date(),
             postId: posts[0].id,
             sender: users[1],

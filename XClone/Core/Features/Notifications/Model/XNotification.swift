@@ -10,7 +10,7 @@ import Foundation
 struct XNotification: Identifiable, Codable {
     let id: String
     let type: XNotificationType
-    let senderId: String
+    let senderID: String
     let timestamp: Date
     var postId: String?
     
