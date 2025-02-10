@@ -12,6 +12,7 @@ enum UserListConfiguration: Hashable {
     case following(uid: String)
     case likes(postId: String)
     case explore
+    case newMessage
     
     var navigationTitle: String {
         switch self {
@@ -23,6 +24,8 @@ enum UserListConfiguration: Hashable {
             return "Likes"
         case .explore:
             return "Explore"
+        case .newMessage:
+            return "New Message"
         }
     }
 }

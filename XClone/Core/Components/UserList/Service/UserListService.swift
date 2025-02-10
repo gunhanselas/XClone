@@ -31,7 +31,7 @@ class UserListService: UserListServiceProtocol {
             return try await fetchFollowing(uid: uid)
         case .likes(let postId):
             return try await fetchPostLikesUsers(postId: postId)
-        case .explore:
+        case .explore, .newMessage:
             return try await fetchAllUsers()
         }
     }

@@ -13,7 +13,7 @@ protocol PostDetailServiceProtocol {
 
 struct PostDetailService: PostDetailServiceProtocol {
     func fetchReplies(for post: Post, sortOption: ReplySortModel) async throws -> [Post] {
-        try await Task.sleep(for: .seconds(1))
+//        try await Task.sleep(for: .seconds(1))
         
         switch sortOption {
         case .mostRecent:

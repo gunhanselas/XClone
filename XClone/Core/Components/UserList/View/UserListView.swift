@@ -8,13 +8,28 @@
 import SwiftUI
 
 struct UserListView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    @Binding private var selectedUser: User?
+    
     @State private var searchText = ""
     @State private var viewModel = UserListViewModel()
-    
     @State private var activeScrollId: String?
     @State private var paginating = false
     
-    let config: UserListConfiguration
+    private let config: UserListConfiguration
+    
+    init(config: UserListConfiguration) {
+        _selectedUser = .constant(nil)
+        
+        self.config = config
+    }
+    
+    init(config: UserListConfiguration, selectedUser: Binding<User?>) {
+        _selectedUser = selectedUser
+        
+        self.config = config
+    }
     
     var body: some View {
         ScrollView {
@@ -32,7 +47,11 @@ struct UserListView: View {
                         NavigationLink(value: user) {
                             UserCell(user: user)
                         }
+                        .disabled(!isNavigable)
                         .id(user.id)
+                        .simultaneousGesture(TapGesture().onEnded {
+                            onCellTap(user)
+                        })
                     }
                     
                     if paginating { ProgressView() }
@@ -61,6 +80,19 @@ struct UserListView: View {
 }
 
 private extension UserListView {
+    var isNavigable: Bool {
+        return config != .newMessage
+    }
+    
+    func onCellTap(_ user: User) {
+        guard !isNavigable else { return }
+        selectedUser = user
+        
+        if config == .newMessage {
+            dismiss()
+        }
+    }
+    
     var filteredUsers: [User] {
         let query = searchText.lowercased()
         

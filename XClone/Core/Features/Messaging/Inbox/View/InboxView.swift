@@ -9,21 +9,21 @@ import SwiftUI
 
 struct InboxView: View {
     @State private var viewModel = InboxViewModel(service: InboxService())
+    @State private var isShowingNewMessageView = false
     @State private var searchText = ""
-    
+    @State private var selectedUser: User?
+
     var body: some View {
-        List {
+        NavigationStack {
             Group {
                 switch viewModel.loadingState {
                 case .empty:
-                    Text("No messages")
+                    InboxEmptyStateView(isShowingNewMessageView: $isShowingNewMessageView)
                 case .error(let error):
                     Text(error.localizedDescription)
                 case .loading:
-                    VStack {
-                        ProgressView()
-                            .containerRelativeFrame(.vertical)
-                    }
+                    ProgressView()
+                        .containerRelativeFrame(.vertical)
                 case .complete:
                     List {
                         ForEach(viewModel.threads) { thread in
@@ -39,14 +39,23 @@ struct InboxView: View {
                         }
                         .listSectionSeparator(.hidden, edges: .top)
                         .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.visible)
+                        .listStyle(PlainListStyle())
                         .padding(.vertical)
                         .padding(.horizontal, 8)
                     }
                 }
             }
+            .sheet(isPresented: $isShowingNewMessageView) {
+                ComposeMessageView(selectedUser: $selectedUser)
+            }
+            .navigationDestination(item: $selectedUser) { _ in
+                ChatView(thread: nil)
+            }
+            .task { await viewModel.fetchThreads() }
+            .navigationTitle("Messages")
+            .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "Search...")
-            .listRowSeparator(.visible)
-            .listStyle(PlainListStyle())
         }
     }
 }
