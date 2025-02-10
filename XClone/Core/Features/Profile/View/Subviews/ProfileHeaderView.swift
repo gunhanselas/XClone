@@ -35,13 +35,24 @@ struct ProfileHeaderView: View {
                         .contentShape(.rect)
                 }
                 
-                Button { dismiss() } label: {
-                    Image(systemName: "arrow.left.circle.fill")
-                        .resizable()
-                        .frame(width: 28, height: 28)
-                        .foregroundStyle(.white, .black.opacity(0.4))
-                        .padding(.leading)
+                HStack {
+                    Button { dismiss() } label: {
+                        Image(systemName: "arrow.left.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .foregroundStyle(.white, .black.opacity(0.4))
+                    }
+                    
+                    Spacer()
+                    
+                    Button { dismiss() } label: {
+                        Image(systemName: "gear.circle.fill")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .foregroundStyle(.white, .black.opacity(0.4))
+                    }
                 }
+                .padding(.horizontal)
             }
             
             HStack(alignment: .top) {
@@ -142,4 +153,13 @@ private extension ProfileHeaderView {
 
 #Preview {
     ProfileHeaderView(user: MockData.currentUser)
+        .environment(
+            ProfileViewModel(
+                user: MockData.currentUser,
+                profileService: MockProfileService(),
+                likeService: MockLikePostService(),
+                followService: MockFollowService(),
+                userService: MockUserService()
+            )
+        )
 }

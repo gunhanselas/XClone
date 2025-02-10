@@ -12,8 +12,12 @@ struct FirestoreConstants {
     
     static let UserCollection = Root.collection("users")
     static let PostsCollection = Root.collection("posts")
-    static let MessagesCollection = Root.collection("messages")
+    static let ThreadsCollection = Root.collection("threads")
     static let NotificationsCollection = Root.collection("notifications")
+    
+    static func messagesCollection(threadID: String) -> CollectionReference {
+        return ThreadsCollection.document(threadID).collection("messages")
+    }
     
     static func postLikesCollection(postId: String) -> CollectionReference {
         return PostsCollection.document(postId).collection("post-likes")
