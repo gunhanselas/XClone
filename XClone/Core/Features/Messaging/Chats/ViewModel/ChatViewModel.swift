@@ -15,17 +15,22 @@ class ChatViewModel {
     
     private let service: ChatService
     private var thread: Thread?
+    private let user: User?
     
-    init(service: ChatService, thread: Thread?) {
+    init(service: ChatService, thread: Thread?, user: User?) {
         self.service = service
         self.thread = thread
+        self.user = user 
     }
     
     func fetchMessages() async {
-        guard let thread else { return }
+//        guard let thread else {
+//            loadingState = .empty
+//            return 
+//        }
         
         do {
-            self.messages = try await service.fetchMessages(for: thread)
+            self.messages = MockData.mockMessages // try await service.fetchMessages(for: thread)
             initiateThreadObserver = true
             loadingState = messages.isEmpty ? .empty : .complete
         } catch {
@@ -58,6 +63,21 @@ class ChatViewModel {
             if case .empty = loadingState {
                 loadingState = .complete
             }
+        }
+    }
+    
+    func sendMessage(_ messageText: String) async {
+        guard let chatPartnerID = user?.id else { return }
+        
+        do {
+            if let thread {
+                try await service.uploadMessage(messageText: messageText, to: thread)
+            } else {
+                let thread = try await service.createThread(chatPartnerID: chatPartnerID)
+                try await service.uploadMessage(messageText: messageText, to: thread)
+            }
+        } catch {
+            print("DEBUG: Failed to send message with error: \(error.localizedDescription)")
         }
     }
 }

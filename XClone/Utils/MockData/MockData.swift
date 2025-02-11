@@ -121,4 +121,34 @@ struct MockData {
             userRelationState: .unknown
         )
     ]
+    
+    static let mockMessages: [ChatMessage] = [
+         ChatMessage(
+             id: UUID().uuidString,
+             fromId: users[0].id,
+             messageText: "Hey, how's it going?",
+             timestamp: Date().addingTimeInterval(-300),
+             imageUrl: nil,
+             status: .delivered,
+             user: users[0]
+         ),
+         ChatMessage(
+             id: UUID().uuidString,
+             fromId: users[1].id,
+             messageText: "All good! You?",
+             timestamp: Date().addingTimeInterval(-250),
+             imageUrl: nil,
+             status: .delivered,
+             user: users[1]
+         ),
+         ChatMessage(
+             id: UUID().uuidString,
+             fromId: users[0].id,
+             messageText: "Doing great! Want to grab lunch later?",
+             timestamp: Date().addingTimeInterval(-200),
+             imageUrl: nil,
+             status: .read,
+             user: users[0]
+         )
+     ]
 }

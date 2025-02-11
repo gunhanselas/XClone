@@ -12,13 +12,7 @@ class ChatService {
     private let fetchLimit = ChatConstants.fetchLimit
     private var lastDoc: DocumentSnapshot?
     private var listenerRegistration: ListenerRegistration?
-    
-//    var thread: Thread?
-//
-//    init(thread: Thread?) {
-//        self.thread = thread
-//    }
-    
+
     deinit {
         listenerRegistration?.remove()
         listenerRegistration = nil
@@ -28,7 +22,7 @@ class ChatService {
 // MARK: - Sending Messages
 
 extension ChatService {
-    private func uploadMessage(messageText: String, to thread: Thread) async throws {
+    func uploadMessage(messageText: String, to thread: Thread) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         let messageRef = FirestoreConstants.ThreadsCollection.document()
         let messageId = messageRef.documentID
@@ -173,13 +167,13 @@ extension ChatService {
 // MARK: - Thread Helpers
 
 extension ChatService {
-    func createThread(with currentUser: User?, chatPartnerID: String) async throws -> Thread {
-        guard let currentUser else { throw AuthenticationError.userNotFound }
+    func createThread(chatPartnerID: String) async throws -> Thread {
+        guard let currentUid = Auth.auth().currentUser?.uid else { throw AuthenticationError.userNotFound }
         let threadRef = FirestoreConstants.ThreadsCollection.document()
         
         let thread = Thread(
             id: threadRef.documentID,
-            uids: [currentUser.id, chatPartnerID],
+            uids: [currentUid, chatPartnerID],
             lastMessage: nil,
             lastUpdated: Date(),
             firstMessageId: nil,

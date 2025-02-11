@@ -19,8 +19,8 @@ struct InboxView: View {
                 switch viewModel.loadingState {
                 case .empty:
                     InboxEmptyStateView(isShowingNewMessageView: $isShowingNewMessageView)
-                case .error(let error):
-                    Text(error.localizedDescription)
+                case .error:
+                    Text("An error ocurred.")
                 case .loading:
                     ProgressView()
                         .containerRelativeFrame(.vertical)
@@ -44,14 +44,20 @@ struct InboxView: View {
                         .listStyle(PlainListStyle())
                         .padding(.vertical)
                         .padding(.horizontal, 8)
+                        .overlay(alignment: .bottomTrailing) {
+                            XButton(systemImage: "envelope") {
+                                print("Show new messaage view..")
+                            }
+                            .buttonStyle(.floating)
+                        }
                     }
                 }
             }
             .sheet(isPresented: $isShowingNewMessageView) {
                 ComposeMessageView(selectedUser: $selectedUser)
             }
-            .navigationDestination(item: $selectedUser) { _ in
-                ChatView(thread: nil)
+            .navigationDestination(item: $selectedUser) { user in
+                ChatView(thread: nil, user: user)
             }
             .task { await viewModel.fetchThreads() }
             .navigationTitle("Messages")

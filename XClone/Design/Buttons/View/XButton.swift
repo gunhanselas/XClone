@@ -10,14 +10,24 @@ import SwiftUI
 struct XButton: View {
     @Environment(\.isLoading) var isLoading
 
-    private let title: String
+    private let title: String?
     private let imageResource: ImageResource?
+    private let systemImage: String?
     private let action: () -> Void
     
     init(_ title: String, imageResource: ImageResource? = nil, action: @escaping () -> Void) {
         self.title = title
         self.imageResource = imageResource
         self.action = action
+        self.systemImage = nil
+    }
+    
+    init(systemImage: String, action: @escaping () -> Void) {
+        self.title = nil
+        self.imageResource = nil
+        
+        self.action = action
+        self.systemImage = systemImage
     }
     
     var body: some View {
@@ -33,9 +43,16 @@ struct XButton: View {
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 20, height: 20)
+                        } else if let systemImage {
+                            Image(systemName: systemImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 20, height: 20)
                         }
                         
-                        Text(title)
+                        if let title {
+                            Text(title)
+                        }
                     }
                 }
             }

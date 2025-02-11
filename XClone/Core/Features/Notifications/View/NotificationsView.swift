@@ -18,8 +18,8 @@ struct NotificationsView: View {
                     .containerRelativeFrame(.vertical)
             case .empty:
                 Text("Empty state..")
-            case .error(let error):
-                Text("Error: \(error.localizedDescription)")
+            case .error:
+                Text("An error ocurred.")
             case .complete:
                 ScrollView {
                     LazyVStack {

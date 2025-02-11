@@ -62,8 +62,8 @@ struct PostDetailView: View {
                     ProgressView()
                 case .empty:
                     EmptyView()
-                case .error(let error):
-                    Text("An error ocurred: \(error.localizedDescription)")
+                case .error:
+                    Text("An error ocurred.")
                 case .complete:
                     ForEach(viewModel.posts) { reply in
                         PostCell(post: reply, viewModel: viewModel)

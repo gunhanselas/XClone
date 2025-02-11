@@ -30,8 +30,8 @@ struct UserProfileView: View {
                             .padding()
                     case .empty:
                         Text("Configure empty state..")
-                    case .error(let error):
-                        Text("An error ocurred: \(error.localizedDescription)")
+                    case .error:
+                        Text("An error ocurred.")
                     case .complete:
                         LazyVStack {
                             ForEach(viewModel.currentDataSource) { post in
