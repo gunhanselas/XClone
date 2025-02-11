@@ -20,12 +20,7 @@ struct PostRepliesView: View {
     
     init(post: Post) {
         self.post = post
-        
-        _viewModel = State(
-            initialValue: PostReplyViewModel(
-                service: PostReplyService(postId: post.id)
-            )
-        )
+        _viewModel = State(initialValue: PostReplyViewModel(post: post))
     }
     
     var body: some View {

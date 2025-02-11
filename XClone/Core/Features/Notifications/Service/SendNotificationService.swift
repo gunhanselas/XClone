@@ -10,16 +10,16 @@ import FirebaseFirestore
 import Foundation
 
 struct SendNotificationService {
-    func sendLikeNotification(toUid uid: String, post: Post) {
-        sendNotification(toUid: uid, type: .like, post: post)
+    func sendLikeNotification(toUid uid: String, post: Post) async throws {
+        try await sendNotification(toUid: uid, type: .like, post: post)
     }
     
-    func sendReplyNotification(toUid uid: String, post: Post) {
-        sendNotification(toUid: uid, type: .reply, post: post)
+    func sendReplyNotification(post: Post) async throws {
+        try await sendNotification(toUid: post.authorID, type: .reply, post: post)
     }
     
-    func sendFollowNotification(toUid uid: String) {
-        sendNotification(toUid: uid, type: .follow)
+    func sendFollowNotification(toUid uid: String) async throws {
+        try await sendNotification(toUid: uid, type: .follow)
     }
     
     func deleteLikeNotification(notificationOwnerUid: String, post: Post) async {
@@ -38,12 +38,12 @@ struct SendNotificationService {
         }
     }
     
-    private func sendNotification(toUid uid: String, type: XNotificationType, post: Post? = nil) {
+    private func sendNotification(toUid uid: String, type: XNotificationType, post: Post? = nil) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid, uid != currentUid else { return }
         let ref = FirestoreConstants.userNotificationsCollection(uid: uid).document()
         let notif = XNotification(id: ref.documentID, type: type, senderID: currentUid, timestamp: Date(), postId: post?.id)
         guard let data = try? Firestore.Encoder().encode(notif) else { return }
-        ref.setData(data)
+        try await ref.setData(data)
     }
     
     private func deleteNotification(toUid uid: String, type: XNotificationType, post: Post? = nil) async throws {

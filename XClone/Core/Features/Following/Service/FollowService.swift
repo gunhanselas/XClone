@@ -15,18 +15,18 @@ protocol FollowServiceProtocol {
 }
 
 struct FollowService: FollowServiceProtocol {
+    private let notificationService: SendNotificationService
+    
+    init(notificationService: SendNotificationService = SendNotificationService()) {
+        self.notificationService = notificationService
+    }
+    
     func follow(uid: String) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         let batch = Firestore.firestore().batch()
         
-        let followingRef = FirestoreConstants
-            .userFollowingCollection(uid: currentUid)
-            .document(uid)
-        
-        let followerRef = FirestoreConstants
-            .userFollowerCollection(uid: uid)
-            .document(currentUid)
-        
+        let followingRef = FirestoreConstants.userFollowingCollection(uid: currentUid).document(uid)
+        let followerRef = FirestoreConstants.userFollowerCollection(uid: uid).document(currentUid)
         let currentUserStatRef = FirestoreConstants.UserCollection.document(currentUid)
         let followedUserStatRef = FirestoreConstants.UserCollection.document(uid)
         
@@ -36,6 +36,7 @@ struct FollowService: FollowServiceProtocol {
         batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(1))], forDocument: followedUserStatRef)
 
         try await batch.commit()
+        try await notificationService.sendFollowNotification(toUid: uid)
     }
     
     func unfollow(uid: String) async throws {
@@ -59,11 +60,12 @@ struct FollowService: FollowServiceProtocol {
         batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(-1))], forDocument: unfollowedUserStatRef)
         
         try await batch.commit()
+        await notificationService.deleteFollowNotification(notificationOwnerUid: uid)
     }
     
     func fetchUserRelationState(uid: String) async throws -> UserRelationState {
         guard let currentUid = Auth.auth().currentUser?.uid else { return .unknown }
-        
+
         if currentUid == uid { return .isCurrentUser }
         
         let isFollowed = try await FirestoreConstants

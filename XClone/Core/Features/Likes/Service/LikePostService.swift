@@ -17,6 +17,12 @@ protocol LikePostServiceProtocol {
 struct LikePostService: LikePostServiceProtocol {
     private let cache = LikesCache.shared
     
+    private let notificationService: SendNotificationService
+    
+    init(notificationService: SendNotificationService = SendNotificationService()) {
+        self.notificationService = notificationService
+    }
+    
     func likePost(_ post: Post) async throws {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let batch = Firestore.firestore().batch()
@@ -32,6 +38,8 @@ struct LikePostService: LikePostServiceProtocol {
         try await batch.commit()
         
         cache.update(post.id, didAdd: true)
+        
+        try await notificationService.sendLikeNotification(toUid: post.authorID, post: post)
     }
     
     func unlikePost(_ post: Post) async throws {
@@ -50,6 +58,8 @@ struct LikePostService: LikePostServiceProtocol {
         try await batch.commit()
         
         cache.update(post.id, didAdd: false)
+        
+        await notificationService.deleteLikeNotification(notificationOwnerUid: post.authorID, post: post)
     }
     
     func checkIfUserLikedPost(_ post: Post) async throws -> Bool {

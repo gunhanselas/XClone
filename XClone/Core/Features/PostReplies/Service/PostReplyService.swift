@@ -9,21 +9,16 @@ import FirebaseAuth
 import FirebaseFirestore
 
 protocol PostReplyServiceProtocol {
-    func uploadReply(caption: String) async throws
+    func uploadReply(caption: String, to postID: String) async throws
 }
 
 struct PostReplyService: PostReplyServiceProtocol {
-    private let postId: String
-    
-    init(postId: String) {
-        self.postId = postId
-    }
-    
-    func uploadReply(caption: String) async throws {
+    func uploadReply(caption: String, to postID: String) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        let postRef = FirestoreConstants.PostsCollection.document(postId)
-        let replyRef = FirestoreConstants.postRepliesCollection(postId: postId).document()
-        let userReplyRef = FirestoreConstants.userRepliesCollection(uid: currentUid).document(postId)
+        let postRef = FirestoreConstants.PostsCollection.document(postID)
+        let replyRef = FirestoreConstants.postRepliesCollection(postId: postID).document()
+        let userReplyRef = FirestoreConstants.userRepliesCollection(uid: currentUid).document(postID)
+        
         let batch = Firestore.firestore().batch()
 
         let reply = Post(
@@ -32,7 +27,7 @@ struct PostReplyService: PostReplyServiceProtocol {
             timestamp: Date(),
             caption: caption,
             engagement: PostEngagement(),
-            parentPostId: postId
+            parentPostId: postID
         )
         
         let replyData = try Firestore.Encoder().encode(reply)
@@ -43,7 +38,7 @@ struct PostReplyService: PostReplyServiceProtocol {
             forDocument: postRef
         )
         
-        let userReply = UserPostReply(uid: currentUid, postId: postId, timestamp: Date())
+        let userReply = UserPostReply(uid: currentUid, postId: postID, timestamp: Date())
         let userReplyData = try Firestore.Encoder().encode(userReply)
         
         batch.setData(userReplyData, forDocument: userReplyRef)
