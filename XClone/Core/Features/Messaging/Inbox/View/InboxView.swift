@@ -37,6 +37,7 @@ struct InboxView: View {
                                     .padding(.horizontal, 8)
                             }
                         }
+                        .searchable(text: $searchText, prompt: "Search...")
                         .listSectionSeparator(.hidden, edges: .top)
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.visible)
@@ -55,7 +56,6 @@ struct InboxView: View {
             .task { await viewModel.fetchThreads() }
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Search...")
         }
     }
 }
