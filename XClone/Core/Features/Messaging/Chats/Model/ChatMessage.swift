@@ -5,7 +5,6 @@
 //  Created by Stephan Dowless on 2/7/25.
 //
 
-import FirebaseAuth
 import Foundation
 
 struct ChatMessage: Identifiable, Codable, Hashable {
@@ -19,7 +18,7 @@ struct ChatMessage: Identifiable, Codable, Hashable {
 }
 
 extension ChatMessage {
-    var isFromCurrentUser: Bool {
-        return fromId == Auth.auth().currentUser?.uid
+    func isMessageFromCurrentUser(currentUid: String) -> Bool {
+        return fromId == currentUid
     }
 }

@@ -8,6 +8,20 @@
 import Foundation
 
 extension Date {
+    private var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }
+    
+    private var dayFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .medium
+        formatter.dateFormat = "MM/dd/yy"
+        return formatter
+    }
+    
     func timestampString() -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second, .minute, .hour, .day, .weekOfMonth]
@@ -26,5 +40,13 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM yyyy"
         return dateFormatter.string(from: self)
+    }
+    
+    func timeString() -> String {
+        return timeFormatter.string(from: self)
+    }
+    
+    func dateString() -> String {
+        return dayFormatter.string(from: self)
     }
 }

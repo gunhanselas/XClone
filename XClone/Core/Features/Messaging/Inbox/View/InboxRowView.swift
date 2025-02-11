@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InboxRowView: View {
+    @Environment(UserManager.self) private var userManager
     @Environment(InboxViewModel.self) private var viewModel
     
     let thread: Thread
@@ -64,13 +65,16 @@ private extension InboxRowView {
     }
     
     var showUnreadIndicator: Bool {
-        guard let lastMessage = thread.lastMessage, !lastMessage.isFromCurrentUser else { return false }
+        guard let currentUser = userManager.currentUser else { return false }
+        guard let lastMessage = thread.lastMessage, !lastMessage.isMessageFromCurrentUser(currentUid: currentUser.id) else { return false }
         return lastMessage.status == .delivered
     }
     
     var subtitle: String {
+        guard let currentUser = userManager.currentUser else { return "" }
+
         if let lastMessage = thread.lastMessage {
-            return lastMessage.isFromCurrentUser ? "You: \(lastMessage.messageText)" : lastMessage.messageText
+            return lastMessage.isMessageFromCurrentUser(currentUid: currentUser.id) ? "You: \(lastMessage.messageText)" : lastMessage.messageText
         }
         
         return ""

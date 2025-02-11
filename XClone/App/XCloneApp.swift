@@ -21,11 +21,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct XCloneApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    @State private var authManager = AuthManager(
-        service: AuthService(),
-        googleAuthService: GoogleAuthService()
-    )
-    @State private var userManager = UserManager(service: UserService())
+    @State private var authManager = AuthManager()
+    @State private var userManager = UserManager(service: MockUserService())
     
     var body: some Scene {
         WindowGroup {

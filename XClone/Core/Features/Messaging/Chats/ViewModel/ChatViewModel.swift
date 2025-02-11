@@ -17,6 +17,14 @@ class ChatViewModel {
     private var thread: Thread?
     private let user: User?
     
+    var isGroupThread: Bool {
+        return thread?.type == .group
+    }
+    
+    var isDirectThread: Bool {
+        return thread?.type == .direct
+    }
+    
     init(service: ChatService, thread: Thread?, user: User?) {
         self.service = service
         self.thread = thread
@@ -48,8 +56,8 @@ class ChatViewModel {
         }
     }
     
-    func observeChatStream() async {
-        guard let thread else { return }
+    func observeChatStream(for currentUserID: String?) async {
+        guard let thread, let currentUserID else { return }
 
         for await message in service.getChatStream(for: thread) {
             if let index = messages.firstIndex(where: { $0.id == message.id }) {
@@ -58,7 +66,7 @@ class ChatViewModel {
                 messages.append(message)
             }
             
-            await updateMessageStatusToReadIfNecessary(message)
+            await updateMessageStatusToReadIfNecessary(message, currentUserID: currentUserID)
 
             if case .empty = loadingState {
                 loadingState = .complete
@@ -83,8 +91,9 @@ class ChatViewModel {
 }
 
 private extension ChatViewModel {
-    func updateMessageStatusToReadIfNecessary(_ message: ChatMessage) async {
-        guard !message.isFromCurrentUser, message.status == .delivered, let thread else { return }
+    func updateMessageStatusToReadIfNecessary(_ message: ChatMessage, currentUserID: String) async {
+        guard !message.isMessageFromCurrentUser(currentUid: currentUserID),
+                message.status == .delivered, let thread else { return }
         
         do {
             try await service.updateMessageStatus(message, status: .read, for: thread)

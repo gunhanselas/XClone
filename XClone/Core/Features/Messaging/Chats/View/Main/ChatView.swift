@@ -35,8 +35,8 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(viewModel.messages) { message in
-                            Text(message.messageText)
-                                .frame(height: 400)
+                            ChatMessageCell(message: message)
+                                .environment(viewModel)
                         }
                     }
                     .scrollPosition($scrollPosition)

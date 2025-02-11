@@ -12,4 +12,9 @@ struct ChatConstants {
     
     static let fetchLimit = 20
     static let listenerLimit = 1
+    
+    static var messageGroupingTimeThreshold: Double {
+        let timeIntervalInSeconds: Double = 60 * 5
+        return timeIntervalInSeconds
+    }
 }
