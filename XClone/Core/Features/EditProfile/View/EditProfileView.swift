@@ -11,6 +11,9 @@ import SwiftUI
 
 struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(UserManager.self) private var userManager
+    
+    @State private var editProfileManager = EditProfileManager(service: EditProfileService(userService: UserService()))
     
     @State private var selectedHeaderPhotosPickerItem: PhotosPickerItem?
     @State private var selectedProfilePhotosPickerItem: PhotosPickerItem?
@@ -18,10 +21,10 @@ struct EditProfileView: View {
     @State private var profilePhotoUIImage: UIImage?
     @State private var headerImage: Image?
     @State private var profileImage: Image?
-    
     @State private var fullname = ""
     @State private var bio = ""
     @State private var didEditUserInfo = false
+    @State private var isLoading = false
     
     private let user: User
     
@@ -36,6 +39,7 @@ struct EditProfileView: View {
                     if let headerImageUrl = user.profileHeaderImageUrl {
                         KFImage(URL(string: headerImageUrl))
                             .resizable()
+                            .scaledToFill()
                             .frame(maxWidth: .infinity)
                             .frame(height: 140)
                             .clipped()
@@ -112,13 +116,12 @@ struct EditProfileView: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") {
-                        dismiss()
+                    XButton("Save") {
+                        onSaveTapped()
                     }
+                    .buttonStyle(.standard(rank: .tertiary), isLoading: $isLoading)
                     .disabled(!didEditUserInfo)
                     .opacity(didEditUserInfo ? 1.0 : 0.5)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primaryText)
                 }
             }
         }
@@ -141,7 +144,26 @@ private extension EditProfileView {
     }
     
     func onSaveTapped() {
-        
+        Task {
+            isLoading = true
+            defer { isLoading = false }
+            
+            if let headerUIImage {
+                guard let imageData = headerUIImage.jpegData(compressionQuality: 0.5) else { return }
+                try await editProfileManager.updateUserHeaderImage(userManager: userManager, with: imageData)
+            }
+            
+            if let profilePhotoUIImage {
+                guard let imageData = profilePhotoUIImage.jpegData(compressionQuality: 0.25) else { return }
+                try await editProfileManager.updateUserProfileImage(userManager: userManager, with: imageData)
+            }
+            
+            if user.fullname != fullname || user.bio != bio {
+                await editProfileManager.updateUser(with: fullname, bio: bio)
+            }
+            
+            dismiss()
+        }
     }
     
     func loadHeaderImage() async {

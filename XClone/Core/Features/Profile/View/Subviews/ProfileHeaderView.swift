@@ -22,6 +22,7 @@ struct ProfileHeaderView: View {
                 if let headerImageUrl = user.profileHeaderImageUrl {
                     KFImage(URL(string: headerImageUrl))
                         .resizable()
+                        .scaledToFill()
                         .frame(maxWidth: .infinity)
                         .frame(height: 140)
                         .clipped()

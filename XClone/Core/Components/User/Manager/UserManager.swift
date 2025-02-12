@@ -27,27 +27,27 @@ class UserManager {
         }
     }
     
+    func updateProfilePhoto(with imageURL: String) {
+        self.currentUser?.profileImageUrl = imageURL
+    }
+    
+    func updateHeaderPhoto(with imageURL: String) {
+        self.currentUser?.profileHeaderImageUrl = imageURL
+    }
+    
     func uploadUsername(_ username: String) async throws {
         try await service.updateUsername(username)
         self.currentUser?.username = username
     }
     
     func uploadProfilePhoto(with imageData: Data) async throws {
-        if let imageURL = currentUser?.profileImageUrl {
-            try await Storage.storage().reference(forURL: imageURL).delete()
-        }
-        
-        let imageUrl = try await service.updateProfilePhoto(imageData)
-        self.currentUser?.profileImageUrl = imageUrl
+        let imageURL = try await service.updateProfilePhoto(imageData)
+        updateProfilePhoto(with: imageURL)
     }
     
     func uploadProfileHeaderPhoto(with imageData: Data) async throws {
-        if let imageURL = currentUser?.profileHeaderImageUrl {
-            try await Storage.storage().reference(forURL: imageURL).delete()
-        }
-        
-        let imageUrl = try await service.updateProfileHeaderPhoto(imageData)
-        self.currentUser?.profileHeaderImageUrl = imageUrl
+        let imageURL = try await service.updateProfileHeaderPhoto(imageData)
+        updateHeaderPhoto(with: imageURL)
     }
     
     func saveUserDataAfterAuthentication(_ user: any BaseUser) async {

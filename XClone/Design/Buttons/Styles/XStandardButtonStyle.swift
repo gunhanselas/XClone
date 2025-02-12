@@ -32,7 +32,7 @@ struct XStandardButtonStyle: ButtonStyle {
             .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
-                if (colorScheme == .light || rank == .secondary) && variant == .system {
+                if rank == .secondary && variant == .system {
                     Capsule()
                         .stroke(.gray, lineWidth: 1.0)
                         .opacity(configuration.isPressed ? 0.4 : 1.0)
@@ -45,15 +45,15 @@ private extension XStandardButtonStyle {
     var backgroundColor: Color {
         switch variant {
         case .primary:
-            .primaryBlue
+                .primaryBlue
         case .system:
             switch rank {
             case .primary:
-                .white
+                    .white
             case .secondary:
                 Color(.systemBackground)
             case .tertiary:
-                .clear
+                    .clear
             }
         }
     }
@@ -61,12 +61,13 @@ private extension XStandardButtonStyle {
     var foregroundColor: Color {
         switch variant {
         case .primary:
-            .white
+            return .white
         case .system:
-            if rank == .secondary {
-                Color(.primaryText)
-            } else {
-                .black
+            switch rank {
+            case .primary:
+                return .black
+            case .secondary, .tertiary:
+                return Color(.primaryText)
             }
         }
     }
@@ -76,16 +77,26 @@ private extension XStandardButtonStyle {
         case .compact:
             return nil
         case .standard:
-            return 360
+            switch rank {
+            case .primary, .secondary:
+                return 360
+            case .tertiary:
+                return nil
+            }
         }
     }
     
-    var height: CGFloat {
+    var height: CGFloat? {
         switch size {
         case .compact:
             return 34
         case .standard:
-            return 50
+            switch rank {
+            case .primary, .secondary:
+                return 50
+            case .tertiary:
+                return nil
+            }
         }
     }
 }
