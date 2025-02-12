@@ -44,3 +44,28 @@ extension FeedViewModelProtocol {
         }
     }
 }
+
+extension FeedViewModelProtocol {
+    func fetchPostUserData(for posts: [Post]) async throws {
+        var result = posts
+        
+        try await withThrowingTaskGroup(of: (Int, User).self) { group in
+            for (index, post) in posts.enumerated() {
+                group.addTask {
+                    let user = try await FirestoreConstants
+                        .UserCollection
+                        .document(post.authorID)
+                        .getDocument(as: User.self)
+                    
+                    return (index, user)
+                }
+            }
+
+            for try await (index, user) in group {
+                result[index].author = user
+            }
+        }
+        
+        self.posts = result
+    }
+}

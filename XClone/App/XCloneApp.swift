@@ -22,7 +22,7 @@ struct XCloneApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     @State private var authManager = AuthManager()
-    @State private var userManager = UserManager(service: MockUserService())
+    @State private var userManager = UserManager(service: UserService())
     
     var body: some Scene {
         WindowGroup {

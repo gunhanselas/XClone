@@ -20,7 +20,11 @@ struct PostCell<ViewModel: FeedViewModelProtocol>: View {
     var body: some View {
         VStack {
             HStack(alignment: .top, spacing: 12) {
-                AvatarView(user: post.author, size: .small)
+                if let user = post.author {
+                    NavigationLink(value: FeedRoutes.profile(user)) {
+                        AvatarView(user: post.author, size: .small)
+                    }
+                }
                 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 2) {

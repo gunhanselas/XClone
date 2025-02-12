@@ -31,7 +31,7 @@ struct FeedView: View {
                     case .complete:
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.posts) { post in
-                                NavigationLink(value: post) {
+                                NavigationLink(value: FeedRoutes.postDetail(post)) {
                                     PostCell(post: post, viewModel: viewModel)
                                 }
                             }
@@ -62,9 +62,14 @@ struct FeedView: View {
                 PostCreationView()
                     .environment(userManager)
             }
-            .navigationDestination(for: Post.self) { post in
-                PostDetailView(post: post)
-                    .environment(viewModel)
+            .navigationDestination(for: FeedRoutes.self) { route in
+                switch route {
+                case .profile(let user):
+                    UserProfileView(user: user)
+                case .postDetail(let post):
+                    PostDetailView(post: post)
+                        .environment(viewModel)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

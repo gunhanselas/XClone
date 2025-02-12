@@ -31,8 +31,7 @@ struct UserService: UserServiceProtocol {
     }
     
     func fetchUser(withUid uid: String) async throws -> User {
-        let snapshot = try await FirestoreConstants.UserCollection.document(uid).getDocument()
-        return try snapshot.data(as: User.self)
+        return try await FirestoreConstants.UserCollection.document(uid).getDocument(as: User.self)
     }
     
     func updateUsername(_ username: String) async throws {

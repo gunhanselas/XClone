@@ -5,6 +5,7 @@
 //  Created by Stephan Dowless on 1/26/25.
 //
 
+import FirebaseStorage
 import Foundation
 
 @Observable
@@ -32,11 +33,19 @@ class UserManager {
     }
     
     func uploadProfilePhoto(with imageData: Data) async throws {
+        if let imageURL = currentUser?.profileImageUrl {
+            try await Storage.storage().reference(forURL: imageURL).delete()
+        }
+        
         let imageUrl = try await service.updateProfilePhoto(imageData)
         self.currentUser?.profileImageUrl = imageUrl
     }
     
     func uploadProfileHeaderPhoto(with imageData: Data) async throws {
+        if let imageURL = currentUser?.profileHeaderImageUrl {
+            try await Storage.storage().reference(forURL: imageURL).delete()
+        }
+        
         let imageUrl = try await service.updateProfileHeaderPhoto(imageData)
         self.currentUser?.profileHeaderImageUrl = imageUrl
     }

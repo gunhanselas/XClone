@@ -104,7 +104,7 @@ struct ProfileHeaderView: View {
             .padding(.horizontal, 8)
         }
         .fullScreenCover(isPresented: $isShowingEditProfile) {
-            EditProfileView()
+            EditProfileView(user: user)
         }
     }
 }
