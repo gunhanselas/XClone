@@ -5,7 +5,7 @@
 //  Created by Stephan Dowless on 1/26/25.
 //
 
-@preconcurrency import Firebase
+import Firebase
 
 struct FirestoreConstants {
     private static let Root = Firestore.firestore()
@@ -13,7 +13,16 @@ struct FirestoreConstants {
     static let UserCollection = Root.collection("users")
     static let PostsCollection = Root.collection("posts")
     static let ThreadsCollection = Root.collection("threads")
+    static let ReportsCollection = Root.collection("reports")
     
+    static func blockedUsersCollection(uid: String) -> CollectionReference {
+        return UserCollection.document(uid).collection("blocked-users")
+    }
+    
+    static func blockedByUsersCollection(uid: String) -> CollectionReference {
+        return UserCollection.document(uid).collection("blocked-users")
+    }
+
     static func messagesCollection(threadID: String) -> CollectionReference {
         return ThreadsCollection.document(threadID).collection("messages")
     }
