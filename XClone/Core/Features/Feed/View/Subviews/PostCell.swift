@@ -8,7 +8,7 @@
 import Kingfisher
 import SwiftUI
 
-struct PostCell<ViewModel: FeedViewModelProtocol>: View {
+struct PostCell<ViewModel: FeedViewModelProtocol>: View {    
     @ObservedObject private var viewModel: ViewModel
     private let post: Post
     
@@ -41,7 +41,7 @@ struct PostCell<ViewModel: FeedViewModelProtocol>: View {
                         
                         Spacer()
                         
-                        PostCellOptionsMenu()
+                        PostOptionsMenu(post: post)
                     }
                     
                     Text(post.caption)

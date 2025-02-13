@@ -11,6 +11,7 @@ struct MainTabView: View {
     @Environment(UserManager.self) private var userManager
     
     @State private var selection = 0
+    @State private var blockingManager = BlockingManager(service: BlockUserService())
     
     var body: some View {
         TabView(selection: $selection) {
@@ -50,6 +51,7 @@ struct MainTabView: View {
                     .tag(4)
             }
         }
+        .environment(blockingManager)
     }
 }
 
