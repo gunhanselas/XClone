@@ -43,6 +43,19 @@ extension FeedViewModelProtocol {
             print("DEBUG: Failed to unlike post with error: \(error)")
         }
     }
+    
+    func didLike(_ post: Post) async {
+        do {
+            guard let index = posts.firstIndex(where: { $0.id == post.id }) else { return }
+            let didLike = try await likeService.checkIfUserLikedPost(post)
+            
+            if didLike {
+                self.posts[index].didLike = didLike
+            }
+        } catch {
+            print("DEBUG: Failed to configure liked post value with error: \(error)")
+        }
+    }
 }
 
 extension FeedViewModelProtocol {

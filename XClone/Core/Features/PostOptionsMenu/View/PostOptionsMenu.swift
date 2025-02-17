@@ -10,6 +10,8 @@ import SwiftUI
 struct PostOptionsMenu: View {
     @Environment(BlockingManager.self) private var blockingManager
     
+    @State private var followButtonTitle = ""
+    @State private var userRelationState: UserRelationState = .unknown
     @State private var isShowingBlockAlert = false
     @State private var isShowingReportView = false
     
@@ -19,17 +21,22 @@ struct PostOptionsMenu: View {
     
     var body: some View {
         Menu {
-            if let author = post.author {
-                if author.userRelationState == .isCurrentUser {
-                    Button("Delete Post", role: .destructive) {
-                        Task { await viewModel.deletePost(post) }
-                    }
-                } else {
+            if userRelationState == .isCurrentUser {
+                Button("Delete Post", role: .destructive) {
+                    Task { await viewModel.deletePost(post) }
+                }
+            } else {
+                if let author = post.author {
                     Button("Report Post", action: {})
 
                     Menu("@\(author.username)") {
-                        Button("Unfollow", action: {})
-                        Button("Block", action: { isShowingBlockAlert.toggle() })
+                        Button(followButtonTitle) {
+                            followAction()
+                        }
+                        
+                        Button("Block") {
+                            isShowingBlockAlert.toggle()
+                        }
                     }
                 }
             }
@@ -37,6 +44,7 @@ struct PostOptionsMenu: View {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.gray)
         }
+        .task { await configureFollowState() }
         .alert("Block @\(post.author?.username ?? "")", isPresented: $isShowingBlockAlert, actions: {
             Button("Block", role: .destructive) {
                 Task { await viewModel.blockUser(post.authorID) }
@@ -48,6 +56,26 @@ struct PostOptionsMenu: View {
         })
         .sheet(isPresented: $isShowingReportView) {
             ReportContentView()
+        }
+    }
+}
+
+private extension PostOptionsMenu {
+    func configureFollowState() async {
+        self.userRelationState =  await viewModel.fetchUserRelationState(post.authorID)
+    }
+    
+    func followAction() {
+        Task {
+            if userRelationState == .followed {
+                await viewModel.unfollow(post.authorID)
+                followButtonTitle = "Follow"
+                userRelationState = .notFollowed
+            } else if userRelationState == .notFollowed {
+                await viewModel.follow(post.authorID)
+                followButtonTitle = "Unfollow"
+                userRelationState = .followed
+            }
         }
     }
 }

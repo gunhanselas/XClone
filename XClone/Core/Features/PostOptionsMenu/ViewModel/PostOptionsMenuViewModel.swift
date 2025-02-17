@@ -40,11 +40,28 @@ class PostOptionsMenuViewModel {
         }
     }
     
+    func fetchUserRelationState(_ uid: String) async -> UserRelationState {
+        do {
+            return try await followService.fetchUserRelationState(uid: uid)
+        } catch {
+            print("DEBUG: Failed to fetch relation state with error: \(error)")
+            return .unknown
+        }
+    }
+    
+    func follow(_ uid: String) async {
+        do {
+            try await followService.follow(uid: uid)
+        } catch {
+            print("DEBUG: Failed to follow user with error: \(error)")
+        }
+    }
+    
     func unfollow(_ uid: String) async {
         do {
             try await followService.unfollow(uid: uid)
         } catch {
-            print("DEBUG: Failed to block user with error: \(error)")
+            print("DEBUG: Failed to unfollow user with error: \(error)")
         }
     }
 }

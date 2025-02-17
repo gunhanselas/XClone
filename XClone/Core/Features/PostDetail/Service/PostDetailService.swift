@@ -13,13 +13,25 @@ protocol PostDetailServiceProtocol {
 
 struct PostDetailService: PostDetailServiceProtocol {
     func fetchReplies(for post: Post, sortOption: ReplySortModel) async throws -> [Post] {
-//        try await Task.sleep(for: .seconds(1))
-        
         switch sortOption {
         case .mostRecent:
-            return MockData.posts.sorted(by: { $0.timestamp > $1.timestamp })
+            return try await fetchMostLikedReplies(for: post.id)
         case .mostLiked:
-            return MockData.posts.sorted(by: { $0.engagement.likesCount > $1.engagement.likesCount })
+            return try await fetchMostLikedReplies(for: post.id)
         }
+    }
+    
+    private func fetchMostRecentReplies(for postID: String) async throws -> [Post] {
+        return try await FirestoreConstants
+            .postRepliesCollection(postId: postID)
+            .order(by: "timestamp", descending: true)
+            .getDocuments(as: Post.self)
+    }
+    
+    private func fetchMostLikedReplies(for postID: String) async throws -> [Post] {
+        return try await FirestoreConstants
+            .postRepliesCollection(postId: postID)
+            .order(by: "postEngagement.likesCount", descending: true)
+            .getDocuments(as: Post.self)
     }
 }

@@ -13,21 +13,24 @@ class FeedViewModel: FeedViewModelProtocol {
     var posts = [Post]()
     
     private let feedService: FeedServiceProtocol
-    
     let likeService: LikePostServiceProtocol
     
+    private var lastLoadTime: Date?
+    private let refreshInterval: TimeInterval = 60 * 30
     init(
         feedService: FeedServiceProtocol = FeedService(),
         likeService: LikePostServiceProtocol = LikePostService()
     ) {
         self.feedService = feedService
         self.likeService = likeService
+        
+        Task { await fetchPosts() }
     }
     
     func fetchPosts() async {
         do {
-            self.posts = try await feedService.fetchPosts()
-//            try await fetchPostUserData(for: posts)
+            let posts = try await feedService.fetchPosts()
+            try await fetchPostUserData(for: posts)
             loadingState = posts.isEmpty ? .empty : .complete
         } catch {
             print("DEBUG: Failed to fetch posts with error: \(error)")

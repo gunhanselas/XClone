@@ -12,7 +12,7 @@ struct ProfileHeaderView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ProfileViewModel.self) private var viewModel
     
-    @State private var isShowingEditProfile = false
+    @State private var sheetConfig: ProfileHeaderView.SheetConfiguration?
     
     let user: User
     
@@ -46,7 +46,7 @@ struct ProfileHeaderView: View {
                     
                     Spacer()
                     
-                    Button { dismiss() } label: {
+                    Button { sheetConfig = .settings } label: {
                         Image(systemName: "gear.circle.fill")
                             .resizable()
                             .frame(width: 28, height: 28)
@@ -69,6 +69,12 @@ struct ProfileHeaderView: View {
                     Text("@\(user.username)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    
+                    if let bio = user.bio {
+                        Text(bio)
+                            .font(.subheadline)
+                            .padding(.vertical, 4)
+                    }
                     
                     HStack(spacing: 2) {
                         Image(systemName: "calendar")
@@ -104,20 +110,32 @@ struct ProfileHeaderView: View {
             }
             .padding(.horizontal, 8)
         }
-        .fullScreenCover(isPresented: $isShowingEditProfile) {
-            EditProfileView(user: user)
+        .fullScreenCover(item: $sheetConfig) { config in
+            switch config {
+            case .editProfile:
+                EditProfileView(user: user)
+            case .settings:
+                SettingsView()
+            }
         }
     }
 }
 
 private extension ProfileHeaderView {
     
+    enum SheetConfiguration: Identifiable, Hashable {
+        case editProfile
+        case settings
+        
+        var id: Int { hashValue }
+    }
+    
     func primaryButtonTapped() {
         switch user.userRelationState {
         case .unknown:
             break
         case .isCurrentUser:
-            isShowingEditProfile.toggle()
+            sheetConfig = .editProfile
         case .notFollowed:
             Task { await viewModel.follow() }
         case .followed:

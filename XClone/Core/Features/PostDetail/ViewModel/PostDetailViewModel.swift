@@ -11,11 +11,17 @@ import Observation
 class PostDetailViewModel: FeedViewModelProtocol {
     var loadingState: ContentLoadingState = .loading
     var posts = [Post]()
+    var replies = [Post]()
     
     private let service: PostDetailServiceProtocol
     private(set) var likeService: LikePostServiceProtocol
     
-    init(service: PostDetailServiceProtocol, likePostService: LikePostServiceProtocol = LikePostService()) {
+    init(
+        post: Post,
+        service: PostDetailServiceProtocol = PostDetailService(),
+        likePostService: LikePostServiceProtocol = LikePostService()
+    ) {
+        self.posts = [post]
         self.service = service
         self.likeService = likePostService
     }
@@ -24,7 +30,7 @@ class PostDetailViewModel: FeedViewModelProtocol {
         loadingState = .loading
         
         do {
-            self.posts = try await service.fetchReplies(for: post, sortOption: sortOption)
+            self.replies = try await service.fetchReplies(for: post, sortOption: sortOption)
             loadingState = posts.isEmpty ? .empty : .complete
         } catch {
             loadingState = .error(error)

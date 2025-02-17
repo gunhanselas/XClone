@@ -5,7 +5,6 @@
 //  Created by Stephan Dowless on 2/12/25.
 //
 
-
 import Foundation
 
 enum ReportType: Int, Codable {

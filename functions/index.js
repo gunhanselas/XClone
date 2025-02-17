@@ -96,3 +96,30 @@ exports.updateUserFeedAfterPost = onDocumentCreated("/posts/{postId}", async (ev
         throw err;
     }
 });
+
+exports.updateFeedsAfterPostDelete = onDocumentDeleted("/posts/{postId}", async (event) => {
+    const postId = event.params.postId; 
+    const snapshot = event.data; 
+    const data = snapshot.data();
+    const authorID = data.authorID;
+    const db = getFirestore();
+
+    try {
+        const followerSnapshot = await db.collection('users').doc(authorID).collection('user-followers').get();
+        const batch = db.batch();
+
+        followerSnapshot.forEach((doc) => {
+            const userFeedRef = db.collection('users').doc(doc.id).collection('user-feed').doc(postId);
+            batch.delete(userFeedRef);
+        });
+
+        const ownerFeedRef = db.collection('users').doc(authorID).collection('user-feed').doc(postId);
+        batch.delete(ownerFeedRef);
+
+        await batch.commit();
+        logger.log("User feeds updated after post creation.");
+    } catch {
+        logger.error("Error updating feed after post", err);
+        throw err;
+    }
+});

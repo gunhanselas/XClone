@@ -10,10 +10,7 @@ import SwiftUI
 struct FeedView: View {
     @Environment(UserManager.self) private var userManager
     
-    @State private var viewModel = FeedViewModel(
-        feedService: MockFeedService(),
-        likeService: MockLikePostService()
-    )
+    @State private var viewModel = FeedViewModel()
     @State private var isShowingPostCreationView = false
     
     var body: some View {
@@ -26,6 +23,7 @@ struct FeedView: View {
                             .containerRelativeFrame(.vertical)
                     case .empty:
                         Text("Feed Empty State")
+                            .frame(maxWidth: .infinity)
                     case .error:
                         Text("An error occurred")
                     case .complete:
@@ -39,7 +37,7 @@ struct FeedView: View {
                     }
                 }
                 
-                if case .complete = viewModel.loadingState {
+                if shouldShowCreatePostButton {
                     Button { isShowingPostCreationView.toggle() } label: {
                         Image(systemName: "plus")
                             .imageScale(.large)
@@ -57,7 +55,6 @@ struct FeedView: View {
             }
             .padding(.vertical)
             .navigationBarTitleDisplayMode(.inline)
-            .task { await viewModel.fetchPosts() }
             .fullScreenCover(isPresented: $isShowingPostCreationView) {
                 PostCreationView()
                     .environment(userManager)
@@ -85,6 +82,10 @@ struct FeedView: View {
 }
 
 private extension FeedView {
+    var shouldShowCreatePostButton: Bool {
+        return viewModel.loadingState == .complete ||
+        viewModel.loadingState == .empty
+    }
 }
 
 #Preview {

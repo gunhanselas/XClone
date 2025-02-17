@@ -9,11 +9,16 @@ import Kingfisher
 import SwiftUI
 
 struct PostDetailView: View {
-    @State private var viewModel = PostDetailViewModel(service: PostDetailService())
+    @State private var viewModel: PostDetailViewModel
     @State private var showReplySortMenu = false
     @State private var selectedReplySortOption: ReplySortModel = .mostRecent
     
     let post: Post
+    
+    init(post: Post) {
+        _viewModel = State(initialValue: PostDetailViewModel(post: post))
+        self.post = post
+    }
     
     var body: some View {
         ScrollView {
@@ -65,7 +70,7 @@ struct PostDetailView: View {
                 case .error:
                     Text("An error ocurred.")
                 case .complete:
-                    ForEach(viewModel.posts) { reply in
+                    ForEach(viewModel.replies) { reply in
                         PostCell(post: reply, viewModel: viewModel)
                     }
                 }

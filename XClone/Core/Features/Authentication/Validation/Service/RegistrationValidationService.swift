@@ -8,23 +8,23 @@
 import Foundation
 
 protocol RegistrationValidationProtocol {
-    func validateEmail(_ email: String) async throws -> Bool
-    func validateUsername(_ username: String) async throws -> Bool
+    func validateEmail(_ email: String) async throws -> InputValidationState
+    func validateUsername(_ username: String) async throws -> InputValidationState
 }
 
 struct RegistrationValidationService: RegistrationValidationProtocol {
-    func validateEmail(_ email: String) async throws -> Bool {
+    func validateEmail(_ email: String) async throws -> InputValidationState {
         let isValid = try await checkUniqueness(forKey: "email", value: email)
         guard isValid else { throw RegistrationValidationError.emailValidationFailed }
         
-        return isValid
+        return isValid ? .validated : .invalid
     }
     
-    func validateUsername(_ username: String) async throws -> Bool {
+    func validateUsername(_ username: String) async throws -> InputValidationState {
         let isValid = try await checkUniqueness(forKey: "username", value: username)
         guard isValid else { throw RegistrationValidationError.usernameValidationFailed }
         
-        return isValid
+        return isValid ? .validated : .invalid
     }
     
     private func checkUniqueness(forKey key: String, value: String) async throws -> Bool {
@@ -39,11 +39,11 @@ struct RegistrationValidationService: RegistrationValidationProtocol {
 }
 
 class MockRegistrationValidationService: RegistrationValidationProtocol {
-    func validateEmail(_ email: String) async throws -> Bool {
-        return email.isValidEmail()
+    func validateEmail(_ email: String) async throws -> InputValidationState {
+        return email.isValidEmail() ? .validated : .invalid
     }
     
-    func validateUsername(_ username: String) async throws -> Bool {
-        return username.isValidUsername()
+    func validateUsername(_ username: String) async throws -> InputValidationState {
+        return username.isValidUsername() ? .validated : .invalid
     }
 }

@@ -32,7 +32,7 @@ struct XStandardButtonStyle: ButtonStyle {
             .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
-                if rank == .secondary && variant == .system {
+                if (rank == .secondary && variant == .system) || colorScheme == .light {
                     Capsule()
                         .stroke(.gray, lineWidth: 1.0)
                         .opacity(configuration.isPressed ? 0.4 : 1.0)

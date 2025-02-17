@@ -44,6 +44,7 @@ struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
             
             PostEngagementStatView(imageName: "chart.bar", count: post.engagement.impressionsCount)
         }
+        .task { await viewModel.didLike(post) }
         .fullScreenCover(isPresented: $showRepliesView) {
             PostRepliesView(post: post)
         }

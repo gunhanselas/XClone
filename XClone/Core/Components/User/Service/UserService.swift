@@ -11,7 +11,6 @@ import FirebaseFirestore
 protocol UserServiceProtocol {
     func fetchCurrentUser() async throws -> User?
     func fetchUser(withUid uid: String) async throws -> User
-    
     func updateUsername(_ username: String) async throws
     func updateProfilePhoto(_ imageData: Data) async throws -> String
     func updateProfileHeaderPhoto(_ imageData: Data) async throws -> String

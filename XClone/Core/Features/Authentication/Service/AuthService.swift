@@ -22,7 +22,14 @@ struct AuthService: AuthServiceProtocol {
     func createUser(withEmail email: String, password: String, username: String, fullname: String) async throws -> User {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
-            return User(id: result.user.uid, username: username, email: email, isPrivate: false, createdAt: Date())
+            return User(
+                id: result.user.uid,
+                username: username,
+                fullname: fullname,
+                email: email,
+                isPrivate: false,
+                createdAt: Date()
+            )
         } catch {
             let authErrorCode = AuthErrorCode(_bridgedNSError: error as NSError)?.rawValue
             throw AuthenticationError(rawValue: authErrorCode)

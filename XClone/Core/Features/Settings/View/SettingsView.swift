@@ -25,6 +25,7 @@ struct SettingsView: View {
                 }
                 .font(.headline)
             }
+            .padding()
         }
         .navigationTitle("Account")
         .navigationBarTitleDisplayMode(.inline)
@@ -47,9 +48,12 @@ struct SettingsRowView: View {
                 .foregroundStyle(.secondary)
         }
         .font(.subheadline)
+        .frame(height: 40)
     }
 }
 
 #Preview {
     SettingsView()
+        .environment(AuthManager())
+        .environment(UserManager(service: MockUserService()))
 }

@@ -19,25 +19,25 @@ class RegistrationValidationManager {
         self.service = service
     }
     
-    func validateEmail(_ email: String) async -> Bool {
+    func validateEmail(_ email: String) async -> InputValidationState {
         emailValidationState = .validating
         
         do {
             return try await service.validateEmail(email)
         } catch {
             self.validationError = error as? RegistrationValidationError ?? .unknown
-            return false
+            return .invalid
         }
     }
     
-    func validateUsername(_ username: String) async -> Bool {
+    func validateUsername(_ username: String) async -> InputValidationState {
         usernameValidationState = .validating
         
         do {
             return try await service.validateUsername(username)
         } catch {
             self.validationError = error as? RegistrationValidationError ?? .unknown
-            return false
+            return .invalid
         }
     }
 }

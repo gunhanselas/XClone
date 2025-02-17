@@ -56,8 +56,8 @@ struct UserInformationView: View {
                 router.pushNextAccountCreationStep()
             }
             .buttonStyle(.standard(size: .compact))
-//            .disabled(!formIsValid)
-//            .opacity(formIsValid ? 1.0 : 0.5)
+            .disabled(!formIsValid)
+            .opacity(formIsValid ? 1.0 : 0.5)
         }
         .onChange(of: store.username) { _, newValue in
             validateUsername(newValue)
@@ -84,8 +84,7 @@ private extension UserInformationView {
         
         Task {
             emailValidation = .validating
-            try await Task.sleep(for: .seconds(1))
-            emailValidation = .validated
+            emailValidation = await validationManager.validateEmail(email)
         }
     }
     
@@ -97,8 +96,7 @@ private extension UserInformationView {
         
         Task {
             usernameValidation = .validating
-            try await Task.sleep(for: .seconds(1))
-            usernameValidation = .validated
+            usernameValidation = await validationManager.validateUsername(username)
         }
     }
 }

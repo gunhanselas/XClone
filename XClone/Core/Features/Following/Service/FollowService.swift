@@ -16,6 +16,7 @@ protocol FollowServiceProtocol {
 
 struct FollowService: FollowServiceProtocol {
     private let notificationService: SendNotificationService
+    private let cache = FollowCache.shared
     
     init(notificationService: SendNotificationService = SendNotificationService()) {
         self.notificationService = notificationService
@@ -36,6 +37,7 @@ struct FollowService: FollowServiceProtocol {
         batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(1))], forDocument: followedUserStatRef)
 
         try await batch.commit()
+        cache.update(uid, didAdd: true)
         try await notificationService.sendFollowNotification(toUid: uid)
     }
     
@@ -60,6 +62,7 @@ struct FollowService: FollowServiceProtocol {
         batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(-1))], forDocument: unfollowedUserStatRef)
         
         try await batch.commit()
+        cache.update(uid, didAdd: false)
         await notificationService.deleteFollowNotification(notificationOwnerUid: uid)
     }
     
@@ -67,6 +70,8 @@ struct FollowService: FollowServiceProtocol {
         guard let currentUid = Auth.auth().currentUser?.uid else { return .unknown }
 
         if currentUid == uid { return .isCurrentUser }
+        
+        if cache.contains(uid) { return .followed }
         
         let isFollowed = try await FirestoreConstants
             .userFollowingCollection(uid: currentUid)

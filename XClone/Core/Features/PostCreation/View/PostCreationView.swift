@@ -105,7 +105,7 @@ private extension PostCreationView {
             isUploading = true
             defer { isUploading = false }
             
-            guard let imageData = postUIImage?.jpegData(compressionQuality: 0.5) else { return }
+            let imageData = postUIImage?.jpegData(compressionQuality: 0.5)
             try await viewModel.uploadPost(caption: caption, imageData: imageData)
             
             dismiss()
@@ -127,7 +127,7 @@ private extension PostCreationView {
     var postButton: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             XButton("Post") {
-                
+                onUploadTapped()
             }
             .buttonStyle(.standard(size: .compact, variant: .primary), isLoading: $isUploading)
             .disabled(caption.isEmpty)

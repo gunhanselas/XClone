@@ -59,9 +59,9 @@ private extension AddUsernameView {
     func validateUsername() {
         Task {
             usernameValidationState = .validating
-            let isValid = await validationManager.validateUsername(username)
+            let validationState = await validationManager.validateUsername(username)
             
-            if isValid {
+            if validationState == .validated {
                 usernameValidationState = .validated
                 try await userManager.uploadUsername(username)
                 authManager.updateAuthState(.authenticated)
