@@ -53,6 +53,7 @@ struct FeedView: View {
                     }
                 }
             }
+            .refreshable { await viewModel.refreshFeed() }
             .padding(.vertical)
             .navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(isPresented: $isShowingPostCreationView) {

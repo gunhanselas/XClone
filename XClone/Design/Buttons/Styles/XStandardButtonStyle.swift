@@ -32,11 +32,9 @@ struct XStandardButtonStyle: ButtonStyle {
             .background(backgroundColor.opacity(configuration.isPressed ? 0.4 : 1.0))
             .clipShape(.capsule)
             .overlay {
-                if (rank == .secondary && variant == .system) || colorScheme == .light {
-                    Capsule()
-                        .stroke(.gray, lineWidth: 1.0)
-                        .opacity(configuration.isPressed ? 0.4 : 1.0)
-                }
+                Capsule()
+                    .stroke(borderColor, lineWidth: 1.0)
+                    .opacity(configuration.isPressed ? 0.4 : 1.0)
             }
     }
 }
@@ -49,12 +47,25 @@ private extension XStandardButtonStyle {
         case .system:
             switch rank {
             case .primary:
-                    .white
+                .white
             case .secondary:
                 Color(.systemBackground)
             case .tertiary:
-                    .clear
+                .clear
             }
+        }
+    }
+    
+    var borderColor: Color {
+        guard variant == .system else { return .clear }
+        
+        switch rank {
+        case .primary:
+            return colorScheme == .dark ? .clear : .gray
+        case .secondary:
+            return .gray
+        case .tertiary:
+            return .clear
         }
     }
     

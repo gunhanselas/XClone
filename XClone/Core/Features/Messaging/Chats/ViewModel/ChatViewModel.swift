@@ -68,7 +68,8 @@ class ChatViewModel {
             
             await updateMessageStatusToReadIfNecessary(message, currentUserID: currentUserID)
 
-            if case .empty = loadingState {
+            if loadingState == .empty {
+                print("DEBUG: Update to complete here..")
                 loadingState = .complete
             }
         }

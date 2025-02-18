@@ -37,12 +37,12 @@ struct AuthenticationRootView: View {
                     XButton("Continue with Google", imageResource: .googleIcon) {
                         signInWithGoogle()
                     }
-                    .buttonStyle(.standard)
-                    
+                    .buttonStyle(.standard(rank: .secondary))
+
                     XButton("Continue with Apple", imageResource: .appleIcon) {
                         signInwithApple()
                     }
-                    .buttonStyle(.standard)
+                    .buttonStyle(.standard(rank: .secondary))
                     
                     HStack {
                         Rectangle()
@@ -60,8 +60,8 @@ struct AuthenticationRootView: View {
                     XButton("Create Account") {
                         router.startAccountCreationFlow()
                     }
-                    .buttonStyle(.standard)
-                    
+                    .buttonStyle(.standard(rank: .secondary))
+
                     VStack(alignment: .leading, spacing: 24) {
                         Text("By signing up, you agree to our Terms of Service.")
                             .font(.caption)

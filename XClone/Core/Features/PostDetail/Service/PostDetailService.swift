@@ -15,7 +15,7 @@ struct PostDetailService: PostDetailServiceProtocol {
     func fetchReplies(for post: Post, sortOption: ReplySortModel) async throws -> [Post] {
         switch sortOption {
         case .mostRecent:
-            return try await fetchMostLikedReplies(for: post.id)
+            return try await fetchMostRecentReplies(for: post.id)
         case .mostLiked:
             return try await fetchMostLikedReplies(for: post.id)
         }
@@ -31,7 +31,7 @@ struct PostDetailService: PostDetailServiceProtocol {
     private func fetchMostLikedReplies(for postID: String) async throws -> [Post] {
         return try await FirestoreConstants
             .postRepliesCollection(postId: postID)
-            .order(by: "postEngagement.likesCount", descending: true)
+            .order(by: "engagement.likesCount", descending: true)
             .getDocuments(as: Post.self)
     }
 }

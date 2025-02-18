@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 protocol FeedServiceProtocol {
     func fetchPosts() async throws -> [Post]
+    func refreshFeed() async throws -> [Post]
 }
 
 class FeedService: FeedServiceProtocol {
@@ -47,6 +48,13 @@ class FeedService: FeedServiceProtocol {
         }
         
         return snapshot.documents.map { $0.documentID }
+    }
+    
+    func refreshFeed() async throws -> [Post] {
+        self.lastDoc = nil
+        self.shouldLoadMoreData = true
+        
+        return try await fetchPosts()
     }
     
     private func fetchPosts(with postIDs: [String]) async throws -> [Post] {

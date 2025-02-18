@@ -52,8 +52,7 @@ class AuthManager: NSObject {
     }
     
     func signUp(withEmail email: String, password: String, username: String, fullname: String) async throws -> User {
-        return try await service
-            .createUser(
+        return try await service.createUser(
                 withEmail: email,
                 password: password,
                 username: username,

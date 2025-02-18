@@ -8,6 +8,11 @@
 import Foundation
 
 class MockFeedService: FeedServiceProtocol {
+    func refreshFeed() async throws -> [Post] {
+        try await Task.sleep(for: .seconds(1))
+        return MockData.posts
+    }
+    
     func fetchPosts() async throws -> [Post] {
         try await Task.sleep(for: .seconds(1))
         return MockData.posts

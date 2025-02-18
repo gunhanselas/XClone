@@ -41,7 +41,7 @@ struct EditProfileService {
             batch.updateData(["fullname": fullname], forDocument: userRef)
         }
         
-        if let bio = bio {
+        if let bio = bio, !bio.isEmpty {
             batch.updateData(["bio": bio], forDocument: userRef)
         }
         

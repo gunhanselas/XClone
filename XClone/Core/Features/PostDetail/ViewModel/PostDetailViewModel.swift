@@ -31,9 +31,25 @@ class PostDetailViewModel: FeedViewModelProtocol {
         
         do {
             self.replies = try await service.fetchReplies(for: post, sortOption: sortOption)
+            try await fetchUserDataForReplies()
             loadingState = posts.isEmpty ? .empty : .complete
         } catch {
             loadingState = .error(error)
+        }
+    }
+    
+    private func fetchUserDataForReplies() async throws {
+        try await withThrowingTaskGroup(of: (Int, User).self) { group in
+            for (index, reply) in replies.enumerated() {
+                group.addTask {
+                    let user = try await FirestoreConstants.UserCollection.document(reply.authorID).getDocument(as: User.self)
+                    return (index, user)
+                }
+            }
+            
+            for try await (index, user) in group {
+                replies[index].author = user
+            }
         }
     }
 }

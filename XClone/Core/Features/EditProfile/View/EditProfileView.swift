@@ -128,10 +128,12 @@ struct EditProfileView: View {
         .task(id: selectedHeaderPhotosPickerItem) { await loadHeaderImage() }
         .task(id: selectedProfilePhotosPickerItem) { await loadProfileImage() }
         .onChange(of: fullname) { _, newValue in
-            didEditUserInfo = user.fullname != newValue
+            didEditUserInfo = newValue != user.fullname
+            print("DEBUG: Did edit fullname \(didEditUserInfo)")
         }
         .onChange(of: bio) { _, newValue in
-            didEditUserInfo = user.bio != newValue
+            didEditUserInfo = newValue != user.bio
+            print("DEBUG: Did edit bio \(didEditUserInfo)")
         }
         .onAppear { configureUserDataOnAppear() }
     }
@@ -171,7 +173,6 @@ private extension EditProfileView {
             let data = try await loadImageDataFromPhotoItem(selectedHeaderPhotosPickerItem)
             self.headerUIImage = data.0
             self.headerImage = data.1
-            self.didEditUserInfo = true
         } catch {
             print("DEBUG: Failed to select profile photo with error: \(error.localizedDescription)")
         }
@@ -182,7 +183,6 @@ private extension EditProfileView {
             let data = try await loadImageDataFromPhotoItem(selectedProfilePhotosPickerItem)
             self.profilePhotoUIImage = data.0
             self.profileImage = data.1
-            self.didEditUserInfo = true
         } catch {
             print("DEBUG: Failed to select profile photo with error: \(error.localizedDescription)")
         }
@@ -195,6 +195,8 @@ private extension EditProfileView {
         guard let uiImage = UIImage(data: data) else { return (nil, nil) }
         let image = Image(uiImage: uiImage)
         
+        self.didEditUserInfo = true
+
         return (uiImage, image)
     }
 }
