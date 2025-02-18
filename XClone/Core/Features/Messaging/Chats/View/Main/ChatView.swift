@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct ChatView: View {
+    @Environment(UserManager.self) private var userManager
+    
     @State private var viewModel: ChatViewModel
     @State private var scrollPosition = ScrollPosition()
     
+    private let user: User?
+    
     init(thread: Thread?, user: User?) {
         _viewModel = State(
-            initialValue: ChatViewModel(service: ChatService(), thread: thread, user: user)
+            initialValue: ChatViewModel(thread: thread, user: user)
         )
+        
+        self.user = user
     }
 
     var body: some View {
@@ -46,6 +52,7 @@ struct ChatView: View {
                 .defaultScrollAnchor(.bottom)
             }
         }
+        .navigationTitle(user?.username ?? "Chat")
         .safeAreaInset(edge: .bottom) {
             if shouldShowInputView {
                 MessageInputView()
@@ -54,6 +61,10 @@ struct ChatView: View {
             }
         }
         .task { await viewModel.fetchMessages() }
+        .task(id: viewModel.initiateThreadObserver) {
+            guard viewModel.initiateThreadObserver else { return }
+            await viewModel.observeChatStream(for: userManager.currentUser?.id)
+        }
         .toolbarVisibility(.hidden, for: .tabBar)
     }
 }

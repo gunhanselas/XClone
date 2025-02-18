@@ -25,20 +25,20 @@ class ChatViewModel {
         return thread?.type == .direct
     }
     
-    init(service: ChatService, thread: Thread?, user: User?) {
+    init(service: ChatService = ChatService(), thread: Thread?, user: User?) {
         self.service = service
         self.thread = thread
         self.user = user 
     }
     
     func fetchMessages() async {
-//        guard let thread else {
-//            loadingState = .empty
-//            return 
-//        }
+        guard let thread else {
+            loadingState = .empty
+            return 
+        }
         
         do {
-            self.messages = MockData.mockMessages // try await service.fetchMessages(for: thread)
+            self.messages = try await service.fetchMessages(for: thread)
             initiateThreadObserver = true
             loadingState = messages.isEmpty ? .empty : .complete
         } catch {

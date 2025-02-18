@@ -46,11 +46,13 @@ struct ProfileHeaderView: View {
                     
                     Spacer()
                     
-                    Button { sheetConfig = .settings } label: {
-                        Image(systemName: "gear.circle.fill")
-                            .resizable()
-                            .frame(width: 28, height: 28)
-                            .foregroundStyle(.white, .black.opacity(0.4))
+                    if user.userRelationState == .isCurrentUser {
+                        Button { sheetConfig = .settings } label: {
+                            Image(systemName: "gear.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.white, .black.opacity(0.4))
+                        }
                     }
                 }
                 .padding(.horizontal)

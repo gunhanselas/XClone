@@ -8,27 +8,38 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     
     var body: some View {
-        ScrollView {
-            VStack {
-                if let currentUser = userManager.currentUser {
-                    SettingsRowView(title: "Username", value: currentUser.username)
-                    SettingsRowView(title: "Email", value: currentUser.email)
-                    SettingsRowView(title: "Joined", value: currentUser.createdAt.monthAndYearString())
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    if let currentUser = userManager.currentUser {
+                        SettingsRowView(title: "Username", value: currentUser.username)
+                        SettingsRowView(title: "Email", value: currentUser.email)
+                        SettingsRowView(title: "Joined", value: currentUser.createdAt.monthAndYearString())
+                    }
+                    
+                    Button("Log Out", role: .destructive) {
+                        authManager.signOut()
+                    }
+                    .font(.headline)
                 }
-                
-                Button("Log Out", role: .destructive) {
-                    authManager.signOut()
-                }
-                .font(.headline)
+                .padding()
             }
-            .padding()
+            .navigationTitle("Account")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .font(.headline)
+                }
+            }
         }
-        .navigationTitle("Account")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

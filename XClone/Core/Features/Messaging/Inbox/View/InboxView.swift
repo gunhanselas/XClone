@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct InboxView: View {
+    @Environment(UserManager.self) private var userManager
+    
     @State private var viewModel = InboxViewModel(service: InboxService())
     @State private var isShowingNewMessageView = false
     @State private var searchText = ""
@@ -26,40 +28,37 @@ struct InboxView: View {
                         .containerRelativeFrame(.vertical)
                 case .complete:
                     List {
-                        ForEach(viewModel.threads) { thread in
-                            ZStack {
-                                NavigationLink(value: thread) {
-                                    EmptyView()
-                                }.opacity(0.0)
-                                
-                                InboxRowView(thread: thread)
-                                    .frame(height: 48)
-                                    .padding(.horizontal, 8)
+                        VStack {
+                            ForEach(viewModel.threads) { thread in
+                                ZStack {
+                                    NavigationLink(value: thread) {
+                                        EmptyView()
+                                    }.opacity(0.0)
+                                    
+                                    InboxRowView(thread: thread)
+                                        .padding(.horizontal, 8)
+                                        .environment(viewModel)
+                                }
                             }
                         }
                         .searchable(text: $searchText, prompt: "Search...")
                         .listSectionSeparator(.hidden, edges: .top)
-                        .listRowInsets(EdgeInsets())
-                        .listRowSeparator(.visible)
-                        .listStyle(PlainListStyle())
-                        .padding(.vertical)
-                        .padding(.horizontal, 8)
-                        .overlay(alignment: .bottomTrailing) {
-                            XButton(systemImage: "envelope") {
-                                print("Show new messaage view..")
-                            }
-                            .buttonStyle(.floating)
-                        }
                     }
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.visible)
+                    .listStyle(PlainListStyle())
                 }
             }
             .sheet(isPresented: $isShowingNewMessageView) {
                 ComposeMessageView(selectedUser: $selectedUser)
             }
+            .navigationDestination(for: Thread.self) { thread in
+                ChatView(thread: thread, user: thread.lastMessage?.user)
+            }
             .navigationDestination(item: $selectedUser) { user in
                 ChatView(thread: nil, user: user)
             }
-            .task { await viewModel.fetchThreads() }
+            .task { await viewModel.fetchThreads(for: userManager.currentUser?.id) }
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.inline)
         }

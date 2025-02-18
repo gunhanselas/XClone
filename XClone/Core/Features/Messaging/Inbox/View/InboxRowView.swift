@@ -21,7 +21,7 @@ struct InboxRowView: View {
                     .foregroundStyle(.blue)
             }
             
-            AvatarView(user: thread.lastMessage?.user, size: .medium)
+            AvatarView(user: thread.lastMessage?.user, size: .small)
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack {

@@ -19,9 +19,8 @@ struct Thread: Identifiable, Hashable, Codable {
 }
 
 extension Thread {    
-    func messageUserID() -> String? {
-        guard let lastMessage else { return nil }
-//        return type == .direct ? lastMessage.chatPartnerId : lastMessage.fromId
-        return nil
+    func chatPartnerID(currentUserID: String) -> String? {
+        guard type == .direct else { return nil }
+        return uids.first(where: { $0 != currentUserID })
     }
 }

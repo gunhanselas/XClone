@@ -30,11 +30,15 @@ class InboxViewModel {
         }
     }
     
-    func fetchThreads() async {
+    func fetchThreads(for currentUserID: String?) async {
+        guard let currentUserID else { return }
+        
         do {
             threads = try await service.fetchThreads()
+            try await fetchThreadUserData(currentUserID)
             
             loadingState = threads.isEmpty ? .empty : .complete
+            await streamThreads()
         } catch {
             loadingState = .error(error)
         }
@@ -55,7 +59,26 @@ class InboxViewModel {
                 if isFirstUnread != isSecondUnread {
                     return isFirstUnread
                 }
+                
                 return ($0.lastMessage?.timestamp ?? .distantPast) > ($1.lastMessage?.timestamp ?? .distantPast)
+            }
+        }
+    }
+}
+
+private extension InboxViewModel {
+    func fetchThreadUserData(_ currentUserID: String) async throws {
+        try await withThrowingTaskGroup(of: (Int, User?).self) { group in
+            for (index, thread) in threads.enumerated() {
+                group.addTask {
+                    guard let userID = thread.chatPartnerID(currentUserID: currentUserID) else { return (index, nil) }
+                    let user = try await FirestoreConstants.UserCollection.document(userID).getDocument(as: User.self)
+                    return (index, user)
+                }
+            }
+            
+            for try await (index, user) in group {
+                threads[index].lastMessage?.user = user
             }
         }
     }
