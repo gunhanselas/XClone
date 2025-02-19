@@ -37,12 +37,17 @@ extension ChatService {
     }
         
     private func addChatPartnerToThreadIfNecessary(_ thread: Thread) async throws {
-//        if !thread.uids.contains(chatPartner.id) {
-//            try await FirestoreConstants
-//                .ThreadsCollection
-//                .document(thread.id)
-//                .updateData(["uids": FieldValue.arrayUnion([chatPartner.id])])
-//        }
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        guard let chatPartnerID = thread.chatPartnerID(currentUserID: currentUid) else { return }
+        
+        if !thread.uids.contains(chatPartnerID) {
+            try await FirestoreConstants
+                .ThreadsCollection
+                .document(thread.id)
+                .updateData(
+                    ["uids": FieldValue.arrayUnion([chatPartnerID])]
+                )
+        }
     }
     
     private func uploadMessageData(_ messageID: String, _ data: [String: Any], _ thread: Thread, _ timestamp: Date) async throws {
