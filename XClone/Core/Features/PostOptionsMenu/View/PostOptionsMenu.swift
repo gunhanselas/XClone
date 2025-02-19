@@ -27,7 +27,7 @@ struct PostOptionsMenu: View {
                 }
             } else {
                 if let author = post.author {
-                    Button("Report Post", action: {})
+                    Button("Report Post", action: { isShowingReportView.toggle() })
 
                     Menu("@\(author.username)") {
                         Button(followButtonTitle) {
@@ -55,7 +55,7 @@ struct PostOptionsMenu: View {
             Text("They will be able to see your public posts, but will no longer be able to engage with them. They will also not be able to follow or message you, and you will not see notifications from them.")
         })
         .sheet(isPresented: $isShowingReportView) {
-            ReportContentView()
+            ReportContentView(contentType: .post(post: post))
         }
     }
 }
