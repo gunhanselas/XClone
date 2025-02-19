@@ -12,23 +12,27 @@ struct NotificationsView: View {
     
     var body: some View {
         NavigationStack {
-            switch viewModel.loadingState {
-            case .loading:
-                ProgressView()
-                    .containerRelativeFrame(.vertical)
-            case .empty:
-                Text("Empty state..")
-            case .error:
-                Text("An error ocurred.")
-            case .complete:
-                ScrollView {
-                    LazyVStack {
-                        ForEach(viewModel.notifications) { notification in
-                            NotificationRowView(notification: notification)
+            Group {
+                switch viewModel.loadingState {
+                case .loading:
+                    ProgressView()
+                        .containerRelativeFrame(.vertical)
+                case .empty:
+                    Text("Empty state..")
+                case .error:
+                    Text("An error ocurred.")
+                case .complete:
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(viewModel.notifications) { notification in
+                                NotificationRowView(notification: notification)
+                            }
                         }
                     }
                 }
             }
+            .navigationTitle("Notifications")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .task { await viewModel.fetchNotifications() }
     }

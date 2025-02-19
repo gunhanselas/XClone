@@ -14,8 +14,11 @@ class ChatViewModel {
     var initiateThreadObserver = false
     
     private let service: ChatService
-    private var thread: Thread?
     private let user: User?
+    
+    private var thread: Thread? {
+        didSet { initiateThreadObserver = thread != nil }
+    }
     
     var isGroupThread: Bool {
         return thread?.type == .group
@@ -34,7 +37,7 @@ class ChatViewModel {
     func fetchMessages() async {
         guard let thread else {
             loadingState = .empty
-            return 
+            return
         }
         
         do {
@@ -58,7 +61,7 @@ class ChatViewModel {
     
     func observeChatStream(for currentUserID: String?) async {
         guard let thread, let currentUserID else { return }
-
+        
         for await message in service.getChatStream(for: thread) {
             if let index = messages.firstIndex(where: { $0.id == message.id }) {
                 messages[index] = message
@@ -69,7 +72,6 @@ class ChatViewModel {
             await updateMessageStatusToReadIfNecessary(message, currentUserID: currentUserID)
 
             if loadingState == .empty {
-                print("DEBUG: Update to complete here..")
                 loadingState = .complete
             }
         }
@@ -83,6 +85,7 @@ class ChatViewModel {
                 try await service.uploadMessage(messageText: messageText, to: thread)
             } else {
                 let thread = try await service.createThread(chatPartnerID: chatPartnerID)
+                self.thread = thread
                 try await service.uploadMessage(messageText: messageText, to: thread)
             }
         } catch {
@@ -94,7 +97,8 @@ class ChatViewModel {
 private extension ChatViewModel {
     func updateMessageStatusToReadIfNecessary(_ message: ChatMessage, currentUserID: String) async {
         guard !message.isMessageFromCurrentUser(currentUid: currentUserID),
-                message.status == .delivered, let thread else { return }
+                message.status == .delivered,
+                let thread else { return }
         
         do {
             try await service.updateMessageStatus(message, status: .read, for: thread)

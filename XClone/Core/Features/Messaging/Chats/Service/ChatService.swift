@@ -28,29 +28,12 @@ extension ChatService {
         let messageId = messageRef.documentID
         let lastUpdated = Date()
         
-        let message = ChatMessage(
-            id: messageId,
-            fromId: currentUid,
-            messageText: messageText,
-            timestamp: lastUpdated,
-            imageUrl: nil,
-            status: .delivered
-        )
-        
+        let message = createMessage(with: messageText, messageId: messageId, date: lastUpdated, currentUid: currentUid)
         let messageData = try Firestore.Encoder().encode(message)
         
-        await withThrowingTaskGroup(of: Void.self) { [weak self] group in
-            guard let self else { return }
-            
-            group.addTask {
-                try await self.addChatPartnerToThreadIfNecessary(thread)
-                try await self.updateDeletedThreadIfNecessary(thread)
-            }
-            
-            group.addTask {
-                try await self.uploadMessageData(messageId, messageData, thread, lastUpdated)
-            }
-        }
+        try await addChatPartnerToThreadIfNecessary(thread)
+        try await uploadMessageData(messageId, messageData, thread, lastUpdated)
+        try await updateDeletedThreadIfNecessary(thread)
     }
         
     private func addChatPartnerToThreadIfNecessary(_ thread: Thread) async throws {
@@ -95,6 +78,17 @@ extension ChatService {
                 .delete()
         }
     }
+    
+    private func createMessage(with messageText: String, messageId: String, date: Date, currentUid: String) -> ChatMessage {
+        return ChatMessage(
+            id: messageId,
+            fromId: currentUid,
+            messageText: messageText,
+            timestamp: date,
+            imageUrl: nil,
+            status: .delivered
+        )
+    }
 }
 
 // MARK: - Message Updates
@@ -136,7 +130,7 @@ extension ChatService {
         let snapshot = try await chatQuery(for: thread.id)?.limit(to: fetchLimit).getDocuments()
         if lastDoc == nil { lastDoc = snapshot?.documents.last }
         guard let messages = snapshot?.documents.compactMap({ try? $0.data(as: ChatMessage.self) }) else { return [] }
-        return messages
+        return messages.reversed()
     }
     
     private func onTerminationOfContinuation(_ continuation: AsyncStream<ChatMessage>.Continuation) {
@@ -152,7 +146,7 @@ extension ChatService {
             .filter { $0.type == .added || $0.type == .modified }
             .compactMap { try? $0.document.data(as: ChatMessage.self) }
         
-        guard let message = messages?.first else { return }
+        guard let message = messages?.last else { return }
         
         continuation.yield(message)
     }

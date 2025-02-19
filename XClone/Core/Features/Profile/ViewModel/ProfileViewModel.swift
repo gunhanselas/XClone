@@ -25,7 +25,7 @@ class ProfileViewModel: FeedViewModelProtocol {
 
     init(
         user: User,
-        profileService: ProfileServiceProtocol = MockProfileService(),
+        profileService: ProfileServiceProtocol = ProfileService(),
         likeService: LikePostServiceProtocol = LikePostService(),
         followService: FollowServiceProtocol = FollowService(),
         userService: UserServiceProtocol = UserService()
@@ -58,7 +58,6 @@ class ProfileViewModel: FeedViewModelProtocol {
             
             await withThrowingTaskGroup(of: Void.self) { [weak self] group in
                 guard let self else { return }
-                
                 group.addTask { await self.fetchUserRelationState() }
                 group.addTask { await self.fetchUserContent() }
             }
@@ -117,7 +116,13 @@ class ProfileViewModel: FeedViewModelProtocol {
 private extension ProfileViewModel {
     func fetchPosts(for uid: String) async {
         do {
-            self.posts = try await profileService.fetchPosts(for: uid)
+            var posts = try await profileService.fetchPosts(for: uid)
+            
+            for (index, post) in posts.enumerated() {
+                posts[index].author = self.user
+            }
+            
+            self.posts = posts
             setCurrentDataSource(for: .posts)
         } catch {
             print("DEBUG: Error fetching posts: \(error)")
@@ -126,7 +131,8 @@ private extension ProfileViewModel {
     
     func fetchReplies(for uid: String) async {
         do {
-            self.replies = try await profileService.fetchReplies(for: uid)
+            let replies = try await profileService.fetchReplies(for: uid)
+            self.replies = try await fetchUserData(for: replies)
         } catch {
             print("DEBUG: Error fetching replies: \(error)")
         }
@@ -134,9 +140,31 @@ private extension ProfileViewModel {
     
     func fetchedLikedPosts(for uid: String) async {
         do {
-            self.likedPosts = try await profileService.fetchLikedPosts(for: uid)
+            let likedPosts = try await profileService.fetchLikedPosts(for: uid)
+            self.likedPosts = try await fetchUserData(for: likedPosts)
         } catch {
             print("DEBUG: Error fetching liked posts: \(error)")
         }
+    }
+    
+    func fetchUserData(for posts: [Post]) async throws -> [Post] {
+        var result = posts
+        
+        try await withThrowingTaskGroup(of: (Int, User?).self) { [weak self] group in
+            guard let self else { return }
+            
+            for (index, post) in posts.enumerated() {
+                group.addTask {
+                    let user = try await self.userService.fetchUser(withUid: post.authorID)
+                    return (index, user)
+                }
+            }
+            
+            for try await (index, user) in group {
+                result[index].author = user
+            }
+        }
+        
+        return result
     }
 }

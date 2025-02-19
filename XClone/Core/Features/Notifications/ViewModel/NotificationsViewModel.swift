@@ -24,6 +24,8 @@ class NotificationsViewModel {
     }
     
     func fetchNotifications() async {
+        guard notifications.isEmpty else { return }
+        
         do {
             notifications = try await service.fetchNotifications()
             try await fetchNotificationUserData()

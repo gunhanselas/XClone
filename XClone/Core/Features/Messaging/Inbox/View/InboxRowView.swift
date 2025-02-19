@@ -9,25 +9,27 @@ import SwiftUI
 
 struct InboxRowView: View {
     @Environment(UserManager.self) private var userManager
-    @Environment(InboxViewModel.self) private var viewModel
+    @EnvironmentObject private var viewModel: InboxViewModel
     
     let thread: Thread
     
     var body: some View {
-        HStack(spacing: 12) {
-            if showUnreadIndicator {
-                Circle()
-                    .frame(width: 8, height: 8)
-                    .foregroundStyle(.blue)
-            }
+        HStack {
+            Circle()
+                .frame(width: 8, height: 8)
+                .foregroundStyle(showUnreadIndicator ? .blue : .clear)
             
-            AvatarView(user: thread.lastMessage?.user, size: .small)
+            if let threadIndex {
+                AvatarView(user: viewModel.threads[threadIndex].lastMessage?.user, size: .small)
+            }
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(thread.lastMessage?.user?.username ?? "")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
+                    if let threadIndex {
+                        Text(viewModel.threads[threadIndex].lastMessage?.user?.username ?? "Loading..")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
                     
                     Spacer()
                     
@@ -47,6 +49,7 @@ struct InboxRowView: View {
                     .frame(maxWidth: UIScreen.main.bounds.width - 100, alignment: .leading)
             }
         }
+        .frame(height: 48)
         .frame(maxHeight: 72)
         .swipeActions {
             withAnimation(.spring()) {
@@ -74,9 +77,15 @@ private extension InboxRowView {
         guard let currentUser = userManager.currentUser else { return "" }
 
         if let lastMessage = thread.lastMessage {
-            return lastMessage.isMessageFromCurrentUser(currentUid: currentUser.id) ? "You: \(lastMessage.messageText)" : lastMessage.messageText
+            return lastMessage.isMessageFromCurrentUser(currentUid: currentUser.id)
+            ? "You: \(lastMessage.messageText)"
+            : lastMessage.messageText
         }
         
         return ""
+    }
+    
+    var threadIndex: Int? {
+        return viewModel.threads.firstIndex(where: { $0.id == thread.id })
     }
 }

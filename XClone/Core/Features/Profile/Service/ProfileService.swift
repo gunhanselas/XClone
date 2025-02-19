@@ -22,12 +22,8 @@ struct ProfileService: ProfileServiceProtocol {
     }
     
     func fetchReplies(for uid: String) async throws -> [Post] {
-        return []
-    }
-    
-    func fetchLikedPosts(for uid: String) async throws -> [Post] {
         let postIDs = try await FirestoreConstants
-            .userLikesCollection(uid: uid)
+            .userRepliesCollection(uid: uid)
             .order(by: "timestamp", descending: true)
             .getDocuments()
         
@@ -37,7 +33,36 @@ struct ProfileService: ProfileServiceProtocol {
             for postID in postIDs.documents {
                 group.addTask {
                     return try await FirestoreConstants
-                        .PostsCollection.document(postID.documentID)
+                        .PostsCollection
+                        .document(postID.documentID)
+                        .getDocument(as: Post.self)
+                }
+            }
+            
+            for try await post in group {
+                result.append(post)
+            }
+            
+            return result
+        }
+    }
+    
+    func fetchLikedPosts(for uid: String) async throws -> [Post] {
+        let postIDs = try await FirestoreConstants
+            .userLikesCollection(uid: uid)
+            .order(by: "timestamp", descending: true)
+            .getDocuments()
+        
+        print("DEBUG: Post IDs \(postIDs)")
+        
+        return try await withThrowingTaskGroup(of: Post.self) { group in
+            var result = [Post]()
+            
+            for postID in postIDs.documents {
+                group.addTask {
+                    return try await FirestoreConstants
+                        .PostsCollection
+                        .document(postID.documentID)
                         .getDocument(as: Post.self)
                 }
             }

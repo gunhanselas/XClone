@@ -31,13 +31,7 @@ struct ChatView: View {
                     .containerRelativeFrame(.vertical)
             case .error:
                 Text("An error ocurred.")
-            case .empty:
-                VStack {
-                    Spacer()
-                    Text("Send first message")
-                    Spacer()
-                }
-            case .complete:
+            case .complete, .empty:
                 ScrollView {
                     LazyVStack {
                         ForEach(viewModel.messages) { message in

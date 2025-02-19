@@ -42,7 +42,7 @@ class InboxService: InboxServiceProtocol {
             .getDocuments()
         
         self.threads = snapshot.documents
-            .compactMap({ try? $0.data(as: Thread.self) })
+            .compactMap { try? $0.data(as: Thread.self) }
             .sorted { thread1, thread2 in
                 let isFirstUnread = thread1.lastMessage?.status != .read
                 let isSecondUnread = thread2.lastMessage?.status != .read
@@ -62,20 +62,26 @@ class InboxService: InboxServiceProtocol {
         return AsyncStream { continuation in
             guard let currentUid = Auth.auth().currentUser?.uid else { return }
             
+            continuation.onTermination = { [weak self] _ in
+                self?.firestoreListener?.remove()
+                self?.firestoreListener = nil
+                continuation.finish()
+            }
+            
             self.firestoreListener = FirestoreConstants
                 .ThreadsCollection
                 .whereField("uids", arrayContains: currentUid)
                 .order(by: "lastUpdated", descending: true)
-                .addSnapshotListener { [weak self] snapshot, _ in
-                    guard let snapshot, let self else { return }
+                .addSnapshotListener { snapshot, _ in
+                    guard let snapshot else { return }
                     
-                    let changes = snapshot.documentChanges.filter({
-                        $0.type == .added || $0.type == .modified
-                    })
+                    let threads = snapshot.documentChanges
+                        .filter { $0.type == .added || $0.type == .modified }
+                        .compactMap { try? $0.document.data(as: Thread.self) }
                     
-                    changes.compactMap { try? $0.document.data(as: Thread.self) }
-                        .filter({ !self.threads.contains($0) })
-                        .forEach({ continuation.yield($0) })
+                    if let thread = threads.first {
+                        continuation.yield(thread)
+                    }
                 }
         }
     }

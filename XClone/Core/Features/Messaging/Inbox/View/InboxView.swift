@@ -10,10 +10,11 @@ import SwiftUI
 struct InboxView: View {
     @Environment(UserManager.self) private var userManager
     
-    @State private var viewModel = InboxViewModel(service: InboxService())
     @State private var isShowingNewMessageView = false
     @State private var searchText = ""
     @State private var selectedUser: User?
+    
+    @StateObject private var viewModel = InboxViewModel()
 
     var body: some View {
         NavigationStack {
@@ -28,24 +29,36 @@ struct InboxView: View {
                         .containerRelativeFrame(.vertical)
                 case .complete:
                     List {
-                        VStack {
-                            ForEach(viewModel.threads) { thread in
-                                ZStack {
-                                    NavigationLink(value: thread) {
-                                        EmptyView()
-                                    }.opacity(0.0)
-                                    
-                                    InboxRowView(thread: thread)
-                                        .padding(.horizontal, 8)
-                                        .environment(viewModel)
-                                }
+                        ForEach(viewModel.threads) { thread in
+                            ZStack {
+                                NavigationLink(value: thread) {
+                                    EmptyView()
+                                }.opacity(0.0)
+                                
+                                InboxRowView(thread: thread)
+                                    .environmentObject(viewModel)
                             }
                         }
-                        .searchable(text: $searchText, prompt: "Search...")
+                        .listRowSeparator(.visible)
                         .listSectionSeparator(.hidden, edges: .top)
                     }
+                    .overlay(alignment: .bottomTrailing) {
+                        Button { isShowingNewMessageView.toggle() } label: {
+                            Image(systemName: "envelope")
+                                .imageScale(.large)
+                                .foregroundStyle(.white)
+                                .frame(width: 40, height: 40)
+                                .background {
+                                    Circle()
+                                        .fill(.primaryBlue)
+                                        .frame(width: 54, height: 54)
+                                        .shadow(color: .primary.opacity(0.25), radius: 6)
+                                }
+                                .padding()
+                        }
+                    }
+                    .searchable(text: $searchText, prompt: "Search...")
                     .listRowInsets(EdgeInsets())
-                    .listRowSeparator(.visible)
                     .listStyle(PlainListStyle())
                 }
             }
@@ -58,7 +71,6 @@ struct InboxView: View {
             .navigationDestination(item: $selectedUser) { user in
                 ChatView(thread: nil, user: user)
             }
-            .task { await viewModel.fetchThreads(for: userManager.currentUser?.id) }
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.inline)
         }

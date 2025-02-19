@@ -14,6 +14,7 @@ struct ChatMessage: Identifiable, Codable, Hashable {
     let timestamp: Date
     var imageUrl: String?
     var status: ChatMessageStatus
+    
     var user: User?
 }
 

@@ -5,17 +5,25 @@
 //  Created by Stephan Dowless on 2/7/25.
 //
 
-import Observation
+import FirebaseAuth
+import SwiftUI
 
-@Observable
-class InboxViewModel {
-    var loadingState: ContentLoadingState = .loading
-    var threads = [Thread]()
-        
-    private let service: InboxServiceProtocol
+@MainActor
+class InboxViewModel: ObservableObject {
+    @Published var loadingState: ContentLoadingState = .loading
+    @Published var threads = [Thread]()
+    @Published var hasUnreadMessages = false
     
-    init(service: InboxServiceProtocol) {
+    private let service: InboxServiceProtocol
+    private let userService: UserServiceProtocol
+    
+    private var currentUserID: String?
+    
+    init(service: InboxServiceProtocol = InboxService(), userService: UserServiceProtocol = UserService()) {
         self.service = service
+        self.userService = userService
+        
+        Task { await fetchThreads() }
     }
     
     func deleteThread(_ thread: Thread) async {
@@ -30,14 +38,15 @@ class InboxViewModel {
         }
     }
     
-    func fetchThreads(for currentUserID: String?) async {
-        guard let currentUserID else { return }
+    func fetchThreads() async {
+        guard let currentUserID = Auth.auth().currentUser?.uid, threads.isEmpty else { return }
+        self.currentUserID = currentUserID
         
         do {
             threads = try await service.fetchThreads()
             try await fetchThreadUserData(currentUserID)
-            
             loadingState = threads.isEmpty ? .empty : .complete
+            
             await streamThreads()
         } catch {
             loadingState = .error(error)
@@ -47,32 +56,51 @@ class InboxViewModel {
     func streamThreads() async {
         for try await thread in service.threadStream() {
             if let threadIndex = threads.firstIndex(where: { $0.id == thread.id }) {
-                threads[threadIndex] = thread
+                await updateExistingThread(thread, with: threadIndex)
             } else {
-                threads.insert(thread, at: 0)
-            }
-            
-            threads.sort {
-                let isFirstUnread = $0.lastMessage?.status != .read
-                let isSecondUnread = $1.lastMessage?.status != .read
-
-                if isFirstUnread != isSecondUnread {
-                    return isFirstUnread
-                }
-                
-                return ($0.lastMessage?.timestamp ?? .distantPast) > ($1.lastMessage?.timestamp ?? .distantPast)
+                createNewThread(thread)
             }
         }
     }
 }
 
 private extension InboxViewModel {
+    func createNewThread(_ thread: Thread) {
+        threads.append(thread)
+        threads.sort(by: { $0.lastUpdated > $1.lastUpdated })
+        
+        if loadingState == .empty {
+            loadingState = .complete
+        }
+    }
+    
+    func updateExistingThread(_ thread: Thread, with threadIndex: Int) async {
+        guard let currentUserID else { return }
+        var copy = thread
+
+        if let chatPartner = threads[threadIndex].lastMessage?.user {
+            copy.lastMessage?.user = chatPartner
+        } else {
+            guard let chatPartnerID = thread.chatPartnerID(currentUserID: currentUserID) else { return }
+            let user = try? await userService.fetchUser(withUid: chatPartnerID)
+            copy.lastMessage?.user = user
+        }
+                
+        self.threads.remove(at: threadIndex)
+        self.threads.insert(copy, at: 0)
+        
+        guard let lastMessage = threads[threadIndex].lastMessage else { return }
+        self.hasUnreadMessages = lastMessage.status != .read && !lastMessage.isMessageFromCurrentUser(currentUid: currentUserID)
+    }
+    
     func fetchThreadUserData(_ currentUserID: String) async throws {
-        try await withThrowingTaskGroup(of: (Int, User?).self) { group in
+        try await withThrowingTaskGroup(of: (Int, User?).self) { [weak self] group in
+            guard let self else { return }
+            
             for (index, thread) in threads.enumerated() {
                 group.addTask {
                     guard let userID = thread.chatPartnerID(currentUserID: currentUserID) else { return (index, nil) }
-                    let user = try await FirestoreConstants.UserCollection.document(userID).getDocument(as: User.self)
+                    let user = try await self.userService.fetchUser(withUid: userID)
                     return (index, user)
                 }
             }

@@ -36,6 +36,7 @@ struct MessageInputView: View {
             }
             .padding(.horizontal, 12)
         }
+        .background(Color(.systemBackground))
     }
 }
 

@@ -42,7 +42,7 @@ struct SendNotificationService {
         guard let currentUid = Auth.auth().currentUser?.uid, uid != currentUid else { return }
         let ref = FirestoreConstants.userNotificationsCollection(uid: uid).document()
         let notif = XNotification(id: ref.documentID, type: type, senderID: currentUid, timestamp: Date(), postId: post?.id)
-        guard let data = try? Firestore.Encoder().encode(notif) else { return }
+        let data = try Firestore.Encoder().encode(notif)
         try await ref.setData(data)
     }
     
@@ -53,18 +53,17 @@ struct SendNotificationService {
             .userNotificationsCollection(uid: uid)
             .whereField("senderID", isEqualTo: currentUid)
             .getDocuments(as: XNotification.self)
-        
-        let filteredByType = notifications.filter { $0.type == type }
+            .filter { $0.type == type }
         
         if type == .follow {
-            for notification in filteredByType {
+            for notification in notifications {
                 try await FirestoreConstants
                     .userNotificationsCollection(uid: uid)
                     .document(notification.id)
                     .delete()
             }
         } else {
-            guard let notificationToDelete = filteredByType.first(where: { $0.postId == post?.id }) else { return }
+            guard let notificationToDelete = notifications.first(where: { $0.postId == post?.id }) else { return }
             
             try await FirestoreConstants
                 .userNotificationsCollection(uid: uid)

@@ -26,13 +26,14 @@ struct LikePostService: LikePostServiceProtocol {
     func likePost(_ post: Post) async throws {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let batch = Firestore.firestore().batch()
+        let timestamp = Date()
         
         let postRef = FirestoreConstants.PostsCollection.document(post.id)
         let postLikesRef = postRef.collection("post-likes").document(uid)
         let userLikesRef = FirestoreConstants.userLikesCollection(uid: uid).document(post.id)
         
-        batch.setData([:], forDocument: postLikesRef)
-        batch.setData([:], forDocument: userLikesRef)
+        batch.setData(["timestamp": timestamp], forDocument: postLikesRef)
+        batch.setData(["timestamp": timestamp], forDocument: userLikesRef)
         batch.updateData(["engagement.likesCount": FieldValue.increment(Int64(1))], forDocument: postRef)
         
         try await batch.commit()
