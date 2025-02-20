@@ -46,7 +46,7 @@ struct UserProfileView: View {
             }
         }
         .navigationDestination(for: Post.self) { post in
-            PostDetailView(post: post)
+            PostDetailView(post: post, viewModel: viewModel)
         }
         .navigationBarBackButtonHidden()
         .refreshable { await viewModel.refresh() }

@@ -8,15 +8,17 @@
 import Kingfisher
 import SwiftUI
 
-struct PostDetailView: View {
-    @State private var viewModel: PostDetailViewModel
+struct PostDetailView<ViewModel: FeedViewModelProtocol>: View {
+    @State private var repliesViewModel = PostDetailRepliesViewModel()
     @State private var showReplySortMenu = false
     @State private var selectedReplySortOption: ReplySortModel = .mostRecent
     
+    @ObservedObject private var viewModel: ViewModel
+    
     let post: Post
     
-    init(post: Post) {
-        _viewModel = State(initialValue: PostDetailViewModel(post: post))
+    init(post: Post, viewModel: ViewModel) {
+        self.viewModel = viewModel
         self.post = post
     }
     
@@ -71,7 +73,7 @@ struct PostDetailView: View {
             Divider()
             
             LazyVStack {
-                switch viewModel.loadingState {
+                switch repliesViewModel.loadingState {
                 case .loading:
                     ProgressView()
                 case .empty:
@@ -79,8 +81,8 @@ struct PostDetailView: View {
                 case .error:
                     Text("An error ocurred.")
                 case .complete:
-                    ForEach(viewModel.replies) { reply in
-                        PostDetailReplyCell(post: reply)
+                    ForEach(repliesViewModel.posts) { reply in
+                        FeedPostCell(post: reply, viewModel: repliesViewModel)
                     }
                 }
             }
@@ -89,7 +91,7 @@ struct PostDetailView: View {
         .navigationTitle("Post")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: selectedReplySortOption) {
-            await viewModel.fetchReplies(for: post, sortOption: selectedReplySortOption)
+            await repliesViewModel.fetchReplies(for: post, sortOption: selectedReplySortOption)
         }
         .sheet(isPresented: $showReplySortMenu) {
             ReplySortSelectionView(selectedReplySortOption: $selectedReplySortOption)
@@ -101,7 +103,7 @@ struct PostDetailView: View {
 }
 
 #Preview {
-    PostDetailView(post: MockData.post)
+    PostDetailView(post: MockData.post, viewModel: FeedViewModel())
         .environment(
             FeedViewModel(
                 feedService: MockFeedService(),

@@ -65,8 +65,7 @@ struct FeedView: View {
                 case .profile(let user):
                     UserProfileView(user: user)
                 case .postDetail(let post):
-                    PostDetailView(post: post)
-                        .environment(viewModel)
+                    PostDetailView(post: post, viewModel: viewModel)
                 }
             }
             .toolbar {

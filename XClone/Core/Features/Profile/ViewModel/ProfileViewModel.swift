@@ -118,8 +118,8 @@ private extension ProfileViewModel {
         do {
             var posts = try await profileService.fetchPosts(for: uid)
             
-            for (index, post) in posts.enumerated() {
-                posts[index].author = self.user
+            for i in 0 ..< posts.count {
+                posts[i].author = self.user
             }
             
             self.posts = posts
