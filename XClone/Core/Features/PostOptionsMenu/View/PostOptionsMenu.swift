@@ -62,19 +62,16 @@ struct PostOptionsMenu: View {
 
 private extension PostOptionsMenu {
     func configureFollowState() async {
-        self.userRelationState =  await viewModel.fetchUserRelationState(post.authorID)
+        self.userRelationState = await viewModel.fetchUserRelationState(post.authorID)
+        self.followButtonTitle = userRelationState == .followed ? "Unfollow" : "Follow"
     }
     
     func followAction() {
         Task {
             if userRelationState == .followed {
                 await viewModel.unfollow(post.authorID)
-                followButtonTitle = "Follow"
-                userRelationState = .notFollowed
             } else if userRelationState == .notFollowed {
                 await viewModel.follow(post.authorID)
-                followButtonTitle = "Unfollow"
-                userRelationState = .followed
             }
         }
     }

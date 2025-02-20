@@ -30,7 +30,7 @@ struct FeedView: View {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.posts) { post in
                                 NavigationLink(value: FeedRoutes.postDetail(post)) {
-                                    PostCell(post: post, viewModel: viewModel)
+                                    FeedPostCell(post: post, viewModel: viewModel)
                                 }
                             }
                         }

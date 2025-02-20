@@ -52,9 +52,7 @@ struct ProfileService: ProfileServiceProtocol {
             .userLikesCollection(uid: uid)
             .order(by: "timestamp", descending: true)
             .getDocuments()
-        
-        print("DEBUG: Post IDs \(postIDs)")
-        
+                
         return try await withThrowingTaskGroup(of: Post.self) { group in
             var result = [Post]()
             

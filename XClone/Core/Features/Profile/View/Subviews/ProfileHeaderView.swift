@@ -37,11 +37,13 @@ struct ProfileHeaderView: View {
                 }
                 
                 HStack {
-                    Button { dismiss() } label: {
-                        Image(systemName: "arrow.left.circle.fill")
-                            .resizable()
-                            .frame(width: 28, height: 28)
-                            .foregroundStyle(.white, .black.opacity(0.4))
+                    if user.userRelationState != .isCurrentUser {
+                        Button { dismiss() } label: {
+                            Image(systemName: "arrow.left.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.white, .black.opacity(0.4))
+                        }
                     }
                     
                     Spacer()

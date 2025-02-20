@@ -43,6 +43,15 @@ struct PostDetailView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
+                if let imageUrl = post.imageURL {
+                    KFImage(URL(string: imageUrl))
+                        .placeholder { ProgressView() }
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(.rect(cornerRadius: 10))
+                        .contentShape(.rect)
+                }
+                
                 PostEngagementView(post: post, viewModel: viewModel)
 
                 Button { showReplySortMenu.toggle() } label: {
@@ -71,7 +80,7 @@ struct PostDetailView: View {
                     Text("An error ocurred.")
                 case .complete:
                     ForEach(viewModel.replies) { reply in
-                        PostCell(post: reply, viewModel: viewModel)
+                        PostDetailReplyCell(post: reply)
                     }
                 }
             }

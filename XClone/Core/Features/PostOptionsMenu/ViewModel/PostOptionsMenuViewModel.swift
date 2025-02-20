@@ -9,7 +9,6 @@ import Foundation
 
 @Observable
 class PostOptionsMenuViewModel {
-    
     private let blockingService: BlockUserService
     private let followService: FollowServiceProtocol
     private let postService: PostService

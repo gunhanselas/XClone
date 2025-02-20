@@ -8,7 +8,7 @@
 import Kingfisher
 import SwiftUI
 
-struct PostCell<ViewModel: FeedViewModelProtocol>: View {    
+struct FeedPostCell<ViewModel: FeedViewModelProtocol>: View {    
     @ObservedObject private var viewModel: ViewModel
     private let post: Post
     
@@ -71,7 +71,7 @@ struct PostCell<ViewModel: FeedViewModelProtocol>: View {
 }
 
 #Preview {
-    PostCell(
+    FeedPostCell(
         post: MockData.post,
         viewModel: FeedViewModel(
             feedService: MockFeedService(),

@@ -35,13 +35,18 @@ struct UserProfileView: View {
                     case .complete:
                         LazyVStack {
                             ForEach(viewModel.currentDataSource) { post in
-                                PostCell(post: post, viewModel: viewModel)
+                                NavigationLink(value: post) {
+                                    FeedPostCell(post: post, viewModel: viewModel)
+                                }
                             }
                         }
                         .padding(.vertical, 8)
                     }
                 }
             }
+        }
+        .navigationDestination(for: Post.self) { post in
+            PostDetailView(post: post)
         }
         .navigationBarBackButtonHidden()
         .refreshable { await viewModel.refresh() }

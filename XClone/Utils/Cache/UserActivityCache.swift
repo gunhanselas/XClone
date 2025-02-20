@@ -76,11 +76,9 @@ private extension UserActivityCache {
                 let items = snapshot.documents.map { $0.documentID }
                 set(items)
                 saveLastFetched(for: uid, date: Date())
-                print("DEBUG: Loaded \(cacheIdentifier) from database")
             }
         } else {
             loadCacheFromDisk(for: uid)
-            print("DEBUG: Loaded post ids for \(cacheIdentifier) from disk")
         }
     }
 }
