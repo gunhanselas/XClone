@@ -69,7 +69,8 @@ struct InboxView: View {
                 ChatView(thread: thread, user: thread.lastMessage?.user)
             }
             .navigationDestination(item: $selectedUser) { user in
-                ChatView(thread: nil, user: user)
+                let thread = viewModel.getThread(withUser: user)
+                ChatView(thread: thread, user: user)
             }
             .navigationTitle("Messages")
             .navigationBarTitleDisplayMode(.inline)

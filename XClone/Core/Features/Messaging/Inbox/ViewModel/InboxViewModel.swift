@@ -53,6 +53,20 @@ class InboxViewModel: ObservableObject {
         }
     }
     
+    func getThread(withUser user: User) -> Thread? {
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return nil }
+        
+        if let thread = threads.first(where: { $0.chatPartnerID(currentUserID: currentUserID) == user.id }) {
+            return thread
+        }
+        
+//        if let thread = deletedThreads.first(where: { $0.lastMessage?.chatPartnerId == user.id }) {
+//            return thread
+//        }
+        
+        return nil
+    }
+    
     func streamThreads() async {
         for try await thread in service.threadStream() {
             if let threadIndex = threads.firstIndex(where: { $0.id == thread.id }) {
