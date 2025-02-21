@@ -9,6 +9,8 @@ import Foundation
 
 @Observable
 class BlockingManager {
+    var didBlockUser = false
+    
     private let service: BlockUserService
     
     init(service: BlockUserService) {

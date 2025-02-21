@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ReportSubmittedView: View {
+    @Environment(SnackbarNotificationManager.self) private var snackbarManager
+    
     @State private var isLoading = false
     @State private var manager = ReportContentManager(service: ReportContentService())
     
@@ -62,6 +64,7 @@ private extension ReportSubmittedView {
             await manager.uploadReport(type: contentType, reason: reportReason)
             dismiss()
             isLoading = false
+            snackbarManager.show(.reported)
         }
     }
 }

@@ -33,6 +33,7 @@ struct InlineInfoItemView: View {
                 
                 Text(subtitle)
                     .foregroundStyle(title == nil ? .primary : Color(.gray))
+                    .multilineTextAlignment(.leading)
             }
             .font(.subheadline)
             

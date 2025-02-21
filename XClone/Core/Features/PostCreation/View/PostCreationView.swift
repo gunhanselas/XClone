@@ -11,15 +11,14 @@ import SwiftUI
 struct PostCreationView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(UserManager.self) private var userManager
-    
+    @Environment(SnackbarNotificationManager.self) private var snackbarManager
+
     @FocusState var isFocused: Bool
 
     @State private var caption = ""
-    
     @State private var isShowingCancellationAlert = false
     @State private var isShowingPhotosPicker = false
     @State private var isUploading = false
-    
     @State private var postImage: Image?
     @State private var postUIImage: UIImage?
     @State private var selectedPhotoItem: PhotosPickerItem?
@@ -108,6 +107,7 @@ private extension PostCreationView {
             let imageData = postUIImage?.jpegData(compressionQuality: 0.5)
             try await viewModel.uploadPost(caption: caption, imageData: imageData)
             
+            snackbarManager.show(.postUploaded)
             dismiss()
         }
     }

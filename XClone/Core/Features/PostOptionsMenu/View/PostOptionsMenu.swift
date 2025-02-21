@@ -9,11 +9,13 @@ import SwiftUI
 
 struct PostOptionsMenu: View {
     @Environment(BlockingManager.self) private var blockingManager
+    @Environment(SnackbarNotificationManager.self) private var snackbarManager
     
     @State private var followButtonTitle = ""
     @State private var userRelationState: UserRelationState = .unknown
     @State private var isShowingBlockAlert = false
     @State private var isShowingReportView = false
+    @State private var didCompleteBlocking = false
     
     @State private var viewModel = PostOptionsMenuViewModel()
     
@@ -47,7 +49,7 @@ struct PostOptionsMenu: View {
         .task { await configureFollowState() }
         .alert("Block @\(post.author?.username ?? "")", isPresented: $isShowingBlockAlert, actions: {
             Button("Block", role: .destructive) {
-                Task { await viewModel.blockUser(post.authorID) }
+                onBlock()
             }
             
             Button("Cancel", role: .cancel) {}
@@ -66,12 +68,26 @@ private extension PostOptionsMenu {
         self.followButtonTitle = userRelationState == .followed ? "Unfollow" : "Follow"
     }
     
+    func onBlock() {
+        Task {
+            await viewModel.blockUser(post.authorID)
+            
+            if let user = post.author {
+                snackbarManager.show(.blocked(user))
+            }
+        }
+    }
+    
     func followAction() {
+        guard let author = post.author else { return }
+        
         Task {
             if userRelationState == .followed {
                 await viewModel.unfollow(post.authorID)
+                snackbarManager.show(.unfollowed(author))
             } else if userRelationState == .notFollowed {
                 await viewModel.follow(post.authorID)
+                snackbarManager.show(.followed(author))
             }
         }
     }

@@ -9,9 +9,11 @@ import SwiftUI
 
 struct FeedView: View {
     @Environment(UserManager.self) private var userManager
+    @Environment(SnackbarNotificationManager.self) private var snackbarManager
     
     @State private var viewModel = FeedViewModel()
     @State private var isShowingPostCreationView = false
+    @State private var showPostSentSnackbar = false
     
     var body: some View {
         NavigationStack {
@@ -59,6 +61,7 @@ struct FeedView: View {
             .fullScreenCover(isPresented: $isShowingPostCreationView) {
                 PostCreationView()
                     .environment(userManager)
+                    .environment(snackbarManager)
             }
             .navigationDestination(for: FeedRoutes.self) { route in
                 switch route {
@@ -78,6 +81,8 @@ struct FeedView: View {
                 }
             }
         }
+        .snackbar(message: "Your post was sent", show: $showPostSentSnackbar)
+        
     }
 }
 

@@ -10,8 +10,10 @@ import SwiftUI
 struct MainTabView: View {
     @Environment(UserManager.self) private var userManager
     
-    @State private var selection = 0
+    @State private var snackbarNotificationManager = SnackbarNotificationManager()
     @State private var blockingManager = BlockingManager(service: BlockUserService())
+    @State private var isShowingSnackbar = false
+    @State private var selection = 0
     
     var body: some View {
         TabView(selection: $selection) {
@@ -51,7 +53,12 @@ struct MainTabView: View {
                     .tag(4)
             }
         }
+        .snackbar(message: snackbarNotificationManager.notification?.title ?? "", show: $isShowingSnackbar)
+        .onChange(of: snackbarNotificationManager.notification) { _, newValue in
+            isShowingSnackbar = newValue != nil
+        }
         .environment(blockingManager)
+        .environment(snackbarNotificationManager)
     }
 }
 
