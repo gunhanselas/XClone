@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UserListView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(BlockingManager.self) private var blockingManager
     
     @Binding private var selectedUser: User?
     
@@ -61,10 +62,10 @@ struct UserListView: View {
                 .searchable(text: $searchText, prompt: "Search...")
             }
         }
+        .task { await viewModel.fetchUsers(forConfig: config, with: blockingManager) }
+        .refreshable { await viewModel.refreshUsers(forConfig: config, with: blockingManager) }
         .overlay {
-            if filteredUsers.isEmpty {
-                ContentUnavailableView.search
-            }
+            if filteredUsers.isEmpty { ContentUnavailableView.search }
         }
         .scrollPosition(id: $activeScrollId, anchor: .bottom)
         .onChange(of: activeScrollId) { _, newValue in
@@ -75,7 +76,6 @@ struct UserListView: View {
         }
         .navigationTitle(config.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.fetchUsers(forConfig: config) }
     }
 }
 
@@ -110,7 +110,7 @@ private extension UserListView {
         
         Task {
             paginating = true
-            await viewModel.fetchUsers(forConfig: config)
+            await viewModel.fetchUsers(forConfig: config, with: blockingManager)
             paginating = false
         }
     }

@@ -10,6 +10,38 @@ const { user } = require("firebase-functions/v1/auth");
 
 initializeApp();
 
+exports.blockUser = onDocumentCreated("/users/{currentUid}/blocked-users/{blockedUserId}", async (event) => {
+    const currentUid = event.params.currentUid; 
+    const blockedUserId = event.params.blockedUserId; 
+    const db = getFirestore();
+
+    try {
+        const threadsSnapshot = await db.collection("threads").where('uids', 'array-contains-any', [currentUid]).get();
+
+        threadsSnapshot.forEach(async (doc) => {
+            const threadData = doc.data();
+            logger.log("Thread data is ", threadData);
+
+            if (threadData.uids.includes(blockedUserId)) {
+                const threadsCollection = db.collection("threads").doc(doc.id).collection("messages");
+                await deleteCollection(db, threadsCollection, 100); 
+
+                db.collection("threads").doc(doc.id).delete();
+            }
+        });
+
+        const notificationsSnapshot = await db.collection("notifications").doc(currentUid).collection("user-notifications").where('notificationSenderUid', '==', blockedUserId).get();
+
+        notificationsSnapshot.forEach((doc) => {
+            db.collection('notifications').doc(currentUid).collection('user-notifications').doc(doc.id).delete();
+        });
+
+        return null;
+    } catch (err) {
+        logger.log(err);
+    }
+});
+
 exports.updateUserFeedAfterFollow = onDocumentCreated("/users/{currentUid}/user-following/{followedUid}", async (event) => {
     const currentUid = event.params.currentUid;
     const followedUid = event.params.followedUid;

@@ -10,6 +10,7 @@ import FirebaseAuth
 
 protocol UserListServiceProtocol {
     func fetchUsers(forConfig config: UserListConfiguration) async throws -> [User]
+    func refreshUsers(forConfig config: UserListConfiguration) async throws -> [User]
 }
 
 class UserListService: UserListServiceProtocol {
@@ -34,6 +35,12 @@ class UserListService: UserListServiceProtocol {
         case .explore, .newMessage:
             return try await fetchAllUsers()
         }
+    }
+    
+    func refreshUsers(forConfig config: UserListConfiguration) async throws -> [User] {
+        self.lastDoc = nil
+        self.shouldLoadMoreData = true
+        return try await fetchUsers(forConfig: config)
     }
 }
 

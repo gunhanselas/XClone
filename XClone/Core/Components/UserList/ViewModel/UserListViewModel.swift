@@ -18,14 +18,26 @@ class UserListViewModel {
         self.service = service
     }
     
-    func fetchUsers(forConfig config: UserListConfiguration) async {
+    func fetchUsers(forConfig config: UserListConfiguration, with blockingManager: BlockingManager) async {
         do {
-            let data = try await service.fetchUsers(forConfig: config)
+            var data = try await service.fetchUsers(forConfig: config)
+            data = blockingManager.filterBlockedUsers(data)
             users.append(contentsOf: data)
+            
             self.loadingState = users.isEmpty ? .empty : .complete
         } catch {
             self.loadingState = .error(error)
             print("DEBUG: Failed to fetch users with error: \(error)")
+        }
+    }
+    
+    func refreshUsers(forConfig config: UserListConfiguration, with blockingManager: BlockingManager) async {
+        do {
+            let data = try await service.refreshUsers(forConfig: config)
+            self.users = blockingManager.filterBlockedUsers(data)
+        } catch {
+            self.loadingState = .error(error)
+            print("DEBUG: Failed to refresh users with error: \(error)")
         }
     }
 }

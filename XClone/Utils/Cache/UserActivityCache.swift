@@ -63,6 +63,10 @@ class UserActivityCache {
         guard let items = cache.object(forKey: uid as NSString) as? [String] else { return [] }
         return items
     }
+    
+    func clear() {
+        set([])
+    }
 }
 
 private extension UserActivityCache {
