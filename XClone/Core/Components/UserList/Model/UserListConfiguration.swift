@@ -8,6 +8,7 @@
 import Foundation
 
 enum UserListConfiguration: Hashable {
+    case blockedAccounts
     case followers(uid: String)
     case following(uid: String)
     case likes(postId: String)
@@ -16,6 +17,8 @@ enum UserListConfiguration: Hashable {
     
     var navigationTitle: String {
         switch self {
+        case .blockedAccounts:
+            return "Blocked Accounts"
         case .followers:
             return "Followers"
         case .following:

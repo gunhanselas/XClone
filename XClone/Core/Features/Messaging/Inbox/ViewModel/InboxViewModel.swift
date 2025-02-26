@@ -18,6 +18,7 @@ class InboxViewModel: ObservableObject {
     private let userService: UserServiceProtocol
     
     private var currentUserID: String?
+    private var deletedThreads = [Thread]()
     
     init(service: InboxServiceProtocol = InboxService(), userService: UserServiceProtocol = UserService()) {
         self.service = service
@@ -32,6 +33,7 @@ class InboxViewModel: ObservableObject {
         do {
             threads.remove(at: index)
             try await service.deleteThread(thread)
+            deletedThreads.append(thread)
         } catch {
             threads.insert(thread, at: index)
             print("DEBUG: Failed to delete thread with error: \(error)")
@@ -60,9 +62,9 @@ class InboxViewModel: ObservableObject {
             return thread
         }
         
-//        if let thread = deletedThreads.first(where: { $0.lastMessage?.chatPartnerId == user.id }) {
-//            return thread
-//        }
+        if let thread = deletedThreads.first(where: { $0.chatPartnerID(currentUserID: currentUserID) == user.id }) {
+            return thread
+        }
         
         return nil
     }
@@ -123,5 +125,13 @@ private extension InboxViewModel {
                 threads[index].lastMessage?.user = user
             }
         }
+    }
+    
+    func fetchUserDeletedThreads() async throws {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+
+        self.deletedThreads = try await FirestoreConstants
+            .deletedThreadsCollection(uid: currentUid)
+            .getDocuments(as: Thread.self)
     }
 }

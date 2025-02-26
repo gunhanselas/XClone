@@ -18,10 +18,23 @@ class UserListViewModel {
         self.service = service
     }
     
+    func updateUsersAfterUnblocking(_ user: User) {
+        guard let index = users.firstIndex(where: { $0.id == user.id }) else { return }
+        users.remove(at: index)
+        
+        if users.isEmpty {
+            loadingState = .empty
+        }
+    }
+    
     func fetchUsers(forConfig config: UserListConfiguration, with blockingManager: BlockingManager) async {
         do {
             var data = try await service.fetchUsers(forConfig: config)
-            data = blockingManager.filterBlockedUsers(data)
+            
+            if config != .blockedAccounts {
+                data = blockingManager.filterBlockedUsers(data)
+            }
+            
             users.append(contentsOf: data)
             
             self.loadingState = users.isEmpty ? .empty : .complete

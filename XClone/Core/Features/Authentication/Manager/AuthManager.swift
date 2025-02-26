@@ -38,8 +38,13 @@ class AuthManager: NSObject {
         self.authState = service.getAuthState()
     }
     
-    func updateAuthState(_ state: AuthenticationState) {
-        self.authState = state
+    func deleteAccount() async {
+        do {
+            try await service.deleteAccount()
+            signOut()
+        } catch {
+            print("DEBUG: Failed to delete account with error: \(error)")
+        }
     }
     
     func login(withEmail email: String, password: String) async {
@@ -77,6 +82,10 @@ class AuthManager: NSObject {
     func signOut() {
         service.signout()
         authState = .unauthenticated
+    }
+    
+    func updateAuthState(_ state: AuthenticationState) {
+        self.authState = state
     }
 }
 

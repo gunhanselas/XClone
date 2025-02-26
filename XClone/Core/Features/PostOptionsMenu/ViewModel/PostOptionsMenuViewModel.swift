@@ -9,26 +9,15 @@ import Foundation
 
 @Observable
 class PostOptionsMenuViewModel {
-    private let blockingService: BlockUserService
     private let followService: FollowServiceProtocol
     private let postService: PostService
     
     init(
-        blockingService: BlockUserService = BlockUserService(),
         followService: FollowServiceProtocol = FollowService(),
         postService: PostService = PostService()
     ) {
-        self.blockingService = blockingService
         self.followService = followService
         self.postService = postService
-    }
-    
-    func blockUser(_ uid: String) async {
-        do {
-            try await blockingService.blockUser(uid)
-        } catch {
-            print("DEBUG: Failed to block user with error: \(error)")
-        }
     }
     
     func deletePost(_ post: Post) async {

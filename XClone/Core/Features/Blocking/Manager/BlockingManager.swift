@@ -22,6 +22,26 @@ class BlockingManager {
         fetchBlockedByUsers()
     }
     
+    func unblockUser(_ user: User) async {
+        guard let index = blockedUIDs.firstIndex(where: { $0 == user.id }) else { return }
+        
+        do {
+            try await service.unblockUser(user.id)
+            blockedUIDs.remove(at: index)
+        } catch {
+            print("DEBUG: Failed to unblock user with error: \(error.localizedDescription)")
+        }
+    }
+    
+    func blockUser(_ uid: String) async {
+        do {
+            try await service.blockUser(uid)
+            blockedUIDs.append(uid)
+        } catch {
+            print("DEBUG: Failed to block user with error: \(error.localizedDescription)")
+        }
+    }
+    
     func filterBlockedUsers(_ users: [User]) -> [User] {
         return users.filter(shouldDisplayUser)
     }

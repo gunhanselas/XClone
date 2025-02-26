@@ -2,17 +2,16 @@
 const {logger} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/v2/https");
 const {onDocumentCreated, onDocumentDeleted} = require("firebase-functions/v2/firestore");
+const functions = require('firebase-functions/v1');
 
 // The Firebase Admin SDK to access Firestore.
 const {initializeApp} = require("firebase-admin/app");
 const {getFirestore} = require("firebase-admin/firestore");
-const { user } = require("firebase-functions/v1/auth");
 
 initializeApp();
 
 exports.blockUser = onDocumentCreated("/users/{currentUid}/blocked-users/{blockedUserId}", async (event) => {
-    const currentUid = event.params.currentUid; 
-    const blockedUserId = event.params.blockedUserId; 
+    const { currentUid, blockedUserId } = event.params;
     const db = getFirestore();
 
     try {
@@ -155,3 +154,95 @@ exports.updateFeedsAfterPostDelete = onDocumentDeleted("/posts/{postId}", async 
         throw err;
     }
 });
+
+exports.deleteUserData = functions.auth.user().onDelete(async (user) => {
+    const uid = user.uid;
+    const db = getFirestore();
+
+    try {
+        const followerSnapshot = await db.collection("users").doc(uid).collection("user-followers").get();
+
+        followerSnapshot.forEach((doc) => {
+            logger.log("Follower id ", doc.id);
+            db.collection('users').doc(doc.id).collection('user-following').doc(uid).delete();
+        });
+
+        const followingSnapshot = await db.collection('users').doc(uid).collection('user-following').get();
+        followingSnapshot.forEach((doc) => {
+            db.collection('users').doc(doc.id).collection('user-following').doc(uid).delete();
+        });
+
+        const followingCollection = db.collection("users").doc(uid).collection("user-following");
+        await deleteCollection(db, followingCollection, 100); 
+
+        const userPostsSnapshot = await db.collection('posts').where('authorID', '==', uid).get();
+
+        userPostsSnapshot.forEach((doc) => {
+            logger.log("Post id ", doc.id);
+            db.collection('posts').doc(doc.id).delete();
+        });
+
+        const threadsSnapshot = await db.collection("threads").where('uids', 'array-contains-any', [uid]).get();
+
+        const deletePromises = threadsSnapshot.docs.map(async (doc) => {
+            logger.log("Thread id ", doc.id);
+            const threadsCollection = db.collection("threads").doc(doc.id).collection("messages");
+            await deleteCollection(db, threadsCollection, 100);
+        });
+        await Promise.all(deletePromises);
+
+        const collectionsToDelete = [
+            "user-feed",
+            "user-likes",
+            "blocked-users",
+            "saved-posts",
+            "user-notifications"
+        ];
+
+        await Promise.all(collectionsToDelete.map(async (collection) => {
+            const ref = db.collection("users").doc(uid).collection(collection);
+            await deleteCollection(db, ref, 100);
+        }));
+
+        await db.collection('users').doc(uid).delete();        
+
+        return null;
+    } catch (err) {
+        logger.log(err);
+    }
+});
+
+
+async function deleteCollection(db, collectionPath, batchSize) {
+    const query = collectionPath.limit(batchSize);
+  
+    return new Promise((resolve, reject) => {
+      deleteQueryBatch(db, query, resolve).catch(reject);
+    });
+  };
+  
+async function deleteQueryBatch(db, query, resolve) {
+    const snapshot = await query.get();
+    
+    const batchSize = snapshot.size;
+    if (batchSize === 0) {
+        logger.log("Snapshot size is 0");
+      // When there are no documents left, we are done
+      resolve();
+      return;
+    }
+  
+    // Delete documents in a batch
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+      logger.log("Snapshot doc ", doc.id);
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+  
+    // Recurse on the next process tick, to avoid
+    // exploding the stack.
+    process.nextTick(() => {
+      deleteQueryBatch(db, query, resolve);
+    });
+};

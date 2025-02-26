@@ -37,7 +37,7 @@ struct AuthService: AuthServiceProtocol {
     }
     
     func deleteAccount() async throws {
-        
+        try await Auth.auth().currentUser?.delete()
     }
     
     func getAuthState() -> AuthenticationState {
@@ -55,7 +55,12 @@ struct AuthService: AuthServiceProtocol {
     }
     
     func sendResetPasswordLink(toEmail email: String) async throws {
-        
+        do {
+            try await Auth.auth().sendPasswordReset(withEmail: email)
+        } catch {
+            print("DEBUG: Failed to send email with error \(error.localizedDescription)")
+            throw error
+        }
     }
     
     func signout() {

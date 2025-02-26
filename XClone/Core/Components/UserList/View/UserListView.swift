@@ -36,7 +36,11 @@ struct UserListView: View {
         ScrollView {
             switch viewModel.loadingState {
             case .empty:
-                Text("User empty state..")
+                ContentUnavailableView(
+                    "No blocked accounts.",
+                    systemImage: "person.slash",
+                    description: Text("Accounts you've blocked will appear here.")
+                )
             case .error:
                 Text("An error occurred.")
             case .loading:
@@ -45,14 +49,23 @@ struct UserListView: View {
             case .complete:
                 LazyVStack(spacing: 12) {
                     ForEach(filteredUsers) { user in
-                        NavigationLink(value: user) {
-                            UserCell(user: user)
+                        Group {
+                            switch config {
+                            case .blockedAccounts:
+                                UserCell(user: user, accessoryButtonTitle: "Unblock") {
+                                    unblockUser(user)
+                                }
+                            case .explore, .likes, .following, .followers:
+                                NavigationLink(value: user) {
+                                    UserCell(user: user)
+                                        .id(user.id)
+                                }
+                            case .newMessage:
+                                UserCell(user: user)
+                                    .onTapGesture { onCellTap(user) }
+                            }
                         }
-                        .disabled(!isNavigable)
                         .id(user.id)
-                        .simultaneousGesture(TapGesture().onEnded {
-                            onCellTap(user)
-                        })
                     }
                     
                     if paginating { ProgressView() }
@@ -64,9 +77,6 @@ struct UserListView: View {
         }
         .task { await viewModel.fetchUsers(forConfig: config, with: blockingManager) }
         .refreshable { await viewModel.refreshUsers(forConfig: config, with: blockingManager) }
-        .overlay {
-            if filteredUsers.isEmpty { ContentUnavailableView.search }
-        }
         .scrollPosition(id: $activeScrollId, anchor: .bottom)
         .onChange(of: activeScrollId) { _, newValue in
             loadMoreUsersIfNecessary(newValue)
@@ -81,7 +91,7 @@ struct UserListView: View {
 
 private extension UserListView {
     var isNavigable: Bool {
-        return config != .newMessage
+        return config != .newMessage && config != .blockedAccounts
     }
     
     func onCellTap(_ user: User) {
@@ -90,6 +100,13 @@ private extension UserListView {
         
         if config == .newMessage {
             dismiss()
+        }
+    }
+    
+    func unblockUser(_ user: User) {
+        Task {
+            await blockingManager.unblockUser(user)
+            viewModel.updateUsersAfterUnblocking(user)
         }
     }
     

@@ -12,22 +12,45 @@ struct SettingsView: View {
     @Environment(AuthManager.self) private var authManager
     @Environment(UserManager.self) private var userManager
     
+    @State private var showBlockedAccounts = false
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack {
-                    if let currentUser = userManager.currentUser {
+            List {
+                if let currentUser = userManager.currentUser {
+                    Section("Account Info") {
                         SettingsRowView(title: "Username", value: currentUser.username)
                         SettingsRowView(title: "Email", value: currentUser.email)
                         SettingsRowView(title: "Joined", value: currentUser.createdAt.monthAndYearString())
                     }
-                    
+                }
+                
+                Section("Privacy") {
+                    Button { showBlockedAccounts.toggle() } label: {
+                        HStack {
+                            Text("Blocked Accounts")
+                                .foregroundStyle(.primaryText)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                }
+                
+                Section {
                     Button("Log Out", role: .destructive) {
                         authManager.signOut()
                     }
-                    .font(.headline)
+                    
+                    Button("Delete Account", role: .destructive) {
+                        // delete account
+                    }
                 }
-                .padding()
+            }
+            .navigationDestination(isPresented: $showBlockedAccounts) {
+                UserListView(config: .blockedAccounts)
             }
             .navigationTitle("Account")
             .navigationBarTitleDisplayMode(.inline)
@@ -50,7 +73,6 @@ struct SettingsRowView: View {
     var body: some View {
         HStack {
             Text(title)
-                .fontWeight(.semibold)
                 .foregroundStyle(.primaryText)
             
             Spacer()
@@ -59,7 +81,6 @@ struct SettingsRowView: View {
                 .foregroundStyle(.secondary)
         }
         .font(.subheadline)
-        .frame(height: 40)
     }
 }
 

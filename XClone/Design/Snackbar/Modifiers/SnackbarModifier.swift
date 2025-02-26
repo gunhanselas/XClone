@@ -19,7 +19,7 @@ public struct SnackbarModifier: ViewModifier {
     public init(
         message: String,
         systemImage: String? = nil,
-        duration: SnackbarDuration = .d1,
+        duration: SnackbarDuration = .duration1,
         entryPosition: SnackbarEntryPosition = .bottom,
         show: Binding<Bool>,
         accessoryAction: SnackbarAction? = nil

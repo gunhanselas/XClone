@@ -8,7 +8,21 @@
 import SwiftUI
 
 struct UserCell: View {
-    let user: User
+    private let user: User
+    private let accessoryAction: (() -> Void)?
+    private let accessoryButtonTitle: String?
+    
+    init(user: User) {
+        self.user = user
+        self.accessoryAction = nil
+        self.accessoryButtonTitle = nil
+    }
+    
+    init(user: User, accessoryButtonTitle: String, accessoryAction: @escaping () -> Void) {
+        self.user = user
+        self.accessoryAction = accessoryAction
+        self.accessoryButtonTitle = accessoryButtonTitle
+    }
     
     var body: some View {
         HStack {
@@ -25,6 +39,11 @@ struct UserCell: View {
             .font(.footnote)
             
             Spacer()
+            
+            if let accessoryButtonTitle, let accessoryAction {
+                XButton(accessoryButtonTitle, action: accessoryAction)
+                    .buttonStyle(.standard(size: .compact))
+            }
         }
         .foregroundStyle(.primaryText)
         .padding(.horizontal)

@@ -26,6 +26,8 @@ class UserListService: UserListServiceProtocol {
     
     func fetchUsers(forConfig config: UserListConfiguration) async throws -> [User] {
         switch config {
+        case .blockedAccounts:
+            return try await fetchBlockedUsers()
         case .followers(let uid):
             return try await fetchFollowers(uid: uid)
         case .following(let uid):
@@ -45,6 +47,12 @@ class UserListService: UserListServiceProtocol {
 }
 
 private extension UserListService {
+    func fetchBlockedUsers() async throws -> [User] {
+        guard shouldLoadMoreData, let uid = Auth.auth().currentUser?.uid else { return [] }
+        let query = FirestoreConstants.blockedUsersCollection(uid: uid).limit(to: fetchLimit)
+        return try await fetchUsers(withQuery: query)
+    }
+    
     func fetchFollowers(uid: String) async throws -> [User] {
         let query = FirestoreConstants.userFollowerCollection(uid: uid).limit(to: fetchLimit)
         return try await fetchUsers(withQuery: query)

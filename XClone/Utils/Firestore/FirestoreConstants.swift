@@ -22,6 +22,10 @@ struct FirestoreConstants {
     static func blockedByUsersCollection(uid: String) -> CollectionReference {
         return UserCollection.document(uid).collection("blocked-users")
     }
+    
+    static func deletedThreadsCollection(uid: String) -> CollectionReference {
+        return UserCollection.document(uid).collection("deleted-threads")
+    }
 
     static func messagesCollection(threadID: String) -> CollectionReference {
         return ThreadsCollection.document(threadID).collection("messages")

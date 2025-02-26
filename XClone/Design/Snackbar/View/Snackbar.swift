@@ -18,7 +18,7 @@ public struct Snackbar: View {
     public init(
         message: String,
         systemImage: String? = nil,
-        duration: SnackbarDuration = .d1,
+        duration: SnackbarDuration = .duration1,
         isPresented: Binding<Bool>,
         accessoryAction: SnackbarAction? = nil
     ) {

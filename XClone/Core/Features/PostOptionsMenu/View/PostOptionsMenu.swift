@@ -70,7 +70,7 @@ private extension PostOptionsMenu {
     
     func onBlock() {
         Task {
-            await viewModel.blockUser(post.authorID)
+            await blockingManager.blockUser(post.authorID)
             
             if let user = post.author {
                 snackbarManager.show(.blocked(user))
