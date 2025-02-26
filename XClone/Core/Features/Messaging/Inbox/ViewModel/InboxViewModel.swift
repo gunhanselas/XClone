@@ -24,6 +24,7 @@ class InboxViewModel: ObservableObject {
         self.service = service
         self.userService = userService
         
+        Task { await fetchUserDeletedThreads() }
         Task { await fetchThreads() }
     }
     
@@ -127,11 +128,15 @@ private extension InboxViewModel {
         }
     }
     
-    func fetchUserDeletedThreads() async throws {
+    func fetchUserDeletedThreads() async {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
 
-        self.deletedThreads = try await FirestoreConstants
-            .deletedThreadsCollection(uid: currentUid)
-            .getDocuments(as: Thread.self)
+        do {
+            self.deletedThreads = try await FirestoreConstants
+                .deletedThreadsCollection(uid: currentUid)
+                .getDocuments(as: Thread.self)
+        } catch {
+            print("DEBUG: Failed to fetch deleted threads with error")
+        }
     }
 }
