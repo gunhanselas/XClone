@@ -5,6 +5,7 @@
 //  Created by Stephan Dowless on 1/26/25.
 //
 
+import AVKit 
 import SwiftUI
 
 struct FeedView: View {
@@ -14,6 +15,7 @@ struct FeedView: View {
     @State private var viewModel = FeedViewModel()
     @State private var isShowingPostCreationView = false
     @State private var showPostSentSnackbar = false
+    @State private var player = AVPlayer()
     
     var body: some View {
         NavigationStack {

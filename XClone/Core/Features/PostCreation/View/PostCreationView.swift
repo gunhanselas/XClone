@@ -5,8 +5,14 @@
 //  Created by Stephan Dowless on 1/30/25.
 //
 
+import AVKit
 import PhotosUI
 import SwiftUI
+
+enum PostMediaContentType: Equatable {
+    case video(Movie)
+    case photo(Image)
+}
 
 struct PostCreationView: View {
     @Environment(\.dismiss) private var dismiss
@@ -16,12 +22,14 @@ struct PostCreationView: View {
     @FocusState var isFocused: Bool
 
     @State private var caption = ""
+    @State private var isLoadingPostMedia = false
     @State private var isShowingCancellationAlert = false
     @State private var isShowingPhotosPicker = false
     @State private var isUploading = false
-    @State private var postImage: Image?
     @State private var postUIImage: UIImage?
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var mediaType: PostMediaContentType?
+    @State private var player = AVPlayer()
     
     @State private var viewModel = UploadPostViewModel(service: CreatePostService())
     
@@ -37,17 +45,41 @@ struct PostCreationView: View {
                 }
                 .padding()
                 
-                if let postImage {
-                    postImage
-                        .resizable()
-                        .scaledToFill()
+                if isLoadingPostMedia {
+                    ProgressView()
                         .frame(width: 320, height: 300)
-                        .clipShape(.rect(cornerRadius: 10))
                 }
                 
+                ZStack(alignment: .topTrailing) {
+                    switch mediaType {
+                    case .video(let movie):
+                        VideoPlayer(player: player)
+                            .frame(width: 320, height: 260)
+                            .clipShape(.rect(cornerRadius: 10))
+                    case .photo(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 320, height: 300)
+                            .clipShape(.rect(cornerRadius: 10))
+                    case .none:
+                        EmptyView()
+                    }
+                    
+                    if mediaType != nil {
+                        Button { mediaType = nil } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                                .foregroundStyle(.white, Color(.darkGray))
+                                .padding(8)
+                        }
+                    }
+                }
+
                 Spacer()
                 
-                if postImage == nil {
+                if mediaType == nil {
                     VStack {
                         Divider()
                         
@@ -60,22 +92,18 @@ struct PostCreationView: View {
                         }
                         .padding(12)
                     }
+                    .animation(.smooth, value: mediaType)
                 }
             }
             .alert("Cancel?", isPresented: $isShowingCancellationAlert, actions: {
-                Button("Discard", role: .destructive) {
-                    dismiss()
-                }
-                
-                Button("Continue", role: .cancel) {}
+                Button("Discard", role: .destructive) { dismiss() }
+                Button("Continue", role: .cancel) { }
             }, message: {
                 Text("Are you sure you want to discard this post?")
             })
-            .task(id: selectedPhotoItem) {
-                await loadPostImage()
-            }
-            .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
             .onAppear { isFocused = true }
+            .task(id: selectedPhotoItem) { await loadPostMedia() }
+            .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
             .toolbar {
                 cancelButton
                 postButton
@@ -85,15 +113,20 @@ struct PostCreationView: View {
 }
 
 private extension PostCreationView {
-    func loadPostImage() async {
+    func loadPostMedia() async {
         guard let selectedPhotoItem else { return }
         
+        isLoadingPostMedia = true
+        defer { isLoadingPostMedia = false }
+        
         do {
-            guard let data = try await selectedPhotoItem.loadTransferable(type: Data.self) else { return }
-            guard let uiImage = UIImage(data: data) else { return }
-            
-            self.postUIImage = uiImage
-            self.postImage = Image(uiImage: uiImage)
+            if let movie = try await selectedPhotoItem.loadTransferable(type: Movie.self) {
+                self.player = AVPlayer(url: movie.url)
+                self.mediaType = .video(movie)
+            } else if let data = try await selectedPhotoItem.loadTransferable(type: Data.self), let uiImage = UIImage(data: data) {
+                self.postUIImage = uiImage
+                self.mediaType = .photo(Image(uiImage: uiImage))
+            }
         } catch {
             print("DEBUG: Failed to select profile photo with error: \(error.localizedDescription)")
         }
@@ -103,9 +136,20 @@ private extension PostCreationView {
         Task {
             isUploading = true
             defer { isUploading = false }
+                        
+            let dataRepresentation: PostMediaDataRepresentation?
             
-            let imageData = postUIImage?.jpegData(compressionQuality: 0.5)
-            try await viewModel.uploadPost(caption: caption, imageData: imageData)
+            switch mediaType {
+            case .photo:
+                guard let imageData = postUIImage?.jpegData(compressionQuality: 0.5) else { return }
+                dataRepresentation = .photo(imageData)
+            case .video(let movie):
+                dataRepresentation = .video(movie.url)
+            case .none:
+                dataRepresentation = nil
+            }
+            
+            try await viewModel.uploadPost(caption: caption, mediaDataRepresentation: dataRepresentation)
             
             snackbarManager.show(.postUploaded)
             dismiss()

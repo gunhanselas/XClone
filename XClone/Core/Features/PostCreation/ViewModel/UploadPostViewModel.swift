@@ -18,9 +18,9 @@ class UploadPostViewModel {
         self.service = service
     }
     
-    func uploadPost(caption: String, imageData: Data? = nil) async throws {
+    func uploadPost(caption: String, mediaDataRepresentation: PostMediaDataRepresentation?) async throws {
         do {
-            try await service.uploadPost(caption: caption, imageData: imageData)
+            try await service.uploadPost(caption: caption, dataRepresentation: mediaDataRepresentation)
         } catch {
             self.error = error
             throw error

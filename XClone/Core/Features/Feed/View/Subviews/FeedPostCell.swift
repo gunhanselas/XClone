@@ -47,15 +47,7 @@ struct FeedPostCell<ViewModel: FeedViewModelProtocol>: View {
                     Text(post.caption)
                         .multilineTextAlignment(.leading)
                     
-                    if let imageUrl = post.imageURL {
-                        KFImage(URL(string: imageUrl))
-                            .placeholder { ProgressView() }
-                            .resizable()
-                            .scaledToFill()
-                            .background(Color(.secondarySystemBackground))
-                            .clipShape(.rect(cornerRadius: 10))
-                            .contentShape(.rect)
-                    }
+                    PostMediaView(post: post)
                 }
                 .font(.subheadline)
             }

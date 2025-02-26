@@ -45,14 +45,7 @@ struct PostDetailView<ViewModel: FeedViewModelProtocol>: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
-                if let imageUrl = post.imageURL {
-                    KFImage(URL(string: imageUrl))
-                        .placeholder { ProgressView() }
-                        .resizable()
-                        .scaledToFill()
-                        .clipShape(.rect(cornerRadius: 10))
-                        .contentShape(.rect)
-                }
+                PostMediaView(post: post)
                 
                 PostEngagementView(post: post, viewModel: viewModel)
 

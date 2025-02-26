@@ -24,7 +24,7 @@ class PostReplyViewModel {
     }
     
     func uploadReply(caption: String) async throws {
-        try await service.uploadReply(caption: caption, to: post.id)
+        try await service.uploadReply(caption: caption, to: post.parentPostId ?? post.id)
         try await notificationService.sendReplyNotification(post: post)
     }
 }

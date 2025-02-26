@@ -9,11 +9,16 @@ import FirebaseAuth
 import FirebaseFirestore
 
 protocol CreatePostServiceProtocol {
-    func uploadPost(caption: String, imageData: Data?) async throws
+    func uploadPost(caption: String, dataRepresentation: PostMediaDataRepresentation?) async throws
+}
+
+enum PostMediaDataRepresentation {
+    case photo(Data)
+    case video(URL)
 }
 
 struct CreatePostService: CreatePostServiceProtocol {
-    func uploadPost(caption: String, imageData: Data?) async throws {
+    func uploadPost(caption: String, dataRepresentation: PostMediaDataRepresentation?) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         let postRef = FirestoreConstants.PostsCollection.document()
         
@@ -25,8 +30,13 @@ struct CreatePostService: CreatePostServiceProtocol {
             engagement: PostEngagement()
         )
         
-        if let imageData {
-            post.imageURL = try await ImageUploader().uploadImage(imageData: imageData, type: .post)
+        switch dataRepresentation {
+        case .photo(let data):
+            post.imageURL = try await ImageUploader().uploadImage(imageData: data, type: .post)
+        case .video(let url):
+            post.videoURL = try await VideoService().uploadVideoToStorage(withUrl: url)
+        case nil:
+            break
         }
         
         let data = try Firestore.Encoder().encode(post)
