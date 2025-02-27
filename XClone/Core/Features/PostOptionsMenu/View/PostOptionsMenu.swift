@@ -47,15 +47,7 @@ struct PostOptionsMenu: View {
                 .foregroundStyle(.gray)
         }
         .task { await configureFollowState() }
-        .alert("Block @\(post.author?.username ?? "")", isPresented: $isShowingBlockAlert, actions: {
-            Button("Block", role: .destructive) {
-                onBlock()
-            }
-            
-            Button("Cancel", role: .cancel) {}
-        }, message: {
-            Text("They will be able to see your public posts, but will no longer be able to engage with them. They will also not be able to follow or message you, and you will not see notifications from them.")
-        })
+        .blockAlert(user: post.author, isShowing: $isShowingBlockAlert, onBlock: onBlock)
         .sheet(isPresented: $isShowingReportView) {
             ReportContentView(contentType: .post(post: post))
         }

@@ -36,13 +36,15 @@ struct UserListView: View {
         ScrollView {
             switch viewModel.loadingState {
             case .empty:
-                ContentUnavailableView(
-                    "No blocked accounts.",
-                    systemImage: "person.slash",
-                    description: Text("Accounts you've blocked will appear here.")
-                )
-            case .error:
-                Text("An error occurred.")
+                if config == .blockedAccounts {
+                    ContentUnavailableView(
+                        "No blocked accounts.",
+                        systemImage: "person.slash",
+                        description: Text("Accounts you've blocked will appear here.")
+                    )
+                }
+            case .error(let error):
+                Text(error.localizedDescription)
             case .loading:
                 ProgressView()
                     .containerRelativeFrame(.vertical)

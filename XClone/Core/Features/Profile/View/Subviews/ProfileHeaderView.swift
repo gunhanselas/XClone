@@ -11,10 +11,16 @@ import SwiftUI
 struct ProfileHeaderView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.isPresented) private var isPresented
+    
+    @Environment(BlockingManager.self) private var blockingManager
+    @Environment(SnackbarNotificationManager.self) private var snackbarManager
     @Environment(UserManager.self) private var userManager
     @Environment(ProfileViewModel.self) private var viewModel
-    
+        
+    @State private var showPrimaryButtonLoadingIndicator = false
     @State private var sheetConfig: ProfileHeaderView.SheetConfiguration?
+    @State private var isShowingBlockAlert = false
+    @State private var isShowingReportView = false
     
     let user: User
     
@@ -53,6 +59,17 @@ struct ProfileHeaderView: View {
                     if user.userRelationState == .isCurrentUser {
                         Button { sheetConfig = .settings } label: {
                             Image(systemName: "gear.circle.fill")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.white, .black.opacity(0.4))
+                        }
+                    } else {
+                        Menu {
+                            Button("Report @\(user.username)", action: { isShowingReportView.toggle() })
+                            Button("Block @\(user.username)", action: { isShowingBlockAlert.toggle() })
+
+                        } label: {
+                            Image(systemName: "ellipsis.circle.fill")
                                 .resizable()
                                 .frame(width: 28, height: 28)
                                 .foregroundStyle(.white, .black.opacity(0.4))
@@ -112,10 +129,11 @@ struct ProfileHeaderView: View {
                 XButton(primaryButtonTitle) {
                     primaryButtonTapped()
                 }
-                .buttonStyle(.standard(rank: primaryButtonRank, size: .compact))
+                .buttonStyle(.standard(rank: primaryButtonRank, size: .compact), isLoading: $showPrimaryButtonLoadingIndicator)
             }
             .padding(.horizontal, 8)
         }
+        .blockAlert(user: user, isShowing: $isShowingBlockAlert, onBlock: onBlock)
         .fullScreenCover(item: $sheetConfig) { config in
             switch config {
             case .editProfile:
@@ -151,7 +169,22 @@ private extension ProfileHeaderView {
         case .followed:
             Task { await viewModel.unfollow() }
         case .blocked:
-            print("DEBUG: Unblock user here..")
+            Task {
+                showPrimaryButtonLoadingIndicator = true
+                await blockingManager.unblockUser(user)
+                viewModel.user.userRelationState = .notFollowed
+                showPrimaryButtonLoadingIndicator = false
+            }
+        }
+    }
+    
+    func onBlock() {
+        Task {
+            showPrimaryButtonLoadingIndicator = true
+            await blockingManager.blockUser(user.id)
+            snackbarManager.show(.blocked(user))
+            viewModel.user.userRelationState = .blocked
+            showPrimaryButtonLoadingIndicator = false
         }
     }
     
