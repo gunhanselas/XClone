@@ -26,6 +26,7 @@ struct NotificationRowView: View {
                     if let post = notification.post {
                         Text(post.caption)
                             .foregroundStyle(.secondary)
+                            .padding(.vertical, 4)
                     }
                 }
                 .font(.subheadline)

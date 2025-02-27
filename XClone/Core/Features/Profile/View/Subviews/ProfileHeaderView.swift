@@ -134,6 +134,9 @@ struct ProfileHeaderView: View {
             .padding(.horizontal, 8)
         }
         .blockAlert(user: user, isShowing: $isShowingBlockAlert, onBlock: onBlock)
+        .sheet(isPresented: $isShowingReportView) {
+            ReportContentView(contentType: .account(user: user))
+        }
         .fullScreenCover(item: $sheetConfig) { config in
             switch config {
             case .editProfile:
