@@ -13,14 +13,9 @@ class FeedViewModel: FeedViewModelProtocol {
     var posts = [Post]()
     
     private let feedService: FeedServiceProtocol
-    let likeService: LikePostServiceProtocol
     
-    init(
-        feedService: FeedServiceProtocol = FeedService(),
-        likeService: LikePostServiceProtocol = LikePostService()
-    ) {
+    init(feedService: FeedServiceProtocol = FeedService()) {
         self.feedService = feedService
-        self.likeService = likeService
         
         Task { await fetchPosts() }
     }

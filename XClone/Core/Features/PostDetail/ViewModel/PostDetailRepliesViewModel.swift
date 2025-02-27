@@ -15,14 +15,9 @@ class PostDetailRepliesViewModel: FeedViewModelProtocol {
     var posts = [Post]()
     
     private let service: PostDetailServiceProtocol
-    private(set) var likeService: LikePostServiceProtocol
     
-    init(
-        service: PostDetailServiceProtocol = PostDetailService(),
-        likePostService: LikePostServiceProtocol = LikePostService()
-    ) {
+    init(service: PostDetailServiceProtocol = PostDetailService()) {
         self.service = service
-        self.likeService = likePostService
     }
     
     func fetchReplies(for post: Post, sortOption: ReplySortModel) async {

@@ -10,14 +10,8 @@ import Observation
 @Observable
 class PostDetailViewModel: FeedViewModelProtocol {
     var posts = [Post]()
-    
-    private(set) var likeService: LikePostServiceProtocol
-    
-    init(
-        post: Post,
-        likePostService: LikePostServiceProtocol = LikePostService()
-    ) {
+        
+    init(post: Post) {
         self.posts = [post]
-        self.likeService = likePostService
     }
 }

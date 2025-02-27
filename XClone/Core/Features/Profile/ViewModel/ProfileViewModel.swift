@@ -19,7 +19,6 @@ class ProfileViewModel: FeedViewModelProtocol {
     private let profileService: ProfileServiceProtocol
     private let followService: FollowServiceProtocol
     private let userService: UserServiceProtocol
-    private(set) var likeService: LikePostServiceProtocol
     
     private var didFetchUserContent = false
     
@@ -30,13 +29,11 @@ class ProfileViewModel: FeedViewModelProtocol {
     init(
         user: User,
         profileService: ProfileServiceProtocol = ProfileService(),
-        likeService: LikePostServiceProtocol = LikePostService(),
         followService: FollowServiceProtocol = FollowService(),
         userService: UserServiceProtocol = UserService()
     ) {
         self.user = user
         self.profileService = profileService
-        self.likeService = likeService
         self.followService = followService
         self.userService = userService
     }

@@ -26,8 +26,7 @@ struct FeedView: View {
                         ProgressView()
                             .containerRelativeFrame(.vertical)
                     case .empty:
-                        Text("Feed Empty State")
-                            .frame(maxWidth: .infinity)
+                        FeedEmptyStateView()
                     case .error:
                         Text("An error occurred")
                     case .complete:
@@ -74,17 +73,12 @@ struct FeedView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    AvatarView(user: userManager.currentUser, size: .xSmall)
-                }
-                
                 ToolbarItem(placement: .principal) {
                     XLogoImageView(size: .small)
                 }
             }
         }
         .snackbar(message: "Your post was sent", show: $showPostSentSnackbar)
-        
     }
 }
 

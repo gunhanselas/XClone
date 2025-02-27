@@ -82,8 +82,8 @@ private extension PostEngagementView {
 }
 
 #Preview {
-    PostEngagementView<FeedViewModel>(post: MockData.post, viewModel: FeedViewModel(
-        feedService: MockFeedService(),
-        likeService: MockLikePostService()
-    ))
+    PostEngagementView<FeedViewModel>(
+        post: MockData.post,
+        viewModel: FeedViewModel(feedService: MockFeedService())
+    )
 }

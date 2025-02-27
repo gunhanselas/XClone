@@ -11,7 +11,6 @@ import Foundation
 class BlockingManager {
     var blockedUIDs = [String]()
     var blockedByUIDs = [String]()
-    var didBlockUser = false
     
     private let service: BlockUserService
     

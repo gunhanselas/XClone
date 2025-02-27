@@ -17,7 +17,6 @@ struct BlockUserService {
     
     func blockUser(_ uid: String) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
-        
         let batch = Firestore.firestore().batch()
         
         let blockedRef = FirestoreConstants.blockedUsersCollection(uid: currentUid).document(uid)

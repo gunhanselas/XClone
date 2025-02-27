@@ -97,10 +97,5 @@ struct PostDetailView<ViewModel: FeedViewModelProtocol>: View {
 
 #Preview {
     PostDetailView(post: MockData.post, viewModel: FeedViewModel())
-        .environment(
-            FeedViewModel(
-                feedService: MockFeedService(),
-                likeService: MockLikePostService()
-            )
-        )
+        .environment(FeedViewModel(feedService: MockFeedService()))
 }

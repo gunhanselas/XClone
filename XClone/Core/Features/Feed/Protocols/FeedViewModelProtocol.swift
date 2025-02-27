@@ -10,10 +10,13 @@ import Foundation
 @MainActor
 protocol FeedViewModelProtocol: ObservableObject {
     var posts: [Post] { get set }
-    var likeService: LikePostServiceProtocol { get }
 }
 
 extension FeedViewModelProtocol {
+    var likeService: any LikePostServiceProtocol {
+        LikePostService()
+    }
+    
     func likePost(_ post: Post) async {
         guard let index = posts.firstIndex(where: { $0.id == post.id }) else { return }
         

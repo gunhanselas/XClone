@@ -65,9 +65,6 @@ struct FeedPostCell<ViewModel: FeedViewModelProtocol>: View {
 #Preview {
     FeedPostCell(
         post: MockData.post,
-        viewModel: FeedViewModel(
-            feedService: MockFeedService(),
-            likeService: MockLikePostService()
-        )
+        viewModel: FeedViewModel(feedService: MockFeedService())
     )
 }

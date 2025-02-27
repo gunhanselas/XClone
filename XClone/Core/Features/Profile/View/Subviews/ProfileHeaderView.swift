@@ -186,7 +186,6 @@ private extension ProfileHeaderView {
             ProfileViewModel(
                 user: MockData.currentUser,
                 profileService: MockProfileService(),
-                likeService: MockLikePostService(),
                 followService: MockFollowService(),
                 userService: MockUserService()
             )
