@@ -13,10 +13,9 @@ import GoogleSignIn
 class AuthManager: NSObject {
     var authState: AuthenticationState = .notDetermined
     var error: AuthenticationError?
-    
+    var googleAuthError: GoogleAuthError?
     var appleAuthUser: XAppleAuthUser?
     var googleAuthUser: XGoogleAuthUser?
-    var googleAuthError: GoogleAuthError?
     
     private let service: AuthServiceProtocol
     private let googleAuthService: GoogleAuthServiceProtocol
