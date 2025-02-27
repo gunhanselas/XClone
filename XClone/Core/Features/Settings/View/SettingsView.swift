@@ -13,7 +13,9 @@ struct SettingsView: View {
     @Environment(UserManager.self) private var userManager
     
     @State private var showBlockedAccounts = false
-    
+    @State private var isShowingLogoutAlert = false
+    @State private var isShowingAccountDeletionAlert = false
+
     var body: some View {
         NavigationStack {
             List {
@@ -41,14 +43,28 @@ struct SettingsView: View {
                 
                 Section {
                     Button("Log Out", role: .destructive) {
-                        authManager.signOut()
+                        isShowingLogoutAlert.toggle()
                     }
                     
                     Button("Delete Account", role: .destructive) {
-                        // delete account
+                        isShowingAccountDeletionAlert.toggle()
                     }
                 }
             }
+            .alert("Delete Account?", isPresented: $isShowingAccountDeletionAlert, actions: {
+                Button("Delete Account", role: .destructive) {
+                    Task { await authManager.deleteAccount() }
+                }
+                Button("Cancel", role: .cancel) { }
+            }, message: {
+                Text("Are you sure you want to delete your account? This operation cannot be undone and all of your data will be permanently deleted.")
+            })
+            .alert("Log Out?", isPresented: $isShowingLogoutAlert, actions: {
+                Button("Log Out", role: .destructive) { authManager.signOut() }
+                Button("Cancel", role: .cancel) { }
+            }, message: {
+                Text("Are you sure you want to log out?")
+            })
             .navigationDestination(isPresented: $showBlockedAccounts) {
                 UserListView(config: .blockedAccounts)
             }
@@ -66,21 +82,23 @@ struct SettingsView: View {
     }
 }
 
-struct SettingsRowView: View {
-    let title: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(.primaryText)
-            
-            Spacer()
-            
-            Text(value)
-                .foregroundStyle(.secondary)
+private extension SettingsView {
+    struct SettingsRowView: View {
+        let title: String
+        let value: String
+        
+        var body: some View {
+            HStack {
+                Text(title)
+                    .foregroundStyle(.primaryText)
+                
+                Spacer()
+                
+                Text(value)
+                    .foregroundStyle(.secondary)
+            }
+            .font(.subheadline)
         }
-        .font(.subheadline)
     }
 }
 

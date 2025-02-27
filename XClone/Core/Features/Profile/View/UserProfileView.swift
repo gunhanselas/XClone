@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct UserProfileView: View {    
-    @State private var selectedFilter: ProfileContentFilterModel = .posts
     @State private var viewModel: ProfileViewModel
         
     init(user: User) {
@@ -22,14 +21,14 @@ struct UserProfileView: View {
                     .environment(viewModel)
                 
                 VStack(spacing: 4) {
-                    ProfileContentFilterView(selectedFilter: $selectedFilter)
+                    ProfileContentFilterView(selectedFilter: $viewModel.currentFilter)
                     
                     switch viewModel.loadingState {
                     case .loading:
                         ProgressView()
                             .padding()
                     case .empty:
-                        Text("Configure empty state..")
+                        ContentUnavailableView("No posts yet.", systemImage: "text.page.slash.rtl")
                     case .error:
                         Text("An error ocurred.")
                     case .complete:
@@ -52,9 +51,6 @@ struct UserProfileView: View {
         .refreshable { await viewModel.refresh() }
         .task { await viewModel.fetchUserContent() }
         .task { await viewModel.fetchUserRelationState() }
-        .onChange(of: selectedFilter) { _, newValue in
-            viewModel.setCurrentDataSource(for: newValue)
-        }
         .ignoresSafeArea(edges: .top)
     }
 }

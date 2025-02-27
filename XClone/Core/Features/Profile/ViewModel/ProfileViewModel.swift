@@ -12,7 +12,6 @@ class ProfileViewModel: FeedViewModelProtocol {
     var user: User
     var currentDataSource = [Post]()
     var loadingState: ContentLoadingState = .loading
-
     var posts = [Post]()
     var replies = [Post]()
     var likedPosts = [Post]()
@@ -20,9 +19,14 @@ class ProfileViewModel: FeedViewModelProtocol {
     private let profileService: ProfileServiceProtocol
     private let followService: FollowServiceProtocol
     private let userService: UserServiceProtocol
-    
     private(set) var likeService: LikePostServiceProtocol
-
+    
+    private var didFetchUserContent = false
+    
+    var currentFilter: ProfileContentFilterModel = .posts {
+        didSet { setCurrentDataSource(for: currentFilter) }
+    }
+    
     init(
         user: User,
         profileService: ProfileServiceProtocol = ProfileService(),
@@ -53,6 +57,8 @@ class ProfileViewModel: FeedViewModelProtocol {
     }
     
     func refresh() async {
+        didFetchUserContent = false
+        
         do {
             self.user = try await userService.fetchUser(withUid: user.id)
             
@@ -61,12 +67,15 @@ class ProfileViewModel: FeedViewModelProtocol {
                 group.addTask { await self.fetchUserRelationState() }
                 group.addTask { await self.fetchUserContent() }
             }
+            
         } catch {
             print("DEBUG: Failed to refresh profile with error: \(error)")
         }
     }
     
     func fetchUserContent() async {
+        guard !didFetchUserContent else { return }
+        
         await withThrowingTaskGroup(of: Void.self) { [weak self] group in
             guard let self else { return }
             
@@ -74,6 +83,9 @@ class ProfileViewModel: FeedViewModelProtocol {
             group.addTask { await self.fetchReplies(for: self.user.id) }
             group.addTask { await self.fetchedLikedPosts(for: self.user.id) }
         }
+        
+        didFetchUserContent = true
+        currentFilter = .posts
     }
     
     func fetchUserRelationState() async {
@@ -123,7 +135,6 @@ private extension ProfileViewModel {
             }
             
             self.posts = posts
-            setCurrentDataSource(for: .posts)
         } catch {
             print("DEBUG: Error fetching posts: \(error)")
         }

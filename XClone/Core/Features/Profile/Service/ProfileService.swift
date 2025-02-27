@@ -18,6 +18,7 @@ struct ProfileService: ProfileServiceProtocol {
         return try await FirestoreConstants
             .PostsCollection
             .whereField("authorID", isEqualTo: uid)
+            .order(by: "timestamp", descending: true)
             .getDocuments(as: Post.self)
     }
     
@@ -52,12 +53,13 @@ struct ProfileService: ProfileServiceProtocol {
             .userLikesCollection(uid: uid)
             .order(by: "timestamp", descending: true)
             .getDocuments()
-                
+                        
         return try await withThrowingTaskGroup(of: Post.self) { group in
             var result = [Post]()
             
             for postID in postIDs.documents {
                 group.addTask {
+                    
                     return try await FirestoreConstants
                         .PostsCollection
                         .document(postID.documentID)
