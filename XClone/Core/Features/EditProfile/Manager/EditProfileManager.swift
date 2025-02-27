@@ -27,9 +27,11 @@ class EditProfileManager {
         userManager.updateProfilePhoto(with: imageURL)
     }
     
-    func updateUser(with fullname: String?, bio: String?) async {
+    func updateUser(with fullname: String?, bio: String?, userManager: UserManager) async {
         do {
             try await service.updateUser(with: fullname, bio: bio)
+            userManager.currentUser?.fullname = fullname
+            userManager.currentUser?.bio = bio
         } catch {
             print("DEBUG: Failed to update user info with error: \(error)")
         }

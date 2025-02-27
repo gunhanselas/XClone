@@ -10,6 +10,8 @@ import SwiftUI
 
 struct ProfileHeaderView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.isPresented) private var isPresented
+    @Environment(UserManager.self) private var userManager
     @Environment(ProfileViewModel.self) private var viewModel
     
     @State private var sheetConfig: ProfileHeaderView.SheetConfiguration?
@@ -37,7 +39,7 @@ struct ProfileHeaderView: View {
                 }
                 
                 HStack {
-                    if user.userRelationState != .isCurrentUser {
+                    if isPresented {
                         Button { dismiss() } label: {
                             Image(systemName: "arrow.left.circle.fill")
                                 .resizable()
@@ -118,6 +120,11 @@ struct ProfileHeaderView: View {
             switch config {
             case .editProfile:
                 EditProfileView(user: user)
+                    .onDisappear {
+                        guard let currentUser = userManager.currentUser else { return }
+                        viewModel.user = currentUser
+                        print("DEBUG: Did update user \(viewModel.user.fullname)")
+                    }
             case .settings:
                 SettingsView()
             }

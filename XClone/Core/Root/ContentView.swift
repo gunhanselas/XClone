@@ -20,7 +20,16 @@ struct ContentView: View {
             case .unauthenticated:
                 AuthenticationRootView()
             case .authenticated:
-                MainTabView()
+                switch userManager.loadingState {
+                case .loading, .empty:
+                    ProgressView()
+                case .error(let error):
+                    Text(error.localizedDescription)
+                case .complete:
+                    if let user = userManager.currentUser {
+                        MainTabView(currentUser: user)
+                    }
+                }
             }
         }
         .onAppear { authManager.configureAuthState() }

@@ -161,7 +161,7 @@ private extension EditProfileView {
             }
             
             if user.fullname != fullname || user.bio != bio {
-                await editProfileManager.updateUser(with: fullname, bio: bio)
+                await editProfileManager.updateUser(with: fullname, bio: bio, userManager: userManager)
             }
             
             dismiss()

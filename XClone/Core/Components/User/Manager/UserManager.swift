@@ -11,6 +11,7 @@ import Foundation
 @Observable
 class UserManager {
     var currentUser: User?
+    var loadingState: ContentLoadingState = .loading
     
     private let service: UserServiceProtocol
     
@@ -22,7 +23,9 @@ class UserManager {
         do {
             self.currentUser = try await service.fetchCurrentUser()
             self.currentUser?.userRelationState = .isCurrentUser
+            self.loadingState = .complete
         } catch {
+            self.loadingState = .error(error)
             print("DEBUG: Error fetching current user: \(error)")
         }
     }

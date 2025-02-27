@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UserProfileView: View {
+struct UserProfileView: View {    
     @State private var selectedFilter: ProfileContentFilterModel = .posts
     @State private var viewModel: ProfileViewModel
         

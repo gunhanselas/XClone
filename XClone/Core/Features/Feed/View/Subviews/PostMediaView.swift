@@ -21,6 +21,7 @@ struct PostMediaView: View {
                     .placeholder { ProgressView() }
                     .resizable()
                     .scaledToFill()
+                    .frame(maxHeight: 440)
                     .background(Color(.secondarySystemBackground))
                     .clipShape(.rect(cornerRadius: 10))
                     .contentShape(.rect)
@@ -39,8 +40,7 @@ struct PostMediaView: View {
             }
         }
         .onDisappear {
-            if let videoURL = post.videoURL {
-                print("DEBUG: Pausing now..")
+            if post.videoURL != nil {
                 player.pause()
             }
         }
