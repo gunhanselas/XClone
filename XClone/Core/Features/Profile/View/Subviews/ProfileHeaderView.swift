@@ -123,7 +123,6 @@ struct ProfileHeaderView: View {
                     .onDisappear {
                         guard let currentUser = userManager.currentUser else { return }
                         viewModel.user = currentUser
-                        print("DEBUG: Did update user \(viewModel.user.fullname)")
                     }
             case .settings:
                 SettingsView()

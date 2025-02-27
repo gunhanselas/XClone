@@ -9,14 +9,6 @@ import FirebaseCore
 import GoogleSignIn
 import SwiftUI
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        FirebaseApp.configure()
-        return true
-    }
-}
-
 @main
 struct XCloneApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -44,7 +36,7 @@ private extension XCloneApp {
             print("Failed to load linker framework")
             return
         }
-        print("RocketSim Connect successfully linked")
+        print("DEBUG: RocketSim Connect successfully linked")
         #endif
     }
 }

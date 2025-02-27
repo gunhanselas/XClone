@@ -25,7 +25,7 @@ struct PostMediaView: View {
                     .background(Color(.secondarySystemBackground))
                     .clipShape(.rect(cornerRadius: 10))
                     .contentShape(.rect)
-            } else if let videoURL = post.videoURL {
+            } else if post.videoURL != nil {
                 VideoPlayer(player: player)
                     .scaledToFill()
                     .background(Color(.systemBackground))

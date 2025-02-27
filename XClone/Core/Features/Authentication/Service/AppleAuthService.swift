@@ -26,9 +26,6 @@ struct AppleAuthService {
             rawNonce: nonce,
             fullName: appleIDCredential.fullName
         )
-        
-        print("DEBUG: Full name \(appleIDCredential.fullName?.givenName)")
-        print("DEBUG: Full name \(appleIDCredential.email)")
 
         let firebaseAuthResult = try await Auth.auth().signIn(with: credential)
         let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false

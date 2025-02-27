@@ -52,7 +52,7 @@ struct PostCreationView: View {
                 
                 ZStack(alignment: .topTrailing) {
                     switch mediaType {
-                    case .video(let movie):
+                    case .video:
                         VideoPlayer(player: player)
                             .frame(width: 320, height: 260)
                             .clipShape(.rect(cornerRadius: 10))

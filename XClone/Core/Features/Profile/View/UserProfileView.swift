@@ -51,7 +51,6 @@ struct UserProfileView: View {
         .refreshable { await viewModel.refresh() }
         .task { await viewModel.fetchUserContent() }
         .task { await viewModel.fetchUserRelationState() }
-        .ignoresSafeArea(edges: .top)
     }
 }
 

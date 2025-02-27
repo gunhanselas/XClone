@@ -25,6 +25,7 @@ struct EditProfileView: View {
     @State private var bio = ""
     @State private var didEditUserInfo = false
     @State private var isLoading = false
+    @State private var showHeaderPhotosPicker = false
     
     private let user: User
     
@@ -35,17 +36,17 @@ struct EditProfileView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                PhotosPicker(selection: $selectedHeaderPhotosPickerItem) {
-                    if let headerImageUrl = user.profileHeaderImageUrl {
-                        KFImage(URL(string: headerImageUrl))
+                Group {
+                    if let headerImage {
+                        headerImage
                             .resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity)
                             .frame(height: 140)
                             .clipped()
                             .contentShape(.rect)
-                    } else if let headerImage {
-                        headerImage
+                    } else if let headerImageUrl = user.profileHeaderImageUrl {
+                        KFImage(URL(string: headerImageUrl))
                             .resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity)
@@ -61,6 +62,7 @@ struct EditProfileView: View {
                             .contentShape(.rect)
                     }
                 }
+                .onTapGesture { showHeaderPhotosPicker.toggle() }
                 
                 PhotosPicker(selection: $selectedProfilePhotosPickerItem) {
                     if let profileImage {
@@ -105,6 +107,7 @@ struct EditProfileView: View {
                 
                 Spacer()
             }
+            .photosPicker(isPresented: $showHeaderPhotosPicker, selection: $selectedHeaderPhotosPickerItem)
             .navigationTitle("Edit Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -129,11 +132,9 @@ struct EditProfileView: View {
         .task(id: selectedProfilePhotosPickerItem) { await loadProfileImage() }
         .onChange(of: fullname) { _, newValue in
             didEditUserInfo = newValue != user.fullname
-            print("DEBUG: Did edit fullname \(didEditUserInfo)")
         }
         .onChange(of: bio) { _, newValue in
             didEditUserInfo = newValue != user.bio
-            print("DEBUG: Did edit bio \(didEditUserInfo)")
         }
         .onAppear { configureUserDataOnAppear() }
     }
