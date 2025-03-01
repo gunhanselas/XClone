@@ -13,6 +13,12 @@ protocol ProfileServiceProtocol {
     func fetchLikedPosts(for uid: String) async throws -> [Post]
 }
 
+struct PostLikeModel: Codable {
+    let postID: String
+    let timestamp: Date
+    let isReply: Bool
+}
+
 struct ProfileService: ProfileServiceProtocol {
     func fetchPosts(for uid: String) async throws -> [Post] {
         return try await FirestoreConstants
@@ -49,20 +55,19 @@ struct ProfileService: ProfileServiceProtocol {
     }
     
     func fetchLikedPosts(for uid: String) async throws -> [Post] {
-        let postIDs = try await FirestoreConstants
+        let likeModels = try await FirestoreConstants
             .userLikesCollection(uid: uid)
-            .order(by: "timestamp", descending: true)
-            .getDocuments()
+            .order(by: "timestamp", descending: false)
+            .getDocuments(as: PostLikeModel.self)
                         
         return try await withThrowingTaskGroup(of: Post.self) { group in
             var result = [Post]()
             
-            for postID in postIDs.documents {
+            for likeModel in likeModels where !likeModel.isReply {
                 group.addTask {
-                    
                     return try await FirestoreConstants
                         .PostsCollection
-                        .document(postID.documentID)
+                        .document(likeModel.postID)
                         .getDocument(as: Post.self)
                 }
             }

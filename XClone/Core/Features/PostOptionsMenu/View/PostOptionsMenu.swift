@@ -44,6 +44,7 @@ struct PostOptionsMenu: View {
             }
         } label: {
             Image(systemName: "ellipsis")
+                .imageScale(.large)
                 .foregroundStyle(.gray)
         }
         .task { await configureFollowState() }

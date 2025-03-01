@@ -40,10 +40,10 @@ struct LikePostService: LikePostServiceProtocol {
         
         if !post.isReply {
             let postLikesRef = postRef.collection("post-likes").document(uid)
-            batch.setData(["timestamp": timestamp], forDocument: postLikesRef)
+            batch.setData(["timestamp": timestamp, "isReply": false, "postID": post.id], forDocument: postLikesRef)
         }
         
-        batch.setData(["timestamp": timestamp], forDocument: userLikesRef)
+        batch.setData(["timestamp": timestamp, "isReply": post.isReply, "postID": post.id], forDocument: userLikesRef)
         batch.updateData(["engagement.likesCount": FieldValue.increment(Int64(1))], forDocument: postRef)
         
         try await batch.commit()

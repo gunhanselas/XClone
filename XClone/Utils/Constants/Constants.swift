@@ -9,4 +9,6 @@ import Foundation
 
 struct Constants {
     static let minimumPasswordCount = 6
+    
+    static let termsOfServiceURLString = "https://google.com"
 }

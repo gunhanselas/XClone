@@ -63,9 +63,13 @@ struct AuthenticationRootView: View {
                     .buttonStyle(.standard(rank: .secondary))
 
                     VStack(alignment: .leading, spacing: 24) {
-                        Text("By signing up, you agree to our Terms of Service.")
-                            .font(.caption)
-                            .foregroundStyle(.gray)
+                        Link(destination: URL(string: Constants.termsOfServiceURLString)!) {
+                            Text("By signing up, you agree to our ") +
+                            Text("Terms and Conditions")
+                                .fontWeight(.semibold)
+                        }
+                        .font(.footnote)
+                        .foregroundStyle(.gray)
                         
                         Button { router.showLogin() } label: {
                             Text("Have an account already? ")
@@ -75,7 +79,7 @@ struct AuthenticationRootView: View {
                             Text("Log in")
                                 .foregroundStyle(.primary)
                         }
-                        .font(.caption)
+                        .font(.footnote)
                     }
                     .padding(.vertical)
                     .padding(.horizontal, 8)
