@@ -25,7 +25,9 @@ struct NotificationsView: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(viewModel.notifications) { notification in
-                                NotificationRowView(notification: notification)
+                                NavigationLink(value: notification) {
+                                    NotificationRowView(notification: notification)
+                                }
                             }
                         }
                     }
@@ -33,8 +35,19 @@ struct NotificationsView: View {
             }
             .navigationTitle("Notifications")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: XNotification.self) { notification in
+                if let post = notification.post {
+                    PostDetailView(post: post, viewModel: viewModel)
+                } else if let sender = notification.sender {
+                    UserProfileView(user: sender)
+                }
+            }
+            .navigationDestination(for: User.self) { user in
+                UserProfileView(user: user)
+            }
         }
         .task { await viewModel.fetchNotifications() }
+        .refreshable { await viewModel.refreshNotifications() }
     }
 }
 

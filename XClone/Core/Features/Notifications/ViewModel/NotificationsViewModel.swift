@@ -8,9 +8,10 @@
 import SwiftUI
 
 @Observable
-class NotificationsViewModel {
+class NotificationsViewModel: FeedViewModelProtocol {
     var loadingState: ContentLoadingState = .loading
     var notifications = [XNotification]()
+    var posts = [Post]()
     
     private let service: XNotificationServiceProtocol
     private let userService: UserServiceProtocol
@@ -39,12 +40,17 @@ class NotificationsViewModel {
         }
     }
     
+    func refreshNotifications() async {
+        notifications.removeAll()
+        await fetchNotifications()
+    }
+    
     private func fetchNotificationMetadata() async {
-        await withThrowingTaskGroup(of: Void.self) { [weak self] group in
-            guard let self else { return }
-            
-            group.addTask { try await self.fetchNotificationUserData() }
-            group.addTask { try await self.fetchNotificationPostDataIfNecessary() }
+        do {
+            try await self.fetchNotificationUserData()
+            try await self.fetchNotificationPostDataIfNecessary()
+        } catch {
+            print("DEBUG: Failed to fetch notification metadata with error: \(error)")
         }
     }
     
@@ -66,6 +72,8 @@ class NotificationsViewModel {
     }
     
     private func fetchNotificationPostDataIfNecessary() async throws {
+        var updatedNotifications = notifications
+
         try await withThrowingTaskGroup(of: (Int, Post?).self) { [weak self] group in
             guard let self else { return }
             
@@ -79,8 +87,11 @@ class NotificationsViewModel {
             }
             
             for try await (index, post) in group {
-                notifications[index].post = post
+                updatedNotifications[index].post = post
+                updatedNotifications[index].post?.author = try await userService.fetchCurrentUser()
             }
         }
+        
+        self.notifications = updatedNotifications
     }
 }

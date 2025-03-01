@@ -19,13 +19,17 @@ struct NotificationRowView: View {
                     .offset(y: AvatarSize.small.dimension / 4)
                 
                 VStack(alignment: .leading) {
-                    AvatarView(user: notification.sender, size: .small)
+                    
+                    NavigationLink(value: notification.sender) {
+                        AvatarView(user: notification.sender, size: .small)
+                    }
                     
                     Text("\(notification.sender?.username ?? "") \(notificationMessage)")
+                        .foregroundStyle(.primaryText)
                     
                     if let post = notification.post {
                         Text(post.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.gray)
                             .padding(.vertical, 4)
                     }
                 }

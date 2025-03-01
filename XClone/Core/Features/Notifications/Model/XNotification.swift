@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct XNotification: Identifiable, Codable {
+struct XNotification: Identifiable, Codable, Hashable {
     let id: String
     let type: XNotificationType
     let senderID: String

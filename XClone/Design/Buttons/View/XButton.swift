@@ -22,6 +22,13 @@ struct XButton: View {
         self.systemImage = nil
     }
     
+    init(_ title: String, systemImage: String, action: @escaping () -> Void) {
+        self.title = title
+        self.systemImage = systemImage
+        self.action = action
+        self.imageResource = nil
+    }
+    
     init(systemImage: String, action: @escaping () -> Void) {
         self.title = nil
         self.imageResource = nil

@@ -18,6 +18,7 @@ struct XNotificationService: XNotificationServiceProtocol {
         
         return try await FirestoreConstants
             .userNotificationsCollection(uid: currentUid)
+            .limit(to: 50)
             .getDocuments(as: XNotification.self)
     }
 }

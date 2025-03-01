@@ -39,7 +39,7 @@ struct AuthenticationRootView: View {
                     }
                     .buttonStyle(.standard(rank: .secondary))
 
-                    XButton("Continue with Apple", imageResource: .appleIcon) {
+                    XButton("Continue with Apple", systemImage: "apple.logo") {
                         signInwithApple()
                     }
                     .buttonStyle(.standard(rank: .secondary))
