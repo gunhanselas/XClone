@@ -11,6 +11,7 @@ import SwiftUI
 class NotificationsViewModel: FeedViewModelProtocol {
     var loadingState: ContentLoadingState = .loading
     var notifications = [XNotification]()
+    var unreadNotificationsCount = 0
     var posts = [Post]()
     
     private let service: XNotificationServiceProtocol
@@ -25,6 +26,8 @@ class NotificationsViewModel: FeedViewModelProtocol {
         self.service = service
         self.userService = userService
         self.postService = postService
+        
+        Task { await fetchNotifications() }
     }
     
     func fetchNotifications() async {
@@ -32,6 +35,8 @@ class NotificationsViewModel: FeedViewModelProtocol {
         
         do {
             notifications = try await service.fetchNotifications()
+            setUnreadNotificationCount()
+            
             await fetchNotificationMetadata()
             loadingState = notifications.isEmpty ? .empty : .complete
         } catch {
@@ -43,6 +48,19 @@ class NotificationsViewModel: FeedViewModelProtocol {
     func refreshNotifications() async {
         notifications.removeAll()
         await fetchNotifications()
+    }
+    
+    private func setUnreadNotificationCount() {
+        self.unreadNotificationsCount = notifications.count(where: { $0.seen == false })
+    }
+    
+    func updateNotifcationsAsRead() async {
+        do {
+            try await service.updateNotificationsTAsRead(self.notifications)
+            self.unreadNotificationsCount = 0
+        } catch {
+            print("DEBUG: Failed to update notification status with error: \(error)")
+        }
     }
     
     private func fetchNotificationMetadata() async {
@@ -81,8 +99,14 @@ class NotificationsViewModel: FeedViewModelProtocol {
                 guard let postID = notification.postId else { continue }
                 
                 group.addTask {
-                    let post = try await self.postService.fetchPost(with: postID)
-                    return (index, post)
+                    do {
+                        let post = try await self.postService.fetchPost(with: postID)
+                        return (index, post)
+                    } catch {
+                        print("DEBUG: Failed to fetch post with error: \(error)")
+                        print("DEBUG: Post id \(postID)")
+                        return (index, nil)
+                    }
                 }
             }
             

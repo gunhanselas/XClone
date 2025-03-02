@@ -12,4 +12,6 @@ struct MockXNotificationService: XNotificationServiceProtocol {
         try await Task.sleep(for: .seconds(1))
         return MockData.notifications
     }
+    
+    func updateNotificationsTAsRead(_ notifications: [XNotification]) async throws { }
 }

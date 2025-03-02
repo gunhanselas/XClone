@@ -115,7 +115,6 @@ private extension InboxViewModel {
         self.threads.remove(at: threadIndex)
         self.threads.insert(copy, at: 0)
         
-        guard let lastMessage = threads[threadIndex].lastMessage else { return }
         setUnreadMessageCount()
     }
     

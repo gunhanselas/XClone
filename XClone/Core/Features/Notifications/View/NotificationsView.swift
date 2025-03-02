@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    @State private var viewModel = NotificationsViewModel()
-    
+    @Environment(NotificationsViewModel.self) private var viewModel
+        
     var body: some View {
         NavigationStack {
             Group {
@@ -50,7 +50,10 @@ struct NotificationsView: View {
                 UserProfileView(user: user)
             }
         }
-        .task { await viewModel.fetchNotifications() }
+        .task(id: viewModel.notifications) {
+            guard !viewModel.notifications.isEmpty, viewModel.unreadNotificationsCount > 0 else { return }
+            await viewModel.updateNotifcationsAsRead()
+        }
         .refreshable { await viewModel.refreshNotifications() }
     }
 }

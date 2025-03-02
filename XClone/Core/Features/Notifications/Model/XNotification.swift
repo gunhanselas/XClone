@@ -13,6 +13,7 @@ struct XNotification: Identifiable, Codable, Hashable {
     let senderID: String
     let timestamp: Date
     var postId: String?
+    var seen: Bool
     
     var sender: User?
     var post: Post? 

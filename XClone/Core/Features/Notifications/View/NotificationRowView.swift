@@ -29,6 +29,7 @@ struct NotificationRowView: View {
                     
                     if let post = notification.post {
                         Text(post.caption)
+                            .multilineTextAlignment(.leading)
                             .foregroundStyle(.gray)
                             .padding(.vertical, 4)
                     }

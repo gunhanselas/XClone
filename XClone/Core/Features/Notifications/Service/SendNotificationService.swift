@@ -41,7 +41,16 @@ struct SendNotificationService {
     private func sendNotification(toUid uid: String, type: XNotificationType, post: Post? = nil) async throws {
         guard let currentUid = Auth.auth().currentUser?.uid, uid != currentUid else { return }
         let ref = FirestoreConstants.userNotificationsCollection(uid: uid).document()
-        let notif = XNotification(id: ref.documentID, type: type, senderID: currentUid, timestamp: Date(), postId: post?.id)
+        
+        let notif = XNotification(
+            id: ref.documentID,
+            type: type,
+            senderID: currentUid,
+            timestamp: Date(),
+            postId: post?.id,
+            seen: false
+        )
+        
         let data = try Firestore.Encoder().encode(notif)
         try await ref.setData(data)
     }

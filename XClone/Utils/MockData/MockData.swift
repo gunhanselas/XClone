@@ -21,6 +21,7 @@ struct MockData {
             senderID: users[1].id,
             timestamp: Date(),
             postId: posts[0].id,
+            seen: false,
             sender: users[1],
             post: posts[0]
         ),
@@ -29,6 +30,7 @@ struct MockData {
             type: .follow,
             senderID: users[1].id,
             timestamp: Date(),
+            seen: false,
             sender: users[1]
         ),
         .init(
@@ -37,6 +39,7 @@ struct MockData {
             senderID: users[1].id,
             timestamp: Date(),
             postId: posts[0].id,
+            seen: false,
             sender: users[1],
             post: posts[0]
         )

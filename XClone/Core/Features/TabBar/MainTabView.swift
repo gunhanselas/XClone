@@ -12,6 +12,7 @@ struct MainTabView: View {
     @State private var blockingManager = BlockingManager(service: BlockUserService())
     @State private var isShowingSnackbar = false
     @State private var selection = 0
+    @State private var notificationsViewModel = NotificationsViewModel()
     
     @StateObject private var inboxViewModel = InboxViewModel()
 
@@ -37,6 +38,7 @@ struct MainTabView: View {
                     Image(systemName: "bell")
                         .environment(\.symbolVariants, selection == 2 ? .fill : .none)
                 }
+                .badge(notificationsViewModel.unreadNotificationsCount)
                 .tag(2)
             
             InboxView()
@@ -60,6 +62,7 @@ struct MainTabView: View {
             isShowingSnackbar = newValue != nil
         }
         .environment(blockingManager)
+        .environment(notificationsViewModel)
         .environment(snackbarNotificationManager)
     }
 }
