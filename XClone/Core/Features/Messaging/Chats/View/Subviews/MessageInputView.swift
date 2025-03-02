@@ -9,8 +9,9 @@ import SwiftUI
 
 struct MessageInputView: View {
     @State private var messageText = ""
-    @Environment(ChatViewModel.self) private var viewModel
-    
+//    @Environment(ChatViewModel.self) private var viewModel
+    @EnvironmentObject private var viewModel: ChatViewModel
+
     var body: some View {
         VStack(spacing: 8) {
             Divider()
@@ -52,5 +53,5 @@ private extension MessageInputView {
 
 #Preview {
     MessageInputView()
-        .environment(ChatViewModel(service: ChatService(), thread: nil, user: nil))
+//        .environment(ChatViewModel(service: ChatService(), thread: nil, user: nil))
 }

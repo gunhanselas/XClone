@@ -18,7 +18,11 @@ struct NotificationsView: View {
                     ProgressView()
                         .containerRelativeFrame(.vertical)
                 case .empty:
-                    Text("Empty state..")
+                    ContentUnavailableView(
+                        "No notifications yet.",
+                        systemImage: "bell.slash",
+                        description: Text("Notifications will appear here when users interact with you.")
+                    )
                 case .error:
                     Text("An error ocurred.")
                 case .complete:

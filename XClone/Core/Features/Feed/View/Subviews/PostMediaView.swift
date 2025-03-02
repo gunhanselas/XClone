@@ -26,11 +26,20 @@ struct PostMediaView: View {
                     .clipShape(.rect(cornerRadius: 10))
                     .contentShape(.rect)
             } else if post.videoURL != nil {
-                VideoPlayer(player: player)
-                    .scaledToFill()
-                    .background(Color(.systemBackground))
-                    .clipShape(.rect(cornerRadius: 10))
-                    .contentShape(.rect)
+                ZStack {
+                    VideoPlayer(player: player)
+                        .scaledToFill()
+                        .background(Color(.systemBackground))
+                        .clipShape(.rect(cornerRadius: 10))
+                        .contentShape(.rect)
+                    
+                    if player.status == .readyToPlay {
+                        ProgressView()
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(10)
+                    }
+                }
             }
         }
         .onAppear {

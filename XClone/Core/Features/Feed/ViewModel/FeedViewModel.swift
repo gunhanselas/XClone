@@ -35,6 +35,7 @@ class FeedViewModel: FeedViewModelProtocol {
         do {
             let posts = try await feedService.refreshFeed()
             try await fetchPostUserData(for: posts)
+            loadingState = posts.isEmpty ? .empty : .complete
         } catch {
             print("DEBUG: Failed to refresh posts with error: \(error)")
             loadingState = .error(error)

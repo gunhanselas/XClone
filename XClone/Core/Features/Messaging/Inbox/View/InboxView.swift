@@ -14,7 +14,7 @@ struct InboxView: View {
     @State private var searchText = ""
     @State private var selectedUser: User?
     
-    @StateObject private var viewModel = InboxViewModel()
+    @EnvironmentObject private var viewModel: InboxViewModel
 
     var body: some View {
         NavigationStack {

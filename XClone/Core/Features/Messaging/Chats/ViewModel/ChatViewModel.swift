@@ -7,11 +7,12 @@
 
 import Foundation
 
-@Observable
-class ChatViewModel {
-    var loadingState: ContentLoadingState = .loading
-    var messages = [ChatMessage]()
-    var initiateThreadObserver = false
+// @Observable
+@MainActor
+class ChatViewModel: ObservableObject {
+    @Published var loadingState: ContentLoadingState = .loading
+    @Published var messages = [ChatMessage]()
+    @Published var initiateThreadObserver = false
     
     private let service: ChatService
     private let user: User?
@@ -44,8 +45,22 @@ class ChatViewModel {
             self.messages = try await service.fetchMessages(for: thread)
             initiateThreadObserver = true
             loadingState = messages.isEmpty ? .empty : .complete
+            print("DEBUG: Messages count \(messages.count)")
         } catch {
             loadingState = .error(error)
+        }
+    }
+    
+    func fetchPreviousMessages() async {
+        guard let thread else { return }
+        
+        do {
+            let result = try await service.fetchPreviousMessages(for: thread)
+            print("DEBUG: Result count \(result.count)")
+            self.messages = result.reversed() + messages
+            print("DEBUG: Messages count after pagination \(messages.count)")
+        } catch {
+            print("DEBUG: Failed to fetch previous messages")
         }
     }
     

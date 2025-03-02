@@ -138,6 +138,18 @@ extension ChatService {
         return messages.reversed()
     }
     
+    func fetchPreviousMessages(for thread: Thread) async throws -> [ChatMessage] {
+        guard let lastDoc = lastDoc else { return [] }
+        
+        guard let snapshot = try await chatQuery(for: thread.id)?
+            .limit(to: fetchLimit)
+            .start(afterDocument: lastDoc)
+            .getDocuments() else { return [] }
+                
+        self.lastDoc = snapshot.documents.last
+        return snapshot.documents.compactMap({ try? $0.data(as: ChatMessage.self) })
+    }
+    
     private func onTerminationOfContinuation(_ continuation: AsyncStream<ChatMessage>.Continuation) {
         continuation.onTermination = { _ in
             self.listenerRegistration?.remove()

@@ -11,7 +11,8 @@ import Kingfisher
 
 struct ChatMessageCell: View {
     @Environment(UserManager.self) private var userManager
-    @Environment(ChatViewModel.self) private var viewModel
+//    @Environment(ChatViewModel.self) private var viewModel
+    @EnvironmentObject private var viewModel: ChatViewModel
     
     private let message: ChatMessage
     
@@ -41,7 +42,7 @@ struct ChatMessageCell: View {
                                 .font(.caption)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.gray)
-                                .padding(.trailing, 14)
+                                .padding(.trailing, 8)
                         }
                     }
                 } else {
@@ -63,8 +64,7 @@ struct ChatMessageCell: View {
                                 .modifier(ChatBubbleModifier(isFromCurrentUser: false))
                         }
                     }
-                    .padding(.leading, leadingPadding)
-                    .padding(.bottom, bottomPadding)
+                    .padding(.leading, 8)
                     
                     Spacer()
                 }
@@ -102,9 +102,10 @@ private extension ChatMessageCell {
     }
     
     var shouldShowMessageAvatarView: Bool {
-        guard !isMessageFromCurrentUser, let nextMessage else { return true }
-        let timeDelta = nextMessage.timestamp.timeIntervalSince(message.timestamp)
-        return nextMessage.fromId != message.fromId || timeDelta > ChatConstants.messageGroupingTimeThreshold
+//        guard !isMessageFromCurrentUser, let nextMessage else { return true }
+//        let timeDelta = nextMessage.timestamp.timeIntervalSince(message.timestamp)
+//        return nextMessage.fromId != message.fromId || timeDelta > ChatConstants.messageGroupingTimeThreshold
+        false
     }
     
     var shouldShowUsername: Bool {
@@ -140,11 +141,11 @@ private extension ChatMessageCell {
 
 #Preview {
     ChatMessageCell(message: MockData.mockMessages[0])
-        .environment(
-            ChatViewModel(
-                service: ChatService(),
-                thread: nil,
-                user: MockData.currentUser
-            )
-        )
+//        .environment(
+//            ChatViewModel(
+//                service: ChatService(),
+//                thread: nil,
+//                user: MockData.currentUser
+//            )
+//        )
 }

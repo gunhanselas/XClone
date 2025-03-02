@@ -212,6 +212,60 @@ exports.deleteUserData = functions.auth.user().onDelete(async (user) => {
     }
 });
 
+exports.sendPushNotification = onDocumentCreated('/users/{currentUid}/user-notifications/{notificationId}', async (event) => {
+    const currentUid = event.params.currentUid;
+    const snapshot = event.data;
+    const data = snapshot.data();
+    const type = data.type;
+    const senderUid = data.senderID;
+    const db = getFirestore();
+
+    var notificationMessage = ""
+
+    logger.log("Notification sender uid ", senderUid);
+    logger.log("Notification type ", type);
+
+    try {
+        const currentUserSnapshot = await db.collection("users").doc(currentUid).get();
+        const userData = currentUserSnapshot.data();
+        const fcmToken = userData.fcmToken;
+
+        logger.log("FCM Token: ", fcmToken);
+
+        if (type === 0) {
+            notificationMessage = ' liked one of your posts.'
+        } else if (type === 1) {
+            notificationMessage = ' replied to one of your posts.'
+        } else if (type === 2) {
+            notificationMessage = ' reposted one of your posts.'
+        } else if (type === 3) {
+            notificationMessage = ' started following you.'
+        }
+
+        const senderSnapshot = await db.collection("users").doc(senderUid).get();
+        const senderData = senderSnapshot.data();
+        const senderUsername = senderData.username;
+
+        logger.log("Sender username: ", senderUsername);
+
+        const message = {
+            notification: { title: 'Instagram ProPlus', body: senderUsername + notificationMessage }, 
+            token: fcmToken
+        };
+
+        admin.messaging().send(message).then((response) => {
+            logger.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+            logger.log('Error sending message:', error);
+        });
+        
+        return null;
+    } catch (err) {
+        logger.log(err);
+    }
+});
+
 
 async function deleteCollection(db, collectionPath, batchSize) {
     const query = collectionPath.limit(batchSize);

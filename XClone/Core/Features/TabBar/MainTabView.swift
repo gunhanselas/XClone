@@ -13,6 +13,8 @@ struct MainTabView: View {
     @State private var isShowingSnackbar = false
     @State private var selection = 0
     
+    @StateObject private var inboxViewModel = InboxViewModel()
+
     let currentUser: User
     
     var body: some View {
@@ -42,6 +44,8 @@ struct MainTabView: View {
                     Image(systemName: "envelope")
                         .environment(\.symbolVariants, selection == 3 ? .fill : .none)
                 }
+                .badge(inboxViewModel.unreadMessageCount)
+                .environmentObject(inboxViewModel)
                 .tag(3)
             
             CurrentUserProfileView(currentUser: currentUser)

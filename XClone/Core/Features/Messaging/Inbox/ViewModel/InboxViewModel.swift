@@ -12,11 +12,10 @@ import SwiftUI
 class InboxViewModel: ObservableObject {
     @Published var loadingState: ContentLoadingState = .loading
     @Published var threads = [Thread]()
-    @Published var hasUnreadMessages = false
+    @Published var unreadMessageCount = 0
     
     private let service: InboxServiceProtocol
     private let userService: UserServiceProtocol
-    
     private var currentUserID: String?
     private var deletedThreads = [Thread]()
     
@@ -26,6 +25,15 @@ class InboxViewModel: ObservableObject {
         
         Task { await fetchUserDeletedThreads() }
         Task { await fetchThreads() }
+    }
+    
+    func setUnreadMessageCount() {
+        guard let currentUserID else { return }
+        
+        self.unreadMessageCount = threads.count(where: { thread in
+            guard let lastMessage = thread.lastMessage else { return false }
+            return !lastMessage.isMessageFromCurrentUser(currentUid: currentUserID) && lastMessage.status != .read
+        })
     }
     
     func deleteThread(_ thread: Thread) async {
@@ -49,6 +57,7 @@ class InboxViewModel: ObservableObject {
             threads = try await service.fetchThreads()
             try await fetchThreadUserData(currentUserID)
             loadingState = threads.isEmpty ? .empty : .complete
+            setUnreadMessageCount()
             
             await streamThreads()
         } catch {
@@ -107,7 +116,7 @@ private extension InboxViewModel {
         self.threads.insert(copy, at: 0)
         
         guard let lastMessage = threads[threadIndex].lastMessage else { return }
-        self.hasUnreadMessages = lastMessage.status != .read && !lastMessage.isMessageFromCurrentUser(currentUid: currentUserID)
+        setUnreadMessageCount()
     }
     
     func fetchThreadUserData(_ currentUserID: String) async throws {

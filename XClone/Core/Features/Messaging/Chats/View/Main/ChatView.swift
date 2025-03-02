@@ -10,14 +10,14 @@ import SwiftUI
 struct ChatView: View {
     @Environment(UserManager.self) private var userManager
     
-    @State private var viewModel: ChatViewModel
+    @StateObject private var viewModel: ChatViewModel
     @State private var scrollPosition = ScrollPosition()
     
     private let user: User?
     
     init(thread: Thread?, user: User?) {
-        _viewModel = State(
-            initialValue: ChatViewModel(thread: thread, user: user)
+        _viewModel = StateObject(
+            wrappedValue: ChatViewModel(thread: thread, user: user)
         )
         
         self.user = user
@@ -36,22 +36,25 @@ struct ChatView: View {
                     LazyVStack {
                         ForEach(viewModel.messages) { message in
                             ChatMessageCell(message: message)
-                                .environment(viewModel)
+                                .environmentObject(viewModel)
+                                .onAppear { loadPreviousMessagesIfNecessary(message) }
                         }
                     }
-                    .scrollPosition($scrollPosition)
+                    .defaultScrollAnchor(.bottom)
                     .scrollTargetLayout()
                 }
-                .scrollDismissesKeyboard(.immediately)
+                .scrollPosition($scrollPosition)
                 .defaultScrollAnchor(.bottom)
+                .onTapGesture { UIApplication.shared.endEditing() }
             }
         }
         .navigationTitle(user?.username ?? "Chat")
         .safeAreaInset(edge: .bottom) {
             if shouldShowInputView {
                 MessageInputView()
-                    .padding(.vertical, 6)
-                    .environment(viewModel)
+                    .padding(.vertical, 8)
+                    .background(Color(.systemBackground))
+                    .environmentObject(viewModel)
             }
         }
         .task { await viewModel.fetchMessages() }
@@ -64,6 +67,11 @@ struct ChatView: View {
 }
 
 private extension ChatView {
+    func loadPreviousMessagesIfNecessary(_ currentMessage: ChatMessage) {
+        guard currentMessage.id == viewModel.messages.first?.id else { return }
+        Task { await viewModel.fetchPreviousMessages() }
+    }
+    
     var shouldShowInputView: Bool {
         return viewModel.loadingState == .empty || viewModel.loadingState == .complete
     }
