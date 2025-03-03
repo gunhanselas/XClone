@@ -10,6 +10,7 @@ import SwiftUI
 struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
     @ObservedObject private var viewModel: ViewModel
     @State private var showRepliesView = false
+    @State private var isShowingRepostComingSoonAlert = false
     
     private let post: Post
     
@@ -26,7 +27,7 @@ struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
             
             Spacer()
             
-            Button {} label: {
+            Button { isShowingRepostComingSoonAlert.toggle() } label: {
                 PostEngagementStatView(imageName: "repeat", count: post.engagement.repostsCount)
             }
             
@@ -44,6 +45,12 @@ struct PostEngagementView<ViewModel: FeedViewModelProtocol>: View {
             
             PostEngagementStatView(imageName: "chart.bar", count: post.engagement.impressionsCount)
         }
+        .alert("Coming Soon", isPresented: $isShowingRepostComingSoonAlert, actions: {
+            Button("Ok", role: .cancel) {}
+        }, message: {
+            Text("This feature will be available soon in an update!")
+        })
+
         .task { await viewModel.didLike(post) }
         .fullScreenCover(isPresented: $showRepliesView) {
             PostRepliesView(post: post)

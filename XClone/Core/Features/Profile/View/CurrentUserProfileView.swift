@@ -13,6 +13,9 @@ struct CurrentUserProfileView: View {
     var body: some View {
         NavigationStack {
             UserProfileView(user: currentUser)
+                .navigationDestination(for: UserListConfiguration.self) { config in
+                    UserListView(config: config)
+                }
         }
     }
 }

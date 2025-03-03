@@ -58,6 +58,7 @@ struct FollowService: FollowServiceProtocol {
         
         batch.deleteDocument(followingRef)
         batch.deleteDocument(followerRef)
+        
         batch.updateData(["followStats.followingCount": FieldValue.increment(Int64(-1))], forDocument: currentUserStatRef)
         batch.updateData(["followStats.followersCount": FieldValue.increment(Int64(-1))], forDocument: unfollowedUserStatRef)
         

@@ -11,6 +11,9 @@ struct ExploreView: View {
     var body: some View {
         NavigationStack {
             UserListView(config: .explore)
+                .navigationDestination(for: UserListConfiguration.self) { config in
+                    UserListView(config: config)
+                }
         }
     }
 }

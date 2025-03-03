@@ -13,14 +13,14 @@ struct ProfileHeaderView: View {
     @Environment(\.isPresented) private var isPresented
     
     @Environment(BlockingManager.self) private var blockingManager
+    @Environment(ProfileViewModel.self) private var viewModel
     @Environment(SnackbarNotificationManager.self) private var snackbarManager
     @Environment(UserManager.self) private var userManager
-    @Environment(ProfileViewModel.self) private var viewModel
         
-    @State private var showPrimaryButtonLoadingIndicator = false
-    @State private var sheetConfig: ProfileHeaderView.SheetConfiguration?
     @State private var isShowingBlockAlert = false
     @State private var isShowingReportView = false
+    @State private var showPrimaryButtonLoadingIndicator = false
+    @State private var sheetConfig: ProfileHeaderView.SheetConfiguration?
     
     let user: User
     
@@ -109,17 +109,23 @@ struct ProfileHeaderView: View {
                     .padding(.vertical)
                     
                     HStack {
-                        Text("\(user.followStats.followingCount)")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.primaryText)
-                        + Text(" Following")
+                        NavigationLink(value: UserListConfiguration.following(uid: user.id)) {
+                            Text("\(user.followStats.followingCount)")
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.primaryText)
+                            + Text(" Following")
+                        }
+                        .disabled(user.followStats.followingCount == 0)
                         
-                        Text("\(user.followStats.followersCount)")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.primaryText)
-                        + Text(" Followers")
+                        NavigationLink(value: UserListConfiguration.followers(uid: user.id)) {
+                            Text("\(user.followStats.followersCount)")
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.primaryText)
+                            + Text(" Followers")
+                        }
+                        .disabled(user.followStats.followersCount == 0)
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.gray)
                     .font(.footnote)
                 }
                 .offset(y: -(AvatarSize.medium.dimension / 2))
@@ -129,7 +135,10 @@ struct ProfileHeaderView: View {
                 XButton(primaryButtonTitle) {
                     primaryButtonTapped()
                 }
-                .buttonStyle(.standard(rank: primaryButtonRank, size: .compact), isLoading: $showPrimaryButtonLoadingIndicator)
+                .buttonStyle(
+                    .standard( rank: primaryButtonRank, size: .compact),
+                    isLoading: $showPrimaryButtonLoadingIndicator
+                )
             }
             .padding(.horizontal, 8)
         }
