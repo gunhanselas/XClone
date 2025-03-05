@@ -105,15 +105,26 @@ extension AuthManager: ASAuthorizationControllerDelegate {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         Task {
-            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
-            guard let appleAuthUser = try await appleAuthService.signInWithApple(appleIDCredential, nonce: currentNOnce) else { return }
-            
-            if appleAuthUser.isNewUser {
-                print("DEBUG: Is new user")
-                self.appleAuthUser = appleAuthUser
-            } else {
-                print("DEBUG: Is not new user")
-                updateAuthState(.authenticated)
+            do {
+                guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                    print("DEBUG: No credential")
+                    return
+                }
+                
+                guard let appleAuthUser = try await appleAuthService.signInWithApple(appleIDCredential, nonce: currentNOnce) else {
+                    print("DEBUG: Failed to sign in with Apple")
+                    return
+                }
+                
+                if appleAuthUser.isNewUser {
+                    print("DEBUG: Is new user")
+                    self.appleAuthUser = appleAuthUser
+                } else {
+                    print("DEBUG: Is not new user")
+                    updateAuthState(.authenticated)
+                }
+            } catch {
+                print("DEBUG: Error signing in with apple \(error.localizedDescription)")
             }
         }
     }

@@ -9,7 +9,7 @@ import Foundation
 
 protocol BaseUser: Identifiable, Hashable {
     var id: String { get }
-    var email: String { get }
+    var email: String? { get }
     var fullname: String? { get }
     var username: String { get }
 }
@@ -21,7 +21,7 @@ struct User: BaseUser, Codable {
     var profileHeaderImageUrl: String?
     var fullname: String?
     var bio: String?
-    let email: String
+    let email: String?
     var isPrivate: Bool
     var followStats: UserFollowStats
     var createdAt: Date
@@ -40,7 +40,7 @@ struct User: BaseUser, Codable {
         profileHeaderImageUrl: String? = nil,
         fullname: String? = nil,
         bio: String? = nil,
-        email: String,
+        email: String?,
         isPrivate: Bool,
         followStats: UserFollowStats? = nil,
         createdAt: Date,

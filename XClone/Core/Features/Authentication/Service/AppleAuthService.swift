@@ -30,7 +30,6 @@ struct AppleAuthService {
         let firebaseAuthResult = try await Auth.auth().signIn(with: credential)
         let isNewUser = firebaseAuthResult.additionalUserInfo?.isNewUser ?? false
         
-        guard let email = appleIDCredential.email else { return nil }
         var name: String?
         
         if let nameComponents = appleIDCredential.fullName {
@@ -41,7 +40,7 @@ struct AppleAuthService {
         
         return XAppleAuthUser(
             id: firebaseAuthResult.user.uid,
-            email: email,
+            email: appleIDCredential.email ?? firebaseAuthResult.user.email,
             fullName: name,
             isNewUser: isNewUser
         )

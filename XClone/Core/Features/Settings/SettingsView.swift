@@ -22,7 +22,11 @@ struct SettingsView: View {
                 if let currentUser = userManager.currentUser {
                     Section("Account Info") {
                         SettingsRowView(title: "Username", value: currentUser.username)
-                        SettingsRowView(title: "Email", value: currentUser.email)
+                        
+                        if let email = currentUser.email {
+                            SettingsRowView(title: "Email", value: email)
+                        }
+                        
                         SettingsRowView(title: "Joined", value: currentUser.createdAt.monthAndYearString())
                     }
                 }

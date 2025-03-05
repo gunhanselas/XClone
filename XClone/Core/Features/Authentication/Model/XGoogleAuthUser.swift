@@ -14,6 +14,6 @@ struct XGoogleAuthUser: BaseUser {
     let userProfileData: GIDProfileData
     
     var username: String { "" }
-    var email: String { userProfileData.email }
+    var email: String? { userProfileData.email }
     var fullname: String? { userProfileData.name }
 }

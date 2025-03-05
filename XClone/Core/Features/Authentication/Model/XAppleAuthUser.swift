@@ -9,7 +9,7 @@ import Foundation
 
 struct XAppleAuthUser: BaseUser {
     let id: String
-    let email: String
+    let email: String?
     let fullName: String?
     let isNewUser: Bool
     var fullname: String?
