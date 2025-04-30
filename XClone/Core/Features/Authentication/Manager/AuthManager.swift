@@ -117,10 +117,8 @@ extension AuthManager: ASAuthorizationControllerDelegate {
                 }
                 
                 if appleAuthUser.isNewUser {
-                    print("DEBUG: Is new user")
                     self.appleAuthUser = appleAuthUser
                 } else {
-                    print("DEBUG: Is not new user")
                     updateAuthState(.authenticated)
                 }
             } catch {

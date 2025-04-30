@@ -67,3 +67,57 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+
+# Xcode
+## User settings
+xcuserdata/
+DerivedData/
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## App packaging
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+# Project files should be versioned, but not user-specific data
+# *.xcodeproj # Commented out as the xcodeproj should be versioned
+
+# Carthage
+Carthage/Build/
+
+# CocoaPods
+Pods/
+# *.xcworkspace # Commented out as the workspace file should be versioned if used
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection
+injected_container/
+injected_scripts/
+injected_code/
+
+# OS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
